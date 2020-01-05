@@ -1,5 +1,4 @@
 package frc.robot;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.XboxController;
 class OI {
@@ -14,7 +13,7 @@ class OI {
     private boolean visionButton;
 
     //Gunner variables
-    private Joystick gunnerStick = new Joystick(1);
+    private XboxController gunnerStick = new XboxController(1);
     private String gunnerScheme = "Default";
 
     //Special Function variables
