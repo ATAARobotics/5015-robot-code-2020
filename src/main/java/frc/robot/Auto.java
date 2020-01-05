@@ -11,6 +11,8 @@ import frc.robot.Teleop;
  */
 public class Auto {
 
+    String autoSelected;
+
     //TODO Tune PIDs
 
     // Drive values
@@ -135,7 +137,21 @@ public class Auto {
      * periodically.
      */
     public void AutoPeriodic() {
+        switch (autoSelected) {
+            case "Default":
+                
+                //Default Auto Code
+                //TODO add auto code
 
+                break;
+            
+            case "Auto 2":
+
+                //Other auto code
+        
+            default:
+                break;
+        }
     }
 
     /**
@@ -144,5 +160,9 @@ public class Auto {
     public void AutoDisabled() {
         drivePID.disable();
         turnPID.disable();
+    }
+
+    public void setAutoMode(String autoMode) {
+        autoSelected = autoMode;
     }
 }

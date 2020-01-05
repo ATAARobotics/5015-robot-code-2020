@@ -8,6 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.LimeLight;
 
 public class Robot extends TimedRobot {
@@ -16,8 +18,18 @@ public class Robot extends TimedRobot {
     Auto auto = new Auto();
     LimeLight limeLight = new LimeLight();
 
+    //Add variables for the auto selector
+    private static final String defaultAuto = "Default";
+    private static final String auto2 = "Auto 2";
+    private String autoSelected;
+    private final SendableChooser<String> autoPicker = new SendableChooser<>();
+
+    
     @Override
     public void robotInit() {
+        autoPicker.setDefaultOption("Default Auto", defaultAuto);
+        autoPicker.addOption("Auto 2", auto2);
+        SmartDashboard.putData("Auto choices", autoPicker);
         teleop.teleopInit();
         teleop.robotMap.getGyro().initializeNavX();
         auto.AutoInit();
@@ -51,6 +63,10 @@ public class Robot extends TimedRobot {
     
     @Override
     public void autonomousInit() {
+        autoSelected = autoPicker.getSelected();
+        auto.setAutoMode(autoSelected);
+        // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
+        System.out.println("Auto selected: " + autoSelected);
         auto.AutoInit();
         System.out.println("Enabling auto from robot");
     }
