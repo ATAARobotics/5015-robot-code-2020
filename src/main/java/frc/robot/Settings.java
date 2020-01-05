@@ -34,8 +34,6 @@ public class Settings {
     static public double TURN_CURVE = settingsFile.getDoubleProperty("TURN_CURVE", 2.4);
 
     static public double TEST = settingsFile.getDoubleProperty("TEST", 0.5);
-    // Example of ShuffleboardTab setup.
-    private ShuffleboardTab dashboardTab = Shuffleboard.getTab("Dashboard");
 
     //NetworkTableEntry LOW_GEAR_TURN_THRESHOLD_ENTRY;
     //static public double LOW_GEAR_TURN_THRESHOLD;
