@@ -8,11 +8,10 @@ import frc.robot.vision.LimeLight;
 
 public class Teleop {
     // Vairables for robot classes
-    private SWATDrive driveTrain;
-    private Encoders encoders;
-    public RobotMap robotMap;
-    private OI joysticks;
-    private LimeLight limeLight;
+    private SWATDrive driveTrain = null;
+    private Encoders encoders = null;
+    private OI joysticks = null;
+    private LimeLight limeLight = null;
 
     public boolean PIDEnabled = false;
     public boolean aligning = false;
@@ -28,13 +27,12 @@ public class Teleop {
     private Ultrasonics ultrasonics;
     */
 
-    public Teleop() {
+    public Teleop(SWATDrive swatDrive, Encoders encoders, LimeLight limeLight) {
         //Initialize Classes
-        robotMap = new RobotMap();
         joysticks = new OI();
-        driveTrain = new SWATDrive(robotMap);
-        encoders = RobotMap.getEncoder();
-        limeLight = new LimeLight();
+        driveTrain = swatDrive;
+        this.encoders = encoders;
+        this.limeLight = limeLight;
     }
     public void teleopInit() {
         encoders.reset();
@@ -98,7 +96,6 @@ public class Teleop {
                 if(!PIDEnabled){
                     limeLight.setCameraMode(CameraMode.Vision);
                     startAlignPID();
-                    System.out.println("Vision Runs");
                 }
             }
         // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
