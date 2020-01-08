@@ -105,6 +105,10 @@ public class LimeLight {
                 camMode.setDouble(0);
                 ledMode.setDouble(3);
                 break;
+            case Disco:
+                camMode.setDouble(1);
+                ledMode.setDouble(2);
+                break;
         }
     }
         

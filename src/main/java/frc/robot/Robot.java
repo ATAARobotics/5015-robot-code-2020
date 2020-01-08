@@ -28,6 +28,16 @@ public class Robot extends TimedRobot {
     private String autoSelected;
     private final SendableChooser<String> autoPicker = new SendableChooser<>();
 
+    private final String defaultDriverScheme = "Default";
+    private final String reverseTurning = "Reverse Turning";
+    private String driveSchemeSelected;
+    private final SendableChooser<String> driveSchemePicker = new SendableChooser<>();
+
+    private final String defaultGunnerScheme = "Default";
+    private final String funMode = "Fun Mode";
+    private String gunnerSchemeSelected;
+    private final SendableChooser<String> gunnerSchemePicker = new SendableChooser<>();
+
     public Robot() {
         robotMap = new RobotMap();
         encoders = robotMap.getEncoder();
@@ -43,6 +53,14 @@ public class Robot extends TimedRobot {
         autoPicker.setDefaultOption("Default Auto", defaultAuto);
         autoPicker.addOption("Auto 2", auto2);
         SmartDashboard.putData("Auto choices", autoPicker);
+
+        autoPicker.setDefaultOption("Default", defaultDriverScheme);
+        autoPicker.addOption("Reverse Turning", reverseTurning);
+        SmartDashboard.putData("Drive Scheme choices", driveSchemePicker);
+
+        autoPicker.setDefaultOption("Default", defaultGunnerScheme);
+        autoPicker.addOption("Fun Mode", funMode);
+        SmartDashboard.putData("Gunner Scheme choices", gunnerSchemePicker);
         teleop.teleopInit();
         robotMap.getGyro().initializeNavX();
         auto.AutoInit();
@@ -96,6 +114,11 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         auto.AutoDisabled();
+        driveSchemeSelected = driveSchemePicker.getSelected();
+        teleop.setDriveScheme(driveSchemeSelected);
+
+        gunnerSchemeSelected = gunnerSchemePicker.getSelected();
+        teleop.setGunnerScheme(gunnerSchemeSelected);
         teleop.teleopInit();   
     }
     @Override

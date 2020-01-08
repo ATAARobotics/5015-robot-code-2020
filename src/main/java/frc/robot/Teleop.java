@@ -159,5 +159,11 @@ public class Teleop {
             driveTrain.slow();
         }
         else; 
-	}
+    }
+    public void setDriveScheme(String driveScheme){
+        joysticks.setDriveScheme(driveScheme);
+    }
+    public void setGunnerScheme(String gunnerScheme){
+        joysticks.setGunnerScheme(gunnerScheme);
+    }
 }
