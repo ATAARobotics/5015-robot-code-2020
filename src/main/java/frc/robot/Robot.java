@@ -14,16 +14,29 @@ import frc.robot.vision.LimeLight;
 
 public class Robot extends TimedRobot {
     //Create objects to run auto and teleop code
-    public static Teleop teleop = new Teleop();
-    Auto auto = new Auto();
-    LimeLight limeLight = new LimeLight();
+    public Teleop teleop = null;
+    Auto auto = null;
+    Encoders encoders = null;
+    LimeLight limeLight = null;
+    RobotMap robotMap = null;
+    SWATDrive driveTrain = null;
+    Gyro gyro = null;
 
     //Add variables for the auto selector
-    private static final String defaultAuto = "Default";
-    private static final String auto2 = "Auto 2";
+    private final String defaultAuto = "Default";
+    private final String auto2 = "Auto 2";
     private String autoSelected;
     private final SendableChooser<String> autoPicker = new SendableChooser<>();
 
+    public Robot() {
+        robotMap = new RobotMap();
+        encoders = robotMap.getEncoder();
+        driveTrain = new SWATDrive(robotMap);
+        gyro = robotMap.getGyro();
+        limeLight = new LimeLight();
+        teleop = new Teleop(driveTrain, encoders, limeLight);
+        auto = new Auto(driveTrain, encoders, gyro);
+    }
     
     @Override
     public void robotInit() {
@@ -31,7 +44,7 @@ public class Robot extends TimedRobot {
         autoPicker.addOption("Auto 2", auto2);
         SmartDashboard.putData("Auto choices", autoPicker);
         teleop.teleopInit();
-        teleop.robotMap.getGyro().initializeNavX();
+        robotMap.getGyro().initializeNavX();
         auto.AutoInit();
         limeLight.ledOff();
     }
@@ -66,9 +79,7 @@ public class Robot extends TimedRobot {
         autoSelected = autoPicker.getSelected();
         auto.setAutoMode(autoSelected);
         // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-        System.out.println("Auto selected: " + autoSelected);
         auto.AutoInit();
-        System.out.println("Enabling auto from robot");
     }
 
     /**

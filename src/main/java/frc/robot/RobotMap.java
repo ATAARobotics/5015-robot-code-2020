@@ -1,7 +1,8 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANEncoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -12,13 +13,15 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 
 public class RobotMap {
 
-    public WPI_TalonSRX frontLeftMotor = new WPI_TalonSRX(0);
-    private WPI_VictorSPX rearLeftMotor = new WPI_VictorSPX(1);
-    public WPI_TalonSRX frontRightMotor = new WPI_TalonSRX(2);
-    private WPI_VictorSPX rearRightMotor = new WPI_VictorSPX(3);
+    public CANSparkMax frontLeftMotor = new CANSparkMax(0, MotorType.kBrushless);
+    private CANSparkMax rearLeftMotor = new CANSparkMax(1, MotorType.kBrushless);
+    public CANSparkMax frontRightMotor = new CANSparkMax(2, MotorType.kBrushless);
+    private CANSparkMax rearRightMotor = new CANSparkMax(3, MotorType.kBrushless);
     
-    private static WPI_TalonSRX staticFrontLeftMotor = new WPI_TalonSRX(0);
-    private static WPI_TalonSRX staticFrontRightMotor = new WPI_TalonSRX(2);
+    //Encoders
+    private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
+    private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
+
     //Group Drive
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor);
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor);
@@ -33,7 +36,7 @@ public class RobotMap {
     private Gyro NavX = new Gyro();
 
     //Add encoders
-    private static Encoders encoder = new Encoders(staticFrontLeftMotor, staticFrontRightMotor);
+    private Encoders encoder = new Encoders(leftEncoder, rightEncoder);
 
     public RobotMap() {
 
@@ -47,6 +50,7 @@ public class RobotMap {
         rearRightMotor.follow(frontRightMotor);
         NavX.initializeNavX();
     }
+    
     public SpeedControllerGroup getLeftMotors() {
         return leftMotors;
     }
@@ -59,7 +63,7 @@ public class RobotMap {
         return gearShiftSolenoid;
     }
 
-    static public Encoders getEncoder() {
+    public Encoders getEncoder() {
         return encoder;
     }
 

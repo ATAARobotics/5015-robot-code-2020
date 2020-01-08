@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.command.PIDSubsystem;
 //import frc.robot.pathweaver.PathFinder;
-import frc.robot.Teleop;
 
 /**
  * A file dedicated to all auto related code
@@ -29,8 +28,6 @@ public class Auto {
 
     double turn = 0;
 
-    private Teleop teleop = Robot.teleop;
-    private RobotMap robotMap = teleop.robotMap;
     PIDSubsystem drivePID;
     PIDSubsystem turnPID;
 
@@ -41,9 +38,15 @@ public class Auto {
     // private final double LEFT_SPEED_CONSTANT = -0.851;
     // private final double RIGHT_SPEED_CONSTANT = -1;
 
-    Encoders encoders = RobotMap.getEncoder();
-    SWATDrive swatDrive = new SWATDrive(robotMap);
-    Gyro gyro = robotMap.getGyro();
+    Encoders encoders = null;
+    SWATDrive swatDrive = null; 
+    Gyro gyro = null;
+
+    public Auto(SWATDrive swatDrive, Encoders encoders, Gyro gyro) {
+        this.gyro = gyro;
+        this.encoders = encoders;
+        this.swatDrive = swatDrive;
+    }
 
     /**
      * Function that contains tasks designed to be ran at initalization
@@ -64,8 +67,6 @@ public class Auto {
             @Override
             protected void usePIDOutput(double output) {
                 speed = output;
-                System.out.println("Speed PID: " + output);
-                System.out.println("Encoder: " + encoders.getLeftDistance());
             }
 
             @Override

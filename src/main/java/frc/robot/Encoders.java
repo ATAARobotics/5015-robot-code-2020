@@ -1,6 +1,6 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANEncoder;
 
 import java.lang.Math;
 
@@ -13,20 +13,20 @@ import java.lang.Math;
 public class Encoders {
     
     //Creates left and right encoder objects
-    private WPI_TalonSRX leftMotor;
-    private WPI_TalonSRX rightMotor;
+    private CANEncoder leftEncoder;
+    private CANEncoder rightEncoder;
 
     private double leftTicksPerInch;
     private double rightTicksPerInch;
     private double wheelCircumference = 6 * Math.PI;
 
-    public Encoders(WPI_TalonSRX leftMotor, WPI_TalonSRX rightMotor) {
+    public Encoders(CANEncoder leftEncoder, CANEncoder rightEncoder) {
 
-        this.leftMotor = leftMotor;
-        this.rightMotor = rightMotor;
+        this.leftEncoder = leftEncoder;
+        this.rightEncoder = rightEncoder;
 
-        this.leftMotor.setSelectedSensorPosition(0);
-        this.rightMotor.setSelectedSensorPosition(0);
+        this.leftEncoder.setPosition(0);
+        this.rightEncoder.setPosition(0);
 
         //TODO Calculate ticks per inch
 
@@ -34,21 +34,21 @@ public class Encoders {
         rightTicksPerInch = 0.0 / wheelCircumference;
     }
     public double getRight() {
-        return rightMotor.getSelectedSensorPosition();
+        return rightEncoder.getPosition();
     }
     public double getLeft() {
-        return leftMotor.getSelectedSensorPosition() * -1;
+        return leftEncoder.getPosition() * -1;
     }
     public double getLeftDistance() {
-        return (leftMotor.getSelectedSensorPosition() * -1) / leftTicksPerInch;     
+        return (leftEncoder.getPosition() * -1) / leftTicksPerInch;     
     }
 
     public double getRightDistance() {
-        return rightMotor.getSelectedSensorPosition() / rightTicksPerInch;
+        return rightEncoder.getPosition() / rightTicksPerInch;
     }
 
     public void reset() {
-        leftMotor.setSelectedSensorPosition(0);
-        rightMotor.setSelectedSensorPosition(0);
+        leftEncoder.setPosition(0);
+        rightEncoder.setPosition(0);
     }
 }
