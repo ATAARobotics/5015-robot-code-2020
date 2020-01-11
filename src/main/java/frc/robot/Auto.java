@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.command.PIDSubsystem;
 
 /**
  * A file dedicated to all auto related code
- * 
+ *
  * @author Alexander Greco and Jacob Guglielmin
  */
 public class Auto {
@@ -39,7 +39,7 @@ public class Auto {
     // private final double RIGHT_SPEED_CONSTANT = -1;
 
     Encoders encoders = null;
-    SWATDrive swatDrive = null; 
+    SWATDrive swatDrive = null;
     Gyro gyro = null;
 
     public Auto(SWATDrive swatDrive, Encoders encoders, Gyro gyro) {
@@ -140,16 +140,16 @@ public class Auto {
     public void AutoPeriodic() {
         switch (autoSelected) {
             case "Default":
-                
+
                 //Default Auto Code
                 //TODO add auto code
 
                 break;
-            
+
             case "Auto 2":
 
                 //Other auto code
-        
+
             default:
                 break;
         }

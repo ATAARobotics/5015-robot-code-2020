@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
 
 /**
  * A file in charge of managing the drivetrain and all drive functions of the robot
- * 
+ *
  */
 public class SWATDrive {
 
@@ -17,7 +17,7 @@ public class SWATDrive {
     private double maxTurnSpeed;
     private double maxStraightSpeed;
     private RobotMap robotMap;
-    
+
     public SWATDrive(RobotMap roboMap) {
 
         robotMap = roboMap;
@@ -33,7 +33,7 @@ public class SWATDrive {
             robotMap.getGearShift().set(DoubleSolenoid.Value.kForward);
         }
     }
-    public void gearShiftSafe() { 
+    public void gearShiftSafe() {
         robotMap.getGearShift().set(DoubleSolenoid.Value.kReverse);
     }
     public void slow() {
@@ -65,4 +65,3 @@ public class SWATDrive {
         robotMap.getDriveTrain().tankDrive(lSpeed, rSpeed);
     }
 }
-  
