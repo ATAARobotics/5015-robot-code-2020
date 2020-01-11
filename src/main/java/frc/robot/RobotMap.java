@@ -104,7 +104,8 @@ public class RobotMap {
 
     public DigitalInput getBallDetector() {
         return ballDetector;
-
+    }
+    
     public ColorSensorV3 getColorSensor() {
         return colorSensor;
 

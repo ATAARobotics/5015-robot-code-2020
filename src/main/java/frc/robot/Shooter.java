@@ -22,6 +22,8 @@ public class Shooter {
 
     private double magazineTicksPerInch;
 
+    private double ballsStored = 3;
+
     private double beltCircumference = 0.0 * Math.PI;
 
     public Shooter(CANEncoder magazineEncoder, CANSparkMax magazineMotor, CANSparkMax shooter, DigitalInput ballDetector) {
