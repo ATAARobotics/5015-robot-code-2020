@@ -20,6 +20,7 @@ public class Robot extends TimedRobot {
     ColorSensor colorSensor = null;
     LimeLight limeLight = null;
     RobotMap robotMap = null;
+    Shooter shooter = null;
     SWATDrive driveTrain = null;
     Gyro gyro = null;
 
@@ -39,14 +40,17 @@ public class Robot extends TimedRobot {
     private String gunnerSchemeSelected;
     private final SendableChooser<String> gunnerSchemePicker = new SendableChooser<>();
 
+    private Double ballsStored = 3.0;
+
     public Robot() {
         robotMap = new RobotMap();
-        encoders = robotMap.getEncoder();
+        encoders = robotMap.getDriveEncoder();
         driveTrain = new SWATDrive(robotMap);
         gyro = robotMap.getGyro();
         colorSensor = new ColorSensor(robotMap.getColorSensor());
         limeLight = new LimeLight();
-        teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight);
+        shooter = new Shooter(robotMap.getBallMagazineEncoder(), robotMap.getBallMagazineMotor(), robotMap.getShooter(), robotMap.getBallDetector());
+        teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight, shooter);
         auto = new Auto(driveTrain, encoders, gyro);
     }
 
@@ -63,6 +67,9 @@ public class Robot extends TimedRobot {
         autoPicker.setDefaultOption("Default", defaultGunnerScheme);
         autoPicker.addOption("Fun Mode", funMode);
         SmartDashboard.putData("Gunner Scheme choices", gunnerSchemePicker);
+
+        SmartDashboard.putNumber("Balls Stored", 3.0);
+
         teleop.teleopInit();
         robotMap.getGyro().initializeNavX();
         auto.AutoInit();
@@ -92,6 +99,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
+        ballsStored = SmartDashboard.getNumber("Balls Stored", 3.0);
+        shooter.setBallsStored(ballsStored);
     }
 
     @Override
@@ -116,6 +125,7 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         auto.AutoDisabled();
+
         driveSchemeSelected = driveSchemePicker.getSelected();
         teleop.setDriveScheme(driveSchemeSelected);
 

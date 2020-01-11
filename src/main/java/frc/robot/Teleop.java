@@ -12,6 +12,7 @@ public class Teleop {
     private Encoders encoders = null;
     private OI joysticks = null;
     private LimeLight limeLight = null;
+    private Shooter shooter = null;
     private ColorSensor colorSensor = null;
 
     public boolean PIDEnabled = false;
@@ -25,14 +26,16 @@ public class Teleop {
     private double D = 0.05;
     private double tolerance = 0.2;
 
-    public Teleop(SWATDrive driveTrain, Encoders encoders, ColorSensor colorSensor, LimeLight limeLight) {
+    public Teleop(SWATDrive driveTrain, Encoders encoders, ColorSensor colorSensor, LimeLight limeLight, Shooter shooter) {
         //Initialize Classes
         joysticks = new OI();
         this.driveTrain = driveTrain;
         this.encoders = encoders;
         this.limeLight = limeLight;
+        this.shooter = shooter;
         this.colorSensor = colorSensor;
     }
+  
     public void teleopInit() {
         encoders.reset();
 

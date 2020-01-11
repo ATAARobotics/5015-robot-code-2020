@@ -7,6 +7,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 /**
@@ -40,11 +41,17 @@ public class RobotMap {
     //Add pneumatics
     private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
 
+    //Add shooter and conveyor belt
+    private CANSparkMax shooter = new CANSparkMax(6, MotorType.kBrushless);
+    private CANSparkMax conveyorBeltMotor = new CANSparkMax(5, MotorType.kBrushless);
+    private CANEncoder conveyorEncoder = new CANEncoder(conveyorBeltMotor);
+    private DigitalInput ballDetector = new DigitalInput(0);
+
     //Add gyro
     private Gyro NavX = new Gyro();
 
     //Add encoders
-    private Encoders encoder = new Encoders(leftEncoder, rightEncoder);
+    private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder);
 
     public RobotMap() {
 
@@ -71,8 +78,8 @@ public class RobotMap {
         return gearShiftSolenoid;
     }
 
-    public Encoders getEncoder() {
-        return encoder;
+    public Encoders getDriveEncoder() {
+        return driveEncoder;
     }
 
     public DifferentialDrive getDriveTrain() {
@@ -83,7 +90,23 @@ public class RobotMap {
         return NavX;
     }
 
+    public CANEncoder getBallMagazineEncoder() {
+        return conveyorEncoder;
+    }
+
+    public CANSparkMax getBallMagazineMotor() {
+        return conveyorBeltMotor;
+    }
+
+    public CANSparkMax getShooter() {
+        return shooter;
+    }
+
+    public DigitalInput getBallDetector() {
+        return ballDetector;
+
     public ColorSensorV3 getColorSensor() {
         return colorSensor;
+
     }
 }
