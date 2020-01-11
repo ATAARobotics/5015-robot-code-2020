@@ -6,12 +6,12 @@ import java.lang.Math;
 
 /**
  * Encoder code
- * 
+ *
  * @author Jacob Guglielmin
  */
 
 public class Encoders {
-    
+
     //Creates left and right encoder objects
     private CANEncoder leftEncoder;
     private CANEncoder rightEncoder;
@@ -40,7 +40,7 @@ public class Encoders {
         return leftEncoder.getPosition() * -1;
     }
     public double getLeftDistance() {
-        return (leftEncoder.getPosition() * -1) / leftTicksPerInch;     
+        return (leftEncoder.getPosition() * -1) / leftTicksPerInch;
     }
 
     public double getRightDistance() {

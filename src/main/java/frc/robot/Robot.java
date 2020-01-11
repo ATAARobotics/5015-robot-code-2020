@@ -17,6 +17,7 @@ public class Robot extends TimedRobot {
     public Teleop teleop = null;
     Auto auto = null;
     Encoders encoders = null;
+    ColorSensor colorSensor = null;
     LimeLight limeLight = null;
     RobotMap robotMap = null;
     Shooter shooter = null;
@@ -46,12 +47,13 @@ public class Robot extends TimedRobot {
         encoders = robotMap.getDriveEncoder();
         driveTrain = new SWATDrive(robotMap);
         gyro = robotMap.getGyro();
+        colorSensor = new ColorSensor(robotMap.getColorSensor());
         limeLight = new LimeLight();
         shooter = new Shooter(robotMap.getBallMagazineEncoder(), robotMap.getBallMagazineMotor(), robotMap.getShooter(), robotMap.getBallDetector());
         teleop = new Teleop(driveTrain, encoders, limeLight, shooter);
         auto = new Auto(driveTrain, encoders, gyro);
     }
-    
+
     @Override
     public void robotInit() {
         autoPicker.setDefaultOption("Default Auto", defaultAuto);
@@ -81,7 +83,7 @@ public class Robot extends TimedRobot {
     *
     * <p>This runs after the mode specific periodic functions, but before
     * LiveWindow and SmartDashboard integrated updating.
-    * 
+    *
     */
     @Override
     public void robotPeriodic() {
@@ -100,7 +102,7 @@ public class Robot extends TimedRobot {
         ballsStored = SmartDashboard.getNumber("Balls Stored", 3.0);
         shooter.setBallsStored(ballsStored);
     }
-    
+
     @Override
     public void autonomousInit() {
         autoSelected = autoPicker.getSelected();
@@ -129,13 +131,13 @@ public class Robot extends TimedRobot {
 
         gunnerSchemeSelected = gunnerSchemePicker.getSelected();
         teleop.setGunnerScheme(gunnerSchemeSelected);
-        teleop.teleopInit();   
+        teleop.teleopInit();
     }
     @Override
     public void teleopPeriodic() {
         teleop.TeleopPeriodic();
     }
-    
+
     public void testPeriodic() {
         teleop.TestPeriodic();
     }

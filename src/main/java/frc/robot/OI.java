@@ -20,7 +20,7 @@ class OI {
     //Special Function variables
     boolean leftTriggerPressed = false;
     boolean rightTriggerPressed = false;
-    
+
     public OI() {
 
     }
@@ -37,24 +37,24 @@ class OI {
             case "Reverse Turning":
                 XSpeed = -driveStick.getY(Hand.kLeft);
                 ZRotation = driveStick.getX(Hand.kRight);
-                break;    
+                break;
             default:
                 XSpeed = driveStick.getY(Hand.kLeft);
                 ZRotation = -driveStick.getX(Hand.kRight);
                 break;
         }
-        
+
         //TODO Add controls for gunner
 
         //Switch statement to detirmine controls for the gunner
-        
+
         switch (gunnerScheme) {
             case "Fun Mode":
                 discoToggle = gunnerStick.getStartButtonReleased();
                 break;
             default:
 
-                break;   
+                break;
         }
     }
 

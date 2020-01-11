@@ -13,6 +13,7 @@ public class Teleop {
     private OI joysticks = null;
     private LimeLight limeLight = null;
     private Shooter shooter = null;
+    private ColorSensor colorSensor = null;
 
     public boolean PIDEnabled = false;
     public boolean aligning = false;
@@ -25,18 +26,16 @@ public class Teleop {
     private double D = 0.05;
     private double tolerance = 0.2;
 
-    /*UltrasonicCode
-    private Ultrasonics ultrasonics;
-    */
-
-    public Teleop(SWATDrive swatDrive, Encoders encoders, LimeLight limeLight, Shooter shooter) {
+    public Teleop(SWATDrive driveTrain, Encoders encoders, ColorSensor colorSensor, LimeLight limeLight, Shooter shooter) {
         //Initialize Classes
         joysticks = new OI();
-        driveTrain = swatDrive;
+        this.driveTrain = driveTrain;
         this.encoders = encoders;
         this.limeLight = limeLight;
         this.shooter = shooter;
+        this.colorSensor = colorSensor;
     }
+  
     public void teleopInit() {
         encoders.reset();
 
@@ -51,7 +50,7 @@ public class Teleop {
             @Override
             protected void initDefaultCommand() { }
             };
-        
+
         visionAlignPID.setAbsoluteTolerance(tolerance);
         visionAlignPID.getPIDController().setContinuous(false);
         visionAlignPID.setOutputRange(-1,1);
@@ -73,11 +72,14 @@ public class Teleop {
                 onTargetCounter = 0;
             }
         }
-        
+
         SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
         SmartDashboard.putNumber("EncoderRight", encoders.getRight());
         SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
         SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
+
+        String colorGuess = colorSensor.findColor();
+        SmartDashboard.putString("Color", colorGuess);
 
         // Vision Alignment
         if(visionActive) {
@@ -126,10 +128,9 @@ public class Teleop {
             if (joysticks.getSlow()) {
                 driveTrain.slow();
             }
-            else; 
-        }    
+        }
     }
-        
+
 	public void drive(double speedA, double speedB, boolean arcade) {
         if(arcade) {
             driveTrain.arcadeDrive(speedA, speedB);
@@ -151,7 +152,7 @@ public class Teleop {
     public void stopAlignPID() {
         visionAlignPID.disable();
         PIDEnabled = false;
-        
+
     }
     // Update tolerance for Vision PID from shuffleboard
     public void updateFromShuffleData(){
@@ -164,12 +165,12 @@ public class Teleop {
         //safe mode
         driveTrain.gearShiftSafe();
         joysticks.checkInputs();
-        
+
         driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
         if (joysticks.getSlow()) {
             driveTrain.slow();
         }
-        else; 
+        else;
     }
     public void setDriveScheme(String driveScheme){
         joysticks.setDriveScheme(driveScheme);
