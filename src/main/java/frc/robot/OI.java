@@ -15,6 +15,7 @@ class OI {
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
     private String gunnerScheme = "Default";
+    private boolean discoToggle;
 
     //Special Function variables
     boolean leftTriggerPressed = false;
@@ -48,7 +49,9 @@ class OI {
         //Switch statement to detirmine controls for the gunner
         
         switch (gunnerScheme) {
-            
+            case "Fun Mode":
+                discoToggle = gunnerStick.getStartButtonReleased();
+                break;
             default:
 
                 break;   
@@ -73,5 +76,14 @@ class OI {
 
     public boolean getVisionButton() {
         return visionButton;
+    }
+    public boolean getDiscoButton(){
+        return discoToggle;
+    }
+    public void setDriveScheme(String driveScheme){
+        driverScheme = driveScheme;
+    }
+    public void setGunnerScheme(String gunnerScheme){
+        this.gunnerScheme = gunnerScheme;
     }
 }
