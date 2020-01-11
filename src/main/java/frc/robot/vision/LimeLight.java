@@ -27,7 +27,7 @@ public class LimeLight {
         ta = table.getEntry("ta");
         ledMode =  table.getEntry("ledMode");
         camMode = table.getEntry("camMode");
-        
+
     }
 
     /**
@@ -111,5 +111,5 @@ public class LimeLight {
                 break;
         }
     }
-        
+
 }

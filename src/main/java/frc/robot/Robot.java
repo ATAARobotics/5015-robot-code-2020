@@ -17,6 +17,7 @@ public class Robot extends TimedRobot {
     public Teleop teleop = null;
     Auto auto = null;
     Encoders encoders = null;
+    ColorSensor colorSensor = null;
     LimeLight limeLight = null;
     RobotMap robotMap = null;
     SWATDrive driveTrain = null;
@@ -43,11 +44,12 @@ public class Robot extends TimedRobot {
         encoders = robotMap.getEncoder();
         driveTrain = new SWATDrive(robotMap);
         gyro = robotMap.getGyro();
+        colorSensor = new ColorSensor(robotMap.getColorSensor());
         limeLight = new LimeLight();
-        teleop = new Teleop(driveTrain, encoders, limeLight);
+        teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight);
         auto = new Auto(driveTrain, encoders, gyro);
     }
-    
+
     @Override
     public void robotInit() {
         autoPicker.setDefaultOption("Default Auto", defaultAuto);
@@ -74,7 +76,7 @@ public class Robot extends TimedRobot {
     *
     * <p>This runs after the mode specific periodic functions, but before
     * LiveWindow and SmartDashboard integrated updating.
-    * 
+    *
     */
     @Override
     public void robotPeriodic() {
@@ -91,7 +93,7 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
     }
-    
+
     @Override
     public void autonomousInit() {
         autoSelected = autoPicker.getSelected();
@@ -119,13 +121,13 @@ public class Robot extends TimedRobot {
 
         gunnerSchemeSelected = gunnerSchemePicker.getSelected();
         teleop.setGunnerScheme(gunnerSchemeSelected);
-        teleop.teleopInit();   
+        teleop.teleopInit();
     }
     @Override
     public void teleopPeriodic() {
         teleop.TeleopPeriodic();
     }
-    
+
     public void testPeriodic() {
         teleop.TestPeriodic();
     }
