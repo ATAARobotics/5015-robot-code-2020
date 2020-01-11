@@ -15,6 +15,7 @@ public class Teleop {
 
     public boolean PIDEnabled = false;
     public boolean aligning = false;
+    private boolean discoOn = false;
     private int onTargetCounter = 0;
     private PIDSubsystem visionAlignPID;
     private boolean visionActive = false;
@@ -109,6 +110,14 @@ public class Teleop {
             //This is where the robot is driven (disabled during vision)
             driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
 
+            if(joysticks.getDiscoButton()){
+                discoOn = !discoOn;
+                if(discoOn){
+                    limeLight.setCameraMode(CameraMode.Disco);
+                }else{
+                    limeLight.setCameraMode(CameraMode.Drive);
+                }
+            }
             if(joysticks.getGearShift()) {
                 driveTrain.gearShift();
             }

@@ -77,6 +77,9 @@ class OI {
     public boolean getVisionButton() {
         return visionButton;
     }
+    public boolean getDiscoButton(){
+        return discoToggle;
+    }
     public void setDriveScheme(String driveScheme){
         driverScheme = driveScheme;
     }
