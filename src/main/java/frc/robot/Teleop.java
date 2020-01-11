@@ -12,6 +12,7 @@ public class Teleop {
     private Encoders encoders = null;
     private OI joysticks = null;
     private LimeLight limeLight = null;
+    private Shooter shooter = null;
 
     public boolean PIDEnabled = false;
     public boolean aligning = false;
@@ -28,12 +29,13 @@ public class Teleop {
     private Ultrasonics ultrasonics;
     */
 
-    public Teleop(SWATDrive swatDrive, Encoders encoders, LimeLight limeLight) {
+    public Teleop(SWATDrive swatDrive, Encoders encoders, LimeLight limeLight, Shooter shooter) {
         //Initialize Classes
         joysticks = new OI();
         driveTrain = swatDrive;
         this.encoders = encoders;
         this.limeLight = limeLight;
+        this.shooter = shooter;
     }
     public void teleopInit() {
         encoders.reset();
