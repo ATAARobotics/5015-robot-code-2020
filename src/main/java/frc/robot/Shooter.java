@@ -43,12 +43,12 @@ public class Shooter {
     private Timer shooterTimer = new Timer();
 
     private double ballsStored = 3;
-    private double shooterTimeToStart = 0.0;
+    private double shooterStartTime = 0.0;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
 
-    public Shooter(CANSparkMax shooter, DigitalInput intakeDetector, DigitalInput shootDetector) {
-        this.shooter = shooter;
+    public Shooter(CANSparkMax shooterMotor, DigitalInput intakeDetector, DigitalInput shootDetector) {
+        this.shooterMotor = shooterMotor;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
     }
@@ -65,9 +65,9 @@ public class Shooter {
 
     private void setShooter(boolean running) {
         if (running) {
-            shooter.set(shooterSpeed);
+            shooterMotor.set(shooterSpeed);
         } else {
-            shooter.set(0);
+            shooterMotor.set(0);
         }
     }
 
@@ -104,12 +104,12 @@ public class Shooter {
                     shooterTimer.reset();
                     shooterTimer.start();
                     setShooter(true);
-                    shooterTimeToStart = shooterSpeedup;
+                    shooterStartTime = shooterSpeedup;
                     shootCase = ShootCase.COOLDOWN;
 
                     break;
                 case COOLDOWN: // Shooter speeding up
-                    if (shooterTimer.get() > shooterCooldown) {
+                    if (shooterTimer.get() > shooterStartTime) {
                         setIntake(true);
                         shootCase = ShootCase.RUNNING_BEFORE_BALL;
                     }
@@ -124,6 +124,7 @@ public class Shooter {
                 case RUNNING_DURING_BALL: // Shooter running, while sensor is seeing a ball
                     if (!shootDetector.get()) {
                         setIntake(false);
+                        ballsStored--;
                         shooterTimeToStart = shooterCooldown;
                         shootCase = ShootCase.COOLDOWN;
                     }
@@ -138,6 +139,8 @@ public class Shooter {
 
             setIntake(false);
             setShooter(false);
+            shooterTimer.stop();
+
             shootCase = ShootCase.INITIAL;
         }
     }
