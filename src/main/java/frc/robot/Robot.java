@@ -40,8 +40,6 @@ public class Robot extends TimedRobot {
     private String gunnerSchemeSelected;
     private final SendableChooser<String> gunnerSchemePicker = new SendableChooser<>();
 
-    private Double ballsStored = 3.0;
-
     public Robot() {
         robotMap = new RobotMap();
         encoders = robotMap.getDriveEncoder();
@@ -49,7 +47,7 @@ public class Robot extends TimedRobot {
         gyro = robotMap.getGyro();
         colorSensor = new ColorSensor(robotMap.getColorSensor());
         limeLight = new LimeLight();
-        shooter = new Shooter(robotMap.getBallMagazineEncoder(), robotMap.getBallMagazineMotor(), robotMap.getShooter(), robotMap.getBallDetector());
+        shooter = new Shooter(robotMap.getShooter(), robotMap.getIntakeDetector(), robotMap.getShooterDetector());
         teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight, shooter);
         auto = new Auto(driveTrain, encoders, gyro);
     }
@@ -99,8 +97,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        ballsStored = SmartDashboard.getNumber("Balls Stored", 3.0);
-        shooter.setBallsStored(ballsStored);
+        shooter.setBallsStored((int)SmartDashboard.getNumber("Balls Stored", 3));
     }
 
     @Override

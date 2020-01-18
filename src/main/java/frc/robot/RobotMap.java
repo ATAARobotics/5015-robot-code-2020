@@ -43,9 +43,8 @@ public class RobotMap {
 
     //Add shooter and conveyor belt
     private CANSparkMax shooter = new CANSparkMax(6, MotorType.kBrushless);
-    private CANSparkMax conveyorBeltMotor = new CANSparkMax(5, MotorType.kBrushless);
-    private CANEncoder conveyorEncoder = new CANEncoder(conveyorBeltMotor);
-    private DigitalInput ballDetector = new DigitalInput(0);
+    private DigitalInput intakeDetector = new DigitalInput(0);
+    private DigitalInput shooterDetector = new DigitalInput(1);
 
     //Add gyro
     private Gyro NavX = new Gyro();
@@ -55,7 +54,7 @@ public class RobotMap {
 
     public RobotMap() {
 
-        //TODO Uncomment/add camera code
+        // TODO: Uncomment/add camera code
         //UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
         //Shuffleboard.getTab("Camera").add(camera);
         //camera.setFPS(30);
@@ -90,22 +89,18 @@ public class RobotMap {
         return NavX;
     }
 
-    public CANEncoder getBallMagazineEncoder() {
-        return conveyorEncoder;
-    }
-
-    public CANSparkMax getBallMagazineMotor() {
-        return conveyorBeltMotor;
-    }
-
     public CANSparkMax getShooter() {
         return shooter;
     }
 
-    public DigitalInput getBallDetector() {
-        return ballDetector;
+    public DigitalInput getIntakeDetector() {
+        return intakeDetector;
     }
-    
+
+    public DigitalInput getShooterDetector() {
+        return shooterDetector;
+    }
+
     public ColorSensorV3 getColorSensor() {
         return colorSensor;
 
