@@ -36,7 +36,7 @@ public class Shooter {
     private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
     private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
 
-    private CANSparkMax shooter = null;
+    private CANSparkMax shooterMotor = null;
     private DigitalInput intakeDetector = null;
     private DigitalInput shootDetector = null;
 
@@ -75,10 +75,10 @@ public class Shooter {
         this.ballsStored = ballsStored;
     }
 
-    public void intake() {
+    public void intake(boolean override) {
         switch (intakeCase) {
             case WAITING:
-                if (ballsStored < 5 && intakeDetector.get()) {
+                if ((ballsStored < 5 || override) && intakeDetector.get()) {
                     setIntake(true);
                     intakeCase = IntakeCase.RUNNING;
                 }
@@ -125,7 +125,7 @@ public class Shooter {
                     if (!shootDetector.get()) {
                         setIntake(false);
                         ballsStored--;
-                        shooterTimeToStart = shooterCooldown;
+                        shooterStartTime = shooterCooldown;
                         shootCase = ShootCase.COOLDOWN;
                     }
 
