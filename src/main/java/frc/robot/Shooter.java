@@ -21,8 +21,10 @@ enum IntakeCase {
 }
 
 enum ShootCase {
-    RESETING,
-    RUNNING,
+    INITIAL,
+    COOLDOWN,
+    RUNNING_BEFORE_BALL,
+    RUNNING_DURING_BALL,
 }
 
 public class Shooter {
@@ -31,30 +33,41 @@ public class Shooter {
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
     private final double shooterSpeed = 0.6;
+    private final double shooterSpeedup = 0.2;
+    private final double shooterCooldown = 0.1;
 
     private CANSparkMax shooter = null;
     private DigitalInput intakeDetector = null;
-    private DigitalInput shooterDetector = null;
+    private DigitalInput shootDetector = null;
 
-    private Timer shooterCooldown = new Timer();
+    private Timer shooterTimer = new Timer();
 
     private double ballsStored = 3;
+    private double shooterTimeToStart = 0.0;
     private IntakeCase intakeCase = IntakeCase.WAITING;
-    private ShootCase shootCase = ShootCase.RESETING;
+    private ShootCase shootCase = ShootCase.INITIAL;
 
-    public Shooter(CANSparkMax shooter, DigitalInput intakeDetector, DigitalInput shooterDetector) {
+    public Shooter(CANSparkMax shooter, DigitalInput intakeDetector, DigitalInput shootDetector) {
         this.shooter = shooter;
         this.intakeDetector = intakeDetector;
-        this.shooterDetector = shooterDetector;
+        this.shootDetector = shootDetector;
     }
 
-    private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor
+    private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
         if (running) {
             // intakeMotor1.set(intakeSpeed)
             // intakeMotor2.set(intakeSpeed)
         } else {
             // intakeMotor1.set(0.0)
             // intakeMotor2.set(0.0)
+        }
+    }
+
+    private void setShooter(boolean running) {
+        if (running) {
+            shooter.set(shooterSpeed);
+        } else {
+            shooter.set(0);
         }
     }
 
@@ -85,9 +98,47 @@ public class Shooter {
     }
 
     public void shoot(boolean active) {
-        switch (shootCase) {
-            default:
-                DriverStation.reportError(String.format("Invalid Shoot Case: %d", shootCase), false); // TODO: Pretty print the enum value
+        if (active) {
+            switch (shootCase) {
+                case INITIAL: // Shooter was not active last tick
+                    shooterTimer.reset();
+                    shooterTimer.start();
+                    setShooter(true);
+                    shooterTimeToStart = shooterSpeedup;
+                    shootCase = ShootCase.COOLDOWN;
+
+                    break;
+                case COOLDOWN: // Shooter speeding up
+                    if (shooterTimer.get() > shooterCooldown) {
+                        setIntake(true);
+                        shootCase = ShootCase.RUNNING_BEFORE_BALL;
+                    }
+
+                    break;
+                case RUNNING_BEFORE_BALL: // Shooter running, before sensor sees a ball
+                    if (shootDetector.get()) {
+                        shootCase = ShootCase.RUNNING_DURING_BALL;
+                    }
+
+                    break;
+                case RUNNING_DURING_BALL: // Shooter running, while sensor is seeing a ball
+                    if (!shootDetector.get()) {
+                        setIntake(false);
+                        shooterTimeToStart = shooterCooldown;
+                        shootCase = ShootCase.COOLDOWN;
+                    }
+
+                    break;
+                default:
+                    DriverStation.reportError(String.format("Invalid Shoot Case: %d", shootCase), false); // TODO: Pretty print the enum value
+            }
+        } else if (shootCase == ShootCase.COOLDOWN ||
+            shootCase == ShootCase.RUNNING_BEFORE_BALL ||
+            shootCase == ShootCase.RUNNING_DURING_BALL) { // User released the button
+
+            setIntake(false);
+            setShooter(false);
+            shootCase = ShootCase.INITIAL;
         }
     }
 
