@@ -32,35 +32,30 @@ public class Shooter {
     private CANSparkMax shooter = null;
     private DigitalInput ballDetector = null;
 
-    private double magazineTicksPerInch;
+    private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
+    private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
+    private final double intakeSpeed = 1.0;
+    private final double shooterSpeed = 0.6;
 
     private double ballsStored = 3;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.RESETING;
 
-    private double beltCircumference = 0.0 * Math.PI;
-
     public Shooter(CANEncoder magazineEncoder, CANSparkMax magazineMotor, CANSparkMax shooter, DigitalInput ballDetector) {
-
         this.magazineEncoder = magazineEncoder;
         this.magazineMotor = magazineMotor;
         this.shooter = shooter;
         this.ballDetector = ballDetector;
 
         this.magazineEncoder.setPosition(0);
-
-        //TODO Calculate ticks per inch
-
-        magazineTicksPerInch = 0.0 / beltCircumference;
-
     }
 
     public double getMagazine() {
         return magazineEncoder.getPosition();
     }
 
-    public double getMagazineDistance() {
-        return (magazineEncoder.getPosition()) / magazineTicksPerInch;
+    public boolean magazineTestNewBall() {
+        return magazineEncoder.getPosition() / magazineTicksPerBall > 1.0;
     }
 
     public void resetEncoder() {
@@ -75,49 +70,45 @@ public class Shooter {
         switch (intakeCase) {
             case WAITING:
                 if (ballsStored < 5 && ballDetector.get()) {
-                    resetEncoder();
                     magazineMotor.set(1.0);
+                    resetEncoder();
                     intakeCase = IntakeCase.RUNNING;
                 }
 
                 break;
             case RUNNING:
-                if(getMagazineDistance() > 7.5) {
-                    resetEncoder();
+                if(magazineTestNewBall()) {
                     magazineMotor.set(0.0);
-                    intakeCase = IntakeCase.WAITING;
                     ballsStored++;
+                    intakeCase = IntakeCase.WAITING;
                 }
 
                 break;
             default:
-                DriverStation.reportError(String.format("Invalid Intake Case %d", intakeCase), false);
-                break;
+                DriverStation.reportError(String.format("Invalid Intake Case: %d", intakeCase), false); // TODO: Pretty print the enum value
         }
     }
 
     public void shoot() {
         switch (shootCase) {
             case RESETING:
+                magazineMotor.set(intakeSpeed);
+                shooter.set(shooterSpeed);
                 resetEncoder();
-                shooter.set(0.6);
-                magazineMotor.set(1.0);
                 shootCase = ShootCase.RUNNING;
 
                 break;
             case RUNNING:
-                if(getMagazineDistance() > 7.5) {
-                    resetEncoder();
+                if(magazineTestNewBall()) {
                     magazineMotor.set(0.0);
                     shooter.set(0.0);
-                    shootCase = ShootCase.RESETING;
                     ballsStored--;
+                    shootCase = ShootCase.RESETING;
                 }
 
                 break;
             default:
-                DriverStation.reportError(String.format("Invalid Shoot Case %d", shootCase), false);
-                break;
+                DriverStation.reportError(String.format("Invalid Shoot Case: %d", shootCase), false); // TODO: Pretty print the enum value
         }
     }
 
