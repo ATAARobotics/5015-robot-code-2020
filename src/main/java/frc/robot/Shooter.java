@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.Timer;
 import java.lang.Math;
 
 /**
- * Ball magazine code
+ * Ball shooter code
  *
  * @author Jacob Guglielmin, Ben Heard
  */
@@ -27,6 +27,10 @@ enum ShootCase {
     RUNNING_DURING_BALL,
 }
 
+/**
+ * The shooter class controls the ball intake, storage, and shooter.
+ * It will automatically intake, but not too many balls.
+ */
 public class Shooter {
 
     private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
@@ -47,12 +51,25 @@ public class Shooter {
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
 
+    /**
+     * Constructs a shooter object with the motors for the shooter and the intake/elevator,
+     * as well as limit switches for the intake and shooter.
+     * @param shooterMotor The motor that shoots balls
+     * @param intakeMotor1 The first motor in the elevator
+     * @param intakeMotor1 The second motor in the elevator
+     * @param intakeDetector The bool of weather there is a ball ready to be intook
+     * @param shootDetector The bool of weather there is a ball being shot
+     */
     public Shooter(CANSparkMax shooterMotor, DigitalInput intakeDetector, DigitalInput shootDetector) {
         this.shooterMotor = shooterMotor;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
     }
 
+    /**
+     * Sets the intake on or off, uses intakeSpeed for the power if on.
+     * @param running Whether the intake wheels should be spinning
+     */
     private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
         if (running) {
             // intakeMotor1.set(intakeSpeed)
@@ -63,6 +80,10 @@ public class Shooter {
         }
     }
 
+    /**
+     * Sets the shooter on or off, uses shootSpeed for the power if on.
+     * @param running Whether the shooter wheel should be spinning
+     */
     private void setShooter(boolean running) {
         if (running) {
             shooterMotor.set(shooterSpeed);
@@ -71,10 +92,17 @@ public class Shooter {
         }
     }
 
+    /**
+     * Sets the amount of balls stored for a user-override.
+     */
     public void setBallsStored(int ballsStored) {
         this.ballsStored = ballsStored;
     }
 
+    /**
+     * Main update loop for intaking balls automatically.
+     * @param override Overrides the protection limit of five balls, in case the ballsStored variable is incorrect.
+     */
     public void intake(boolean override) {
         switch (intakeCase) {
             case WAITING:
@@ -97,6 +125,10 @@ public class Shooter {
         }
     }
 
+    /**
+     * Main update loop for the shooter, when not active, just shuts off the shooter.
+     * @param active Whether the shooter should be shooting.
+     */
     public void shoot(boolean active) {
         if (active) {
             switch (shootCase) {
