@@ -12,7 +12,7 @@ import java.lang.Math;
 /**
  * Ball magazine code
  *
- * @author Jacob Guglielmin
+ * @author Jacob Guglielmin, Ben Heard
  */
 
 enum IntakeCase {
