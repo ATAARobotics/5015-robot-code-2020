@@ -14,6 +14,16 @@ import java.lang.Math;
  * @author Jacob Guglielmin
  */
 
+enum IntakeCase {
+    WAITING,
+    RUNNING,
+}
+
+enum ShootCase {
+    RESETING,
+    RUNNING,
+}
+
 public class Shooter {
 
     //Creates ball magazine encoder object
@@ -25,8 +35,8 @@ public class Shooter {
     private double magazineTicksPerInch;
 
     private double ballsStored = 3;
-    private Integer intakeCase = 0;
-    private Integer shootCase = 0;
+    private IntakeCase intakeCase = IntakeCase.WAITING;
+    private ShootCase shootCase = ShootCase.RESETING;
 
     private double beltCircumference = 0.0 * Math.PI;
 
@@ -53,7 +63,7 @@ public class Shooter {
         return (magazineEncoder.getPosition()) / magazineTicksPerInch;
     }
 
-    public void reset() {
+    public void resetEncoder() {
         magazineEncoder.setPosition(0);
     }
 
@@ -63,56 +73,50 @@ public class Shooter {
 
     public void intake() {
         switch (intakeCase) {
-            case 0:
-
+            case WAITING:
                 if (ballsStored < 5 && ballDetector.get()) {
-                    reset();
+                    resetEncoder();
                     magazineMotor.set(1.0);
-                    intakeCase++;
+                    intakeCase = IntakeCase.RUNNING;
                 }
 
                 break;
-
-            case 1:
-
+            case RUNNING:
                 if(getMagazineDistance() > 7.5) {
+                    resetEncoder();
                     magazineMotor.set(0.0);
-                    intakeCase = 0;
+                    intakeCase = IntakeCase.WAITING;
                     ballsStored++;
-                    reset();
                 }
 
                 break;
-
             default:
-                DriverStation.reportError("Invalid intakeCase", false);
+                DriverStation.reportError(String.format("Invalid Intake Case %d", intakeCase), false);
                 break;
         }
     }
 
     public void shoot() {
         switch (shootCase) {
-            case 0:
-
-                reset();
+            case RESETING:
+                resetEncoder();
                 shooter.set(0.6);
                 magazineMotor.set(1.0);
-                shootCase++;
+                shootCase = ShootCase.RUNNING;
 
                 break;
-
-            case 1:
-
+            case RUNNING:
                 if(getMagazineDistance() > 7.5) {
+                    resetEncoder();
                     magazineMotor.set(0.0);
                     shooter.set(0.0);
-                    shootCase = 0;
+                    shootCase = ShootCase.RESETING;
                     ballsStored--;
-                    reset();
                 }
 
+                break;
             default:
-                DriverStation.reportError("Invalid shootCase", false);
+                DriverStation.reportError(String.format("Invalid Shoot Case %d", shootCase), false);
                 break;
         }
     }
