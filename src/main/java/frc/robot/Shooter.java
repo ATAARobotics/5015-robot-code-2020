@@ -32,9 +32,9 @@ public class Shooter {
     private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
-    private final double shooterSpeed = 0.6;
-    private final double shooterSpeedup = 0.2;
-    private final double shooterCooldown = 0.1;
+    private final double shooterSpeed = 0.6; // TODO: Configure shooter speed
+    private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
+    private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
 
     private CANSparkMax shooter = null;
     private DigitalInput intakeDetector = null;
