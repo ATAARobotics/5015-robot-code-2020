@@ -2,10 +2,10 @@ package frc.robot;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
-
 
 import java.lang.Math;
 
@@ -41,6 +41,8 @@ public class Shooter {
     private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
 
     private CANSparkMax shooterMotor = null;
+    private VictorSP intakeMotor1 = null;
+    private VictorSP intakeMotor2 = null;
     private DigitalInput intakeDetector = null;
     private DigitalInput shootDetector = null;
 
@@ -60,8 +62,10 @@ public class Shooter {
      * @param intakeDetector The bool of weather there is a ball ready to be intook
      * @param shootDetector The bool of weather there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, DigitalInput intakeDetector, DigitalInput shootDetector) {
+    public Shooter(CANSparkMax shooterMotor, VictorSP intakeMotor1, VictorSP intakeMotor2, DigitalInput intakeDetector, DigitalInput shootDetector) {
         this.shooterMotor = shooterMotor;
+        this.intakeMotor1 = intakeMotor1;
+        this.intakeMotor2 = intakeMotor2;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
     }
@@ -72,11 +76,11 @@ public class Shooter {
      */
     private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
         if (running) {
-            // intakeMotor1.set(intakeSpeed)
-            // intakeMotor2.set(intakeSpeed)
+            intakeMotor1.set(intakeSpeed);
+            intakeMotor2.set(intakeSpeed);
         } else {
-            // intakeMotor1.set(0.0)
-            // intakeMotor2.set(0.0)
+            intakeMotor1.set(0.0);
+            intakeMotor2.set(0.0);
         }
     }
 

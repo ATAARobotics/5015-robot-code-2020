@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
         gyro = robotMap.getGyro();
         colorSensor = new ColorSensor(robotMap.getColorSensor());
         limeLight = new LimeLight();
-        shooter = new Shooter(robotMap.getShooter(), robotMap.getIntakeDetector(), robotMap.getShooterDetector());
+        shooter = new Shooter(robotMap.getShooter(), robotMap.getElevatorMotor1(), robotMap.getElevatorMotor2(), robotMap.getIntakeDetector(), robotMap.getShooterDetector());
         teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight, shooter);
         auto = new Auto(driveTrain, encoders, gyro);
     }

@@ -6,6 +6,7 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
@@ -21,11 +22,14 @@ public class RobotMap {
 
     private final ColorSensorV3 colorSensor = new ColorSensorV3(colorPort);
 
-
-    public CANSparkMax frontLeftMotor = new CANSparkMax(0, MotorType.kBrushless);
+    // Motors
+    public CANSparkMax frontLeftMotor = new CANSparkMax(0, MotorType.kBrushless); // TODO: Make this private.
     private CANSparkMax rearLeftMotor = new CANSparkMax(1, MotorType.kBrushless);
     public CANSparkMax frontRightMotor = new CANSparkMax(2, MotorType.kBrushless);
     private CANSparkMax rearRightMotor = new CANSparkMax(3, MotorType.kBrushless);
+
+    private VictorSP elevatorMotor1 = new VictorSP(0); // Actually an SPX
+    private VictorSP elevatorMotor2 = new VictorSP(1);
 
     //Encoders
     private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
@@ -91,6 +95,14 @@ public class RobotMap {
 
     public CANSparkMax getShooter() {
         return shooter;
+    }
+
+    public VictorSP getElevatorMotor1() {
+        return elevatorMotor1;
+    }
+
+    public VictorSP getElevatorMotor2() {
+        return elevatorMotor2;
     }
 
     public DigitalInput getIntakeDetector() {
