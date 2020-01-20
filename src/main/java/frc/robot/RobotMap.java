@@ -30,11 +30,17 @@ public class RobotMap {
 
     private VictorSPX elevatorMotor1 = new VictorSPX(5); // Actually an SPX
     private VictorSPX elevatorMotor2 = new VictorSPX(6);
+    
+    //Add shooter and conveyor belt
+    private CANSparkMax shooter = new CANSparkMax(7, MotorType.kBrushless);
+    private DigitalInput intakeDetector = new DigitalInput(0);
+    private DigitalInput shooterDetector = new DigitalInput(1);
 
-    /*Encoders
-    private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
-    private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
-*/
+    //Encoders
+    //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
+    //private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
+    private CANEncoder shooterEncoder = new CANEncoder(shooter);
+
     //Group Drive
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor);
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor);
@@ -45,11 +51,7 @@ public class RobotMap {
     //Add pneumatics
     //private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
 
-    //Add shooter and conveyor belt
-    private CANSparkMax shooter = new CANSparkMax(7, MotorType.kBrushless);
-    private DigitalInput intakeDetector = new DigitalInput(0);
-    private DigitalInput shooterDetector = new DigitalInput(1);
-
+    
     //Add gyro
     private Gyro NavX = new Gyro();
 
@@ -84,6 +86,10 @@ public class RobotMap {
     /*public Encoders getDriveEncoder() {
         return driveEncoder;
     }*/
+
+    public CANEncoder getShooterEncoder() {
+        return shooterEncoder;
+    }
 
     public DifferentialDrive getDriveTrain() {
         return driveTrain;
