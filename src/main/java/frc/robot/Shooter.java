@@ -2,7 +2,8 @@ package frc.robot;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
-import edu.wpi.first.wpilibj.VictorSP;
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -36,13 +37,14 @@ public class Shooter {
     private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
-    private final double shooterSpeed = 0.6; // TODO: Configure shooter speed
+    private final double shooterSpeed = 0.65; // TODO: Configure shooter speed
     private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
     private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
+    private boolean shooterActive = false;
 
     private CANSparkMax shooterMotor = null;
-    private VictorSP intakeMotor1 = null;
-    private VictorSP intakeMotor2 = null;
+    private VictorSPX intakeMotor1 = null;
+    private VictorSPX intakeMotor2 = null;
     private DigitalInput intakeDetector = null;
     private DigitalInput shootDetector = null;
 
@@ -62,7 +64,7 @@ public class Shooter {
      * @param intakeDetector The bool of weather there is a ball ready to be intook
      * @param shootDetector The bool of weather there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSP intakeMotor1, VictorSP intakeMotor2, DigitalInput intakeDetector, DigitalInput shootDetector) {
+    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, DigitalInput intakeDetector, DigitalInput shootDetector) {
         this.shooterMotor = shooterMotor;
         this.intakeMotor1 = intakeMotor1;
         this.intakeMotor2 = intakeMotor2;
@@ -74,13 +76,16 @@ public class Shooter {
      * Sets the intake on or off, uses intakeSpeed for the power if on.
      * @param running Whether the intake wheels should be spinning
      */
+    public void shooterPeriodic() {
+        setShooter(shooterActive);
+    }
     private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
         if (running) {
-            intakeMotor1.set(intakeSpeed);
-            intakeMotor2.set(intakeSpeed);
+            intakeMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
+            intakeMotor2.set(ControlMode.PercentOutput,intakeSpeed);
         } else {
-            intakeMotor1.set(0.0);
-            intakeMotor2.set(0.0);
+            intakeMotor1.set(ControlMode.PercentOutput,0.0);
+            intakeMotor2.set(ControlMode.PercentOutput,0.0);
         }
     }
 
@@ -135,13 +140,15 @@ public class Shooter {
      */
     public void shoot(boolean active) {
         if (active) {
+            DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterTimer.reset();
                     shooterTimer.start();
-                    setShooter(true);
+                    shooterActive = true;
                     shooterStartTime = shooterSpeedup;
                     shootCase = ShootCase.COOLDOWN;
+                    DriverStation.reportWarning("Switching to cooldown", false); // TODO: Pretty print the enum value
 
                     break;
                 case COOLDOWN: // Shooter speeding up
@@ -167,14 +174,14 @@ public class Shooter {
 
                     break;
                 default:
-                    DriverStation.reportError(String.format("Invalid Shoot Case: %d", shootCase), false); // TODO: Pretty print the enum value
+                    DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
             }
         } else if (shootCase == ShootCase.COOLDOWN ||
             shootCase == ShootCase.RUNNING_BEFORE_BALL ||
             shootCase == ShootCase.RUNNING_DURING_BALL) { // User released the button
 
             setIntake(false);
-            setShooter(false);
+            shooterActive = false;
             shooterTimer.stop();
 
             shootCase = ShootCase.INITIAL;

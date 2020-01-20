@@ -42,7 +42,7 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         robotMap = new RobotMap();
-        encoders = robotMap.getDriveEncoder();
+        //encoders = robotMap.getDriveEncoder();
         driveTrain = new SWATDrive(robotMap);
         gyro = robotMap.getGyro();
         colorSensor = new ColorSensor(robotMap.getColorSensor());
@@ -124,10 +124,10 @@ public class Robot extends TimedRobot {
         auto.AutoDisabled();
 
         driveSchemeSelected = driveSchemePicker.getSelected();
-        teleop.setDriveScheme(driveSchemeSelected);
+        //teleop.setDriveScheme(driveSchemeSelected);
 
         gunnerSchemeSelected = gunnerSchemePicker.getSelected();
-        teleop.setGunnerScheme(gunnerSchemeSelected);
+        //teleop.setGunnerScheme(gunnerSchemeSelected);
         teleop.teleopInit();
     }
     @Override

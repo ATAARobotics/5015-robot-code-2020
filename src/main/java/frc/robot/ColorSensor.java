@@ -3,7 +3,6 @@ package frc.robot;
 import java.lang.Math;
 
 import com.revrobotics.ColorSensorV3;
-
 public class ColorSensor {
     private ColorSensorV3 colorSensor = null;
 

@@ -53,7 +53,7 @@ public class Auto {
      */
     public void AutoInit() {
 
-        encoders.reset();
+        //encoders.reset();
         gyro.reset();
 
         // Speed PID

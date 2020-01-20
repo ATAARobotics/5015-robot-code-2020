@@ -37,7 +37,7 @@ public class Teleop {
     }
   
     public void teleopInit() {
-        encoders.reset();
+        //encoders.reset();
 
         //Sets up PID
         visionAlignPID = new PIDSubsystem("AlignPID", P, I, D) {
@@ -63,7 +63,11 @@ public class Teleop {
 
     public void TeleopPeriodic() {
         joysticks.checkInputs();
-        visionAlignPID.setAbsoluteTolerance(tolerance);
+        shooter.intake(false);
+        boolean shootButton = joysticks.getShoot();
+        shooter.shoot(shootButton);
+        shooter.shooterPeriodic();
+        //visionAlignPID.setAbsoluteTolerance(tolerance);
         //drive
 
         if(joysticks.getVisionButton()) {
@@ -73,10 +77,10 @@ public class Teleop {
             }
         }
 
-        SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
-        SmartDashboard.putNumber("EncoderRight", encoders.getRight());
-        SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
-        SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
+        //SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
+        //SmartDashboard.putNumber("EncoderRight", encoders.getRight());
+        //SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
+        //SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
 
         String colorGuess = colorSensor.findColor();
         SmartDashboard.putString("Color", colorGuess);
@@ -122,9 +126,9 @@ public class Teleop {
                     limeLight.setCameraMode(CameraMode.Drive);
                 }
             }
-            if(joysticks.getGearShift()) {
+            /*if(joysticks.getGearShift()) {
                 driveTrain.gearShift();
-            }
+            }*/
             if (joysticks.getSlow()) {
                 driveTrain.slow();
             }
@@ -163,7 +167,7 @@ public class Teleop {
 
 	public void TestPeriodic() {
         //safe mode
-        driveTrain.gearShiftSafe();
+        //driveTrain.gearShiftSafe();
         joysticks.checkInputs();
 
         driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
@@ -172,10 +176,10 @@ public class Teleop {
         }
         else;
     }
-    public void setDriveScheme(String driveScheme){
+    /*public void setDriveScheme(String driveScheme){
         joysticks.setDriveScheme(driveScheme);
     }
     public void setGunnerScheme(String gunnerScheme){
         joysticks.setGunnerScheme(gunnerScheme);
-    }
+    }*/
 }

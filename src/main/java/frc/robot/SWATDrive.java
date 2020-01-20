@@ -24,7 +24,7 @@ public class SWATDrive {
         maxStraightSpeed = 1;
         maxTurnSpeed = 0.8;
     }
-    public void gearShift() {
+    /*public void gearShift() {
         lowGear = !lowGear;
         if(lowGear) {
             robotMap.getGearShift().set(DoubleSolenoid.Value.kReverse);
@@ -35,7 +35,7 @@ public class SWATDrive {
     }
     public void gearShiftSafe() {
         robotMap.getGearShift().set(DoubleSolenoid.Value.kReverse);
-    }
+    }*/
     public void slow() {
         slow = !slow;
         if(slow) {
