@@ -8,6 +8,9 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 
 import java.lang.Math;
+import java.net.Socket;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 /**
  * Ball shooter code
@@ -41,10 +44,13 @@ public class Shooter {
     private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
 
     private CANSparkMax shooterMotor = null;
+    private CANEncoder shooterEncoder = null;
     private VictorSP intakeMotor1 = null;
     private VictorSP intakeMotor2 = null;
     private DigitalInput intakeDetector = null;
     private DigitalInput shootDetector = null;
+    private Socket pidSocket = null;
+    private PrintWriter pidStream = null;
 
     private Timer shooterTimer = new Timer();
 
@@ -62,12 +68,20 @@ public class Shooter {
      * @param intakeDetector The bool of weather there is a ball ready to be intook
      * @param shootDetector The bool of weather there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSP intakeMotor1, VictorSP intakeMotor2, DigitalInput intakeDetector, DigitalInput shootDetector) {
+    public Shooter(CANSparkMax shooterMotor, VictorSP intakeMotor1, VictorSP intakeMotor2, CANEncoder shooterEncoder, DigitalInput intakeDetector, DigitalInput shootDetector) {
         this.shooterMotor = shooterMotor;
         this.intakeMotor1 = intakeMotor1;
         this.intakeMotor2 = intakeMotor2;
+        this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
+
+        try {
+            this.pidSocket = new Socket("0.0.0.0", 54345);
+            this.pidStream = new PrintWriter(pidSocket.getOutputStream(), true);
+        } catch(IOException ex) {
+            DriverStation.reportError(String.format("Error initializing pidStuff: %s", ex.toString()), false);
+        }
     }
 
     /**
@@ -101,6 +115,10 @@ public class Shooter {
      */
     public void setBallsStored(int ballsStored) {
         this.ballsStored = ballsStored;
+    }
+
+    public void logPID() {
+        pidStream.println(Double.toString(shooterEncoder.getVelocity()));
     }
 
     /**
