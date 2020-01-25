@@ -13,120 +13,160 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import frc.robot.vision.LimeLight;
+
 /**
  * A centralized file that keeps track of all robot actuators and physical components
  *
  */
 
 public class RobotMap {
-
+    // Color wheel / Control Panel
     private final I2C.Port colorPort = I2C.Port.kOnboard;
-
-    private final ColorSensorV3 colorSensor = new ColorSensorV3(colorPort);
+    private final ColorSensorV3 colorSensorHardware = new ColorSensorV3(colorPort);
 
     // Motors
-    // public CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless); // TODO: Make this private.
-    // private CANSparkMax rearLeftMotor = new CANSparkMax(4, MotorType.kBrushless);
-    // public CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
-    // private CANSparkMax rearRightMotor = new CANSparkMax(2, MotorType.kBrushless);
+    // Drive
+    private CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless);
+    private CANSparkMax rearLeftMotor = new CANSparkMax(4, MotorType.kBrushless);
+    private CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
+    private CANSparkMax rearRightMotor = new CANSparkMax(2, MotorType.kBrushless);
+    private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
+    private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
 
-    private VictorSPX elevatorMotor1 = new VictorSPX(5); // Actually an SPX
+    // Elevator
+    private VictorSPX elevatorMotor1 = new VictorSPX(5);
     private VictorSPX elevatorMotor2 = new VictorSPX(6);
     
     //Add shooter and conveyor belt
-    private CANSparkMax shooter = new CANSparkMax(7, MotorType.kBrushless);
-    private CANPIDController shootController = shooter.getPIDController();
+    private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
+    private CANPIDController shootController = shootMotor.getPIDController();
     private DigitalInput intakeDetector = new DigitalInput(0);
     private DigitalInput shooterDetector = new DigitalInput(1);
 
     //Encoders
     //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
     //private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
-    private CANEncoder shooterEncoder = shooter.getEncoder();
-
-    //Group Drive
-    // private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor);
-    // private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor);
+    private CANEncoder shooterEncoder = shootMotor.getEncoder();
 
     //Add drivetrain
-    // private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
+    private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
-    //Add pneumatics
-    //private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
+    // Pneumatics
+    // private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
 
-    
-    //Add gyro
+    // Gyro
     private Gyro NavX = new Gyro();
 
-    //Add encoders
-    //private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder);
+    // Controllers for specific actions on the robot, these classes should be
+    // accessed directly because they have nice interfaces
 
     public RobotMap() {
 
-        // TODO: Uncomment/add camera code
-        //UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
-        //Shuffleboard.getTab("Camera").add(camera);
-        //camera.setFPS(30);
-        //camera.setResolution(160, 120);
+        // TODO: Reenable camera code
+        // UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
+        // Shuffleboard.getTab("Camera").add(camera);
+        // camera.setFPS(30);
+        // camera.setResolution(160, 120);
 
-        //rearLeftMotor.follow(frontLeftMotor);
-        //rearRightMotor.follow(frontRightMotor);
+        // Make each side controlled with only one motor object each
+        rearLeftMotor.follow(frontLeftMotor);
+        rearRightMotor.follow(frontRightMotor);
+
         NavX.initializeNavX();
         // PID coefficients
 
     }
 
-    /*public SpeedControllerGroup getLeftMotors() {
-        return leftMotors;
-    }
+    // Drive train
 
-    public SpeedControllerGroup getRightMotors() {
-        return rightMotors;
-    }
+    /**
+     * Returns the double solenoid accessed with the gear shifting functionality
+     * TODO: make a wrapper class for this.
+     */
+    // public DoubleSolenoid getGearShift() {
+    //     return gearShiftSolenoid;
+    // }
 
-    public DoubleSolenoid getGearShift() {
-        return gearShiftSolenoid;
-    }
+    /**
+     * Returns the encoders associated with the drive train.
+     * TODO: make a wrapper class for this.
+     */
+    // public Encoders getDriveEncoders() {
+    //     return driveEncoders;
+    // }
 
-    /*public Encoders getDriveEncoder() {
-        return driveEncoder;
-    }*/
-
-    public CANEncoder getShooterEncoder() {
-        return shooterEncoder;
-    }
-
-    /*public DifferentialDrive getDriveTrain() {
+    /**
+     * For internal use in SWATDrive.java.
+     * Returns the DifferentialDrive object associated with the drive train.
+     */
+    protected DifferentialDrive getDriveTrain() {
         return driveTrain;
-    }*/
+    }
 
+    /**
+     * Returns the navx attached to the robot.
+     * TODO: make a wrapper class for this.
+     */
     public Gyro getGyro() {
         return NavX;
     }
 
-    public CANSparkMax getShooter() {
-        return shooter;
+    /**
+     * For internal use in Shooter.java.
+     * Returns the hardware encoder on the shooter motor.
+     */
+    protected CANEncoder getShooterEncoder() {
+        return shooterEncoder;
     }
 
-    public VictorSPX getElevatorMotor1() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the hardware shooter motor.
+     */
+    protected CANSparkMax getShooterMotor() {
+        return shootMotor;
+    }
+
+    /**
+     * For internal use in Shooter.java.
+     * Returns the first elevator motor.
+     */
+    protected VictorSPX getElevatorMotor1() {
         return elevatorMotor1;
     }
 
-    public VictorSPX getElevatorMotor2() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the seconed elevator motor.
+     */
+    protected VictorSPX getElevatorMotor2() {
         return elevatorMotor2;
     }
 
-    public DigitalInput getIntakeDetector() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the detector for balls waiting at the intake
+     */
+    protected DigitalInput getIntakeDetector() {
         return intakeDetector;
     }
 
-    public DigitalInput getShooterDetector() {
+    /**
+     * For internal use in Shooter.java.
+     * TODO: Replace this with a detector for the shooter encoder slowing down.
+     * Returns the shooting detector, which detects balls exiting the robot
+     */
+    protected DigitalInput getShooterDetector() {
         return shooterDetector;
     }
 
-    public ColorSensorV3 getColorSensor() {
-        return colorSensor;
-
+    /**
+     * For internal use in Shooter.java.
+     * Returns the hardware color sensor for the control panel.
+     */
+    protected ColorSensorV3 getColorSensor() {
+        return colorSensorHardware;
     }
 
 	public CANPIDController getShooterController() {

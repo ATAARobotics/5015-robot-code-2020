@@ -47,7 +47,7 @@ public class Robot extends TimedRobot {
         gyro = robotMap.getGyro();
         colorSensor = new ColorSensor(robotMap.getColorSensor());
         limeLight = new LimeLight();
-        shooter = new Shooter(robotMap.getShooter(), robotMap.getElevatorMotor1(), 
+        shooter = new Shooter(robotMap.getShooterMotor(), robotMap.getElevatorMotor1(), 
                 robotMap.getElevatorMotor2(), robotMap.getShooterEncoder(), robotMap.getIntakeDetector(), 
                 robotMap.getShooterDetector(), robotMap.getShooterController());
         teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight, shooter);
@@ -71,7 +71,6 @@ public class Robot extends TimedRobot {
         SmartDashboard.putNumber("Balls Stored", 3.0);
 
         teleop.teleopInit();
-        robotMap.getGyro().initializeNavX();
         auto.AutoInit();
         limeLight.ledOff();
     }
