@@ -71,7 +71,6 @@ public class Teleop {
             shooter.intake(false);
             boolean shootButton = joysticks.getShoot();
             shooter.shoot(shootButton);
-            shooter.shooterPeriodic();
             //visionAlignPID.setAbsoluteTolerance(tolerance);
             //drive
 

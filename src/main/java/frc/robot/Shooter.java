@@ -4,8 +4,6 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
@@ -46,15 +44,9 @@ public class Shooter {
     private final double shooterSpeed = 0.65; // TODO: Configure shooter speed
     private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
     private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
-    private boolean shooterActive = false;
 
-    private CANSparkMax shooterMotor = null;
-    private CANEncoder shooterEncoder = null;
+    private RobotMap robotMap = null;
     private CANPIDController shooterController = null;
-    private VictorSPX intakeMotor1 = null;
-    private VictorSPX intakeMotor2 = null;
-    private DigitalInput intakeDetector = null;
-    private DigitalInput shootDetector = null;
     private Socket pidSocket = null;
     private PrintWriter pidStream = null;
 
@@ -71,19 +63,10 @@ public class Shooter {
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as limit switches for the intake and shooter.
-     * @param shooterMotor The motor that shoots balls
-     * @param intakeMotor1 The first motor in the conveyor
-     * @param intakeMotor1 The second motor in the conveyor
-     * @param intakeDetector The boolean of whether there is a ball ready to be intook
-     * @param shootDetector The boolean of whether there is a ball being shot
+     * @param robotMap The motor that shoots balls
      */
     public Shooter(RobotMap robotMap) {
-        this.shooterMotor = robotMap.getShooterMotor();
-        this.intakeMotor1 = robotMap.getConveyorMotor1();
-        this.intakeMotor2 = robotMap.getConveyorMotor2();
-        this.shooterEncoder = robotMap.getShooterEncoder();
-        this.intakeDetector = robotMap.getIntakeDetector();
-        this.shootDetector = robotMap.getShooterDetector();
+        this.robotMap = robotMap;
         this.shooterController = robotMap.getShooterController();
 
         try {
@@ -163,19 +146,19 @@ public class Shooter {
         }
 
         SmartDashboard.putNumber("SetPoint", setPoint);
-        SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
+        SmartDashboard.putNumber("ProcessVariable", robotMap.getShooterEncoderVelocity());
 
     }
-    public void shooterPeriodic() {
-        setShooter(shooterActive);
-    }
-    private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
+
+    /**
+     * Sets the intake on or off, uses intakeSpeed for the power if on.
+     * @param running Whether the intake wheels should be spinning
+     */
+    private void setIntake(boolean running) {
         if (running) {
-            intakeMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
-            intakeMotor2.set(ControlMode.PercentOutput,intakeSpeed);
+            robotMap.setElevatorMotors(-intakeSpeed);
         } else {
-            intakeMotor1.set(ControlMode.PercentOutput,0.0);
-            intakeMotor2.set(ControlMode.PercentOutput,0.0);
+            robotMap.setElevatorMotors(0.0);
         }
     }
 
@@ -185,9 +168,9 @@ public class Shooter {
      */
     private void setShooter(boolean running) {
         if (running) {
-            setPoint = shooterSpeed * maxRPM;
+            robotMap.setShooterMotor(shooterSpeed);
         } else {
-            setPoint = 0 * maxRPM;
+            robotMap.setShooterMotor(0);
         }
         shooterController.setReference(setPoint, ControlType.kVelocity);
 
@@ -200,8 +183,11 @@ public class Shooter {
         this.ballsStored = ballsStored;
     }
 
+    /**
+     * Log the Shooter's velocity to the network.
+     */
     public void logPID() {
-        double velocity = shooterEncoder.getVelocity()/maxRPM * 100;
+        double velocity = robotMap.getShooterEncoderVelocity()/maxRPM * 100;
         pidStream.println(Double.toString(velocity));
     }
 
@@ -212,14 +198,14 @@ public class Shooter {
     public void intake(boolean override) {
         switch (intakeCase) {
             case WAITING:
-                if ((ballsStored < 5 || override) && intakeDetector.get()) {
+                if ((ballsStored < 5 || override) && robotMap.isIntakeDetected()) {
                     setIntake(true);
                     intakeCase = IntakeCase.RUNNING;
                 }
 
                 break;
             case RUNNING:
-                if(!intakeDetector.get()) {
+                if(!robotMap.isIntakeDetected()) {
                     setIntake(false);
                     ballsStored++;
                     intakeCase = IntakeCase.WAITING;
@@ -242,7 +228,7 @@ public class Shooter {
                 case INITIAL: // Shooter was not active last tick
                     shooterTimer.reset();
                     shooterTimer.start();
-                    shooterActive = true;
+                    setShooter(true);
                     shooterStartTime = shooterSpeedup;
                     shootCase = ShootCase.COOLDOWN;
                     DriverStation.reportWarning("Switching to cooldown", false); // TODO: Pretty print the enum value
@@ -256,13 +242,13 @@ public class Shooter {
 
                     break;
                 case RUNNING_BEFORE_BALL: // Shooter running, before sensor sees a ball
-                    if (shootDetector.get()) {
+                    if (robotMap.isShotDetected()) {
                         shootCase = ShootCase.RUNNING_DURING_BALL;
                     }
 
                     break;
                 case RUNNING_DURING_BALL: // Shooter running, while sensor is seeing a ball
-                    if (!shootDetector.get()) {
+                    if (!robotMap.isShotDetected()) {
                         setIntake(false);
                         ballsStored--;
                         shooterStartTime = shooterCooldown;
@@ -278,7 +264,7 @@ public class Shooter {
             shootCase == ShootCase.RUNNING_DURING_BALL) { // User released the button
 
             setIntake(false);
-            shooterActive = false;
+            setShooter(false);
             shooterTimer.stop();
 
             shootCase = ShootCase.INITIAL;

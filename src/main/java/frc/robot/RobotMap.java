@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.I2C;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
@@ -144,40 +145,36 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the hardware encoder on the shooter motor.
      */
-    protected CANEncoder getShooterEncoder() {
-        return shooterEncoder;
+    protected double getShooterEncoderVelocity() {
+        return shooterEncoder.getVelocity();
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the hardware shooter motor.
-     */
-    protected CANSparkMax getShooterMotor() {
-        return shooterMotor;
-    }
-
-    /**
-     * For internal use in Shooter.java.
+     * Sets the shooter speed.
+     * @param speed The speed the shooter should be spinning
      * Returns the first conveyor motor.
      */
-    protected VictorSPX getConveyorMotor1() {
-        return conveyorMotor1;
+    protected void setShooterMotor(double speed) {
+        shooterMotor.set(speed);
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the seconed conveyor motor.
+     * Sets the conveyor speed.
+     * @param speed The speed the shooter should be spinning
      */
-    protected VictorSPX getConveyorMotor2() {
-        return conveyorMotor2;
+    protected void setElevatorMotors(double speed) {
+        conveyorMotor1.set(ControlMode.PercentOutput, speed);
+        conveyorMotor2.set(ControlMode.PercentOutput, speed);
     }
 
     /**
      * For internal use in Shooter.java.
      * Returns the detector for balls waiting at the intake
      */
-    protected DigitalInput getIntakeDetector() {
-        return intakeDetector;
+    protected boolean isIntakeDetected() {
+        return !intakeDetector.get();
     }
 
     /**
@@ -185,8 +182,8 @@ public class RobotMap {
      * TODO: Replace this with a detector for the shooter encoder slowing down.
      * Returns the shooting detector, which detects balls exiting the robot
      */
-    protected DigitalInput getShooterDetector() {
-        return shooterDetector;
+    protected boolean isShotDetected() {
+        return !shooterDetector.get();
     }
 
     /**
