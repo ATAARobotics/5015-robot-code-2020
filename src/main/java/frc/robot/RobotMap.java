@@ -45,9 +45,9 @@ public class RobotMap {
     // Drive
     // private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
     // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
-    // private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder); // Group
+    // private Encoders driveEncoders = new Encoders(leftEncoder, rightEncoder); // Group
     // Shooter
-    private CANEncoder shooterEncoders = new CANEncoder(shooterMotor);
+    private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
