@@ -1,13 +1,15 @@
 package frc.robot;
 
-
 import edu.wpi.first.wpilibj.I2C;
 import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -23,30 +25,31 @@ public class RobotMap {
     private final ColorSensorV3 colorSensor = new ColorSensorV3(colorPort);
 
     // Motors
-    public CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless); // TODO: Make this private.
-    private CANSparkMax rearLeftMotor = new CANSparkMax(4, MotorType.kBrushless);
-    public CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
-    private CANSparkMax rearRightMotor = new CANSparkMax(2, MotorType.kBrushless);
+    // public CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless); // TODO: Make this private.
+    // private CANSparkMax rearLeftMotor = new CANSparkMax(4, MotorType.kBrushless);
+    // public CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
+    // private CANSparkMax rearRightMotor = new CANSparkMax(2, MotorType.kBrushless);
 
     private VictorSPX elevatorMotor1 = new VictorSPX(5); // Actually an SPX
     private VictorSPX elevatorMotor2 = new VictorSPX(6);
     
     //Add shooter and conveyor belt
     private CANSparkMax shooter = new CANSparkMax(7, MotorType.kBrushless);
+    private CANPIDController shootController = shooter.getPIDController();
     private DigitalInput intakeDetector = new DigitalInput(0);
     private DigitalInput shooterDetector = new DigitalInput(1);
 
     //Encoders
     //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
     //private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
-    private CANEncoder shooterEncoder = new CANEncoder(shooter);
+    private CANEncoder shooterEncoder = shooter.getEncoder();
 
     //Group Drive
-    private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor);
-    private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor);
+    // private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor);
+    // private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor);
 
     //Add drivetrain
-    private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
+    // private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     //Add pneumatics
     //private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
@@ -66,12 +69,14 @@ public class RobotMap {
         //camera.setFPS(30);
         //camera.setResolution(160, 120);
 
-        rearLeftMotor.follow(frontLeftMotor);
-        rearRightMotor.follow(frontRightMotor);
+        //rearLeftMotor.follow(frontLeftMotor);
+        //rearRightMotor.follow(frontRightMotor);
         NavX.initializeNavX();
+        // PID coefficients
+
     }
 
-    public SpeedControllerGroup getLeftMotors() {
+    /*public SpeedControllerGroup getLeftMotors() {
         return leftMotors;
     }
 
@@ -79,9 +84,9 @@ public class RobotMap {
         return rightMotors;
     }
 
-    /*public DoubleSolenoid getGearShift() {
+    public DoubleSolenoid getGearShift() {
         return gearShiftSolenoid;
-    }*/
+    }
 
     /*public Encoders getDriveEncoder() {
         return driveEncoder;
@@ -91,9 +96,9 @@ public class RobotMap {
         return shooterEncoder;
     }
 
-    public DifferentialDrive getDriveTrain() {
+    /*public DifferentialDrive getDriveTrain() {
         return driveTrain;
-    }
+    }*/
 
     public Gyro getGyro() {
         return NavX;
@@ -122,5 +127,9 @@ public class RobotMap {
     public ColorSensorV3 getColorSensor() {
         return colorSensor;
 
+    }
+
+	public CANPIDController getShooterController() {
+		return shootController;
     }
 }

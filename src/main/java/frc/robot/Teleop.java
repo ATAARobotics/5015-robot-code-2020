@@ -39,7 +39,7 @@ public class Teleop {
     public void teleopInit() {
         //encoders.reset();
 
-        //Sets up PID
+        /*Sets up PID
         visionAlignPID = new PIDSubsystem("AlignPID", P, I, D) {
             @Override
             protected double returnPIDInput() {return limeLight.getTx(); }
@@ -58,7 +58,7 @@ public class Teleop {
         // Disable Vision Processing on Limelight
         limeLight.setCameraMode(CameraMode.Drive);
         SmartDashboard.putNumber("Tolerance", tolerance);
-        SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
+        SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());*/
     }
 
     public void TeleopPeriodic() {
@@ -116,7 +116,7 @@ public class Teleop {
             }
 
             //This is where the robot is driven (disabled during vision)
-            driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
+            //driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
 
             if(joysticks.getDiscoButton()){
                 discoOn = !discoOn;
@@ -128,21 +128,21 @@ public class Teleop {
             }
             /*if(joysticks.getGearShift()) {
                 driveTrain.gearShift();
-            }*/
+            }
             if (joysticks.getSlow()) {
                 driveTrain.slow();
-            }
+            }*/
         }
     }
 
-	public void drive(double speedA, double speedB, boolean arcade) {
+	/*public void drive(double speedA, double speedB, boolean arcade) {
         if(arcade) {
             driveTrain.arcadeDrive(speedA, speedB);
         }
         else {
             driveTrain.tankDrive(speedA, speedB);
         }
-	}
+	}*/
 
     // -- Vision: --
     // Start alignment PID
@@ -170,11 +170,11 @@ public class Teleop {
         //driveTrain.gearShiftSafe();
         joysticks.checkInputs();
 
-        driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
+        /*driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
         if (joysticks.getSlow()) {
             driveTrain.slow();
         }
-        else;
+        else;*/
     }
     /*public void setDriveScheme(String driveScheme){
         joysticks.setDriveScheme(driveScheme);

@@ -1,12 +1,15 @@
 package frc.robot;
 
 import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.lang.Math;
 import java.net.Socket;
@@ -47,6 +50,7 @@ public class Shooter {
 
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
+    private CANPIDController shooterController = null;
     private VictorSPX intakeMotor1 = null;
     private VictorSPX intakeMotor2 = null;
     private DigitalInput intakeDetector = null;
@@ -60,6 +64,9 @@ public class Shooter {
     private double shooterStartTime = 0.0;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
+    private double setPoint = 0;
+    public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
+
 
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/elevator,
@@ -70,16 +77,17 @@ public class Shooter {
      * @param intakeDetector The bool of weather there is a ball ready to be intook
      * @param shootDetector The bool of weather there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, DigitalInput intakeDetector, DigitalInput shootDetector) {
+    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, DigitalInput intakeDetector, DigitalInput shootDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.intakeMotor1 = intakeMotor1;
         this.intakeMotor2 = intakeMotor2;
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
+        this.shooterController = shooterController;
 
         try {
-            this.pidSocket = new Socket("0.0.0.0", 54345);
+            this.pidSocket = new Socket("172.22.11.1", 21);
             this.pidStream = new PrintWriter(pidSocket.getOutputStream(), true);
         } catch(IOException ex) {
             DriverStation.reportError(String.format("Error initializing pidStuff: %s", ex.toString()), false);
@@ -90,6 +98,74 @@ public class Shooter {
      * Sets the intake on or off, uses intakeSpeed for the power if on.
      * @param running Whether the intake wheels should be spinning
      */
+    public void PIDInit() {
+        // set PID coefficients
+        kP = 0; 
+        kI = 0;
+        kD = 0; 
+        kIz = 0; 
+        kFF = 0; 
+        kMaxOutput = 1; 
+        kMinOutput = -1;
+        maxRPM = 5700;
+        shooterController.setP(kP);
+        shooterController.setI(kI);
+        shooterController.setD(kD);
+        shooterController.setIZone(kIz);
+        shooterController.setFF(kFF);
+        shooterController.setOutputRange(kMinOutput, kMaxOutput);
+
+        // display PID coefficients on SmartDashboard
+        SmartDashboard.putNumber("P Gain", kP);
+        SmartDashboard.putNumber("I Gain", kI);
+        SmartDashboard.putNumber("D Gain", kD);
+        SmartDashboard.putNumber("I Zone", kIz);
+        SmartDashboard.putNumber("Feed Forward", kFF);
+        SmartDashboard.putNumber("Max Output", kMaxOutput);
+        SmartDashboard.putNumber("Min Output", kMinOutput);
+    }
+
+    public void PIDPeriodic() {
+        // read PID coefficients from SmartDashboard
+        double p = SmartDashboard.getNumber("P Gain", 0);
+        double i = SmartDashboard.getNumber("I Gain", 0);
+        double d = SmartDashboard.getNumber("D Gain", 0);
+        double iz = SmartDashboard.getNumber("I Zone", 0);
+        double ff = SmartDashboard.getNumber("Feed Forward", 0);
+        double max = SmartDashboard.getNumber("Max Output", 0);
+        double min = SmartDashboard.getNumber("Min Output", 0);
+
+        // if PID coefficients on SmartDashboard have changed, write new values to
+        // controller
+        if ((p != kP)) {
+            shooterController.setP(p);
+            kP = p;
+        }
+        if ((i != kI)) {
+            shooterController.setI(i);
+            kI = i;
+        }
+        if ((d != kD)) {
+            shooterController.setD(d);
+            kD = d;
+        }
+        if ((iz != kIz)) {
+            shooterController.setIZone(iz);
+            kIz = iz;
+        }
+        if ((ff != kFF)) {
+            shooterController.setFF(ff);
+            kFF = ff;
+        }
+        if ((max != kMaxOutput) || (min != kMinOutput)) {
+            shooterController.setOutputRange(min, max);
+            kMinOutput = min; kMaxOutput = max; 
+        }
+    
+        SmartDashboard.putNumber("SetPoint", setPoint);
+        SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
+
+    }
     public void shooterPeriodic() {
         setShooter(shooterActive);
     }
@@ -109,10 +185,12 @@ public class Shooter {
      */
     private void setShooter(boolean running) {
         if (running) {
-            shooterMotor.set(shooterSpeed);
+            setPoint = shooterSpeed * maxRPM;
         } else {
-            shooterMotor.set(0);
+            setPoint = 0 * maxRPM;
         }
+        shooterController.setReference(setPoint, ControlType.kVelocity);
+
     }
 
     /**
@@ -123,7 +201,8 @@ public class Shooter {
     }
 
     public void logPID() {
-        pidStream.println(Double.toString(shooterEncoder.getVelocity()));
+        double velocity = shooterEncoder.getVelocity()/maxRPM * 100;
+        pidStream.println(Double.toString(velocity));
     }
 
     /**
