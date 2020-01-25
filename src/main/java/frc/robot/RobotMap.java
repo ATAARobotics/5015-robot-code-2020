@@ -17,57 +17,58 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
  */
 
 public class RobotMap {
-
+    // Color wheel / Control Panel
     private final I2C.Port colorPort = I2C.Port.kOnboard;
-
     private final ColorSensorV3 colorSensor = new ColorSensorV3(colorPort);
 
     // Motors
-    public CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless); // TODO: Make this private.
+    // Drive
+    private CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless);
     private CANSparkMax rearLeftMotor = new CANSparkMax(4, MotorType.kBrushless);
-    public CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
+    private CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
     private CANSparkMax rearRightMotor = new CANSparkMax(2, MotorType.kBrushless);
+    private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
+    private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
 
-    private VictorSPX elevatorMotor1 = new VictorSPX(5); // Actually an SPX
+    // Elevator
+    private VictorSPX elevatorMotor1 = new VictorSPX(5);
     private VictorSPX elevatorMotor2 = new VictorSPX(6);
-    
-    //Add shooter and conveyor belt
+
+    // Shooter
     private CANSparkMax shooter = new CANSparkMax(7, MotorType.kBrushless);
     private DigitalInput intakeDetector = new DigitalInput(0);
     private DigitalInput shooterDetector = new DigitalInput(1);
 
     //Encoders
-    //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
-    //private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
+    // Drive
+    // private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
+    // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
+    // private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder); // Group
+    // Shooter
     private CANEncoder shooterEncoder = new CANEncoder(shooter);
 
-    //Group Drive
-    private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor);
-    private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor);
-
-    //Add drivetrain
+    // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
-    //Add pneumatics
-    //private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
+    // Pneumatics
+    // private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
 
-    
-    //Add gyro
+    // Gyro
     private Gyro NavX = new Gyro();
 
-    //Add encoders
-    //private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder);
 
     public RobotMap() {
 
         // TODO: Uncomment/add camera code
-        //UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
-        //Shuffleboard.getTab("Camera").add(camera);
-        //camera.setFPS(30);
-        //camera.setResolution(160, 120);
+        // UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
+        // Shuffleboard.getTab("Camera").add(camera);
+        // camera.setFPS(30);
+        // camera.setResolution(160, 120);
 
+        // Make each side controlled with only one motor object each
         rearLeftMotor.follow(frontLeftMotor);
         rearRightMotor.follow(frontRightMotor);
+
         NavX.initializeNavX();
     }
 
