@@ -42,10 +42,10 @@ public class Auto {
     SWATDrive swatDrive = null;
     Gyro gyro = null;
 
-    public Auto(SWATDrive swatDrive, Encoders encoders, Gyro gyro) {
-        this.gyro = gyro;
-        this.encoders = encoders;
-        this.swatDrive = swatDrive;
+    public Auto(RobotMap robotMap) {
+        this.gyro = robotMap.getGyro();
+        // this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
+        this.swatDrive = robotMap.swatDrive;
     }
 
     /**

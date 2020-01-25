@@ -6,9 +6,9 @@ import com.revrobotics.ColorSensorV3;
 public class ColorSensor {
     private ColorSensorV3 colorSensor = null;
 
-    public ColorSensor(ColorSensorV3 colorSensor) {
+    public ColorSensor(RobotMap robotMap) {
         // Initialize Classes
-        this.colorSensor = colorSensor;
+        this.colorSensor = robotMap.getColorSensor();
     }
 
     String findColor() {

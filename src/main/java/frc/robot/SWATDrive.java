@@ -12,15 +12,14 @@ public class SWATDrive {
     //slow variable
     private boolean slow = false;
     //low gear variable
-    private static boolean lowGear = true;
+    private boolean lowGear = true;
 
     private double maxTurnSpeed;
     private double maxStraightSpeed;
     private RobotMap robotMap;
 
-    public SWATDrive(RobotMap roboMap) {
-
-        robotMap = roboMap;
+    public SWATDrive(RobotMap robotMap) {
+        this.robotMap = robotMap;
         maxStraightSpeed = 1;
         maxTurnSpeed = 0.8;
     }

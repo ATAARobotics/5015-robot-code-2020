@@ -70,16 +70,16 @@ public class Shooter {
      * @param intakeDetector The bool of weather there is a ball ready to be intook
      * @param shootDetector The bool of weather there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, DigitalInput intakeDetector, DigitalInput shootDetector) {
-        this.shooterMotor = shooterMotor;
-        this.intakeMotor1 = intakeMotor1;
-        this.intakeMotor2 = intakeMotor2;
-        this.shooterEncoder = shooterEncoder;
-        this.intakeDetector = intakeDetector;
-        this.shootDetector = shootDetector;
+    public Shooter(RobotMap robotMap) {
+        this.shooterMotor = robotMap.getShooterMotor();
+        this.intakeMotor1 = robotMap.getElevatorMotor1();
+        this.intakeMotor2 = robotMap.getElevatorMotor2();
+        this.shooterEncoder = robotMap.getShooterEncoder();
+        this.intakeDetector = robotMap.getIntakeDetector();
+        this.shootDetector = robotMap.getShooterDetector();
 
         try {
-            this.pidSocket = new Socket("0.0.0.0", 54345);
+            this.pidSocket = new Socket("0.0.0.0", 54345); // TODO: Get driver station's ip automatically
             this.pidStream = new PrintWriter(pidSocket.getOutputStream(), true);
         } catch(IOException ex) {
             DriverStation.reportError(String.format("Error initializing pidStuff: %s", ex.toString()), false);
