@@ -30,7 +30,7 @@ public class Teleop {
         //Initialize Classes
         joysticks = new OI();
         this.driveTrain = robotMap.swatDrive;
-        // this.encoders = robotMap.getDriveEncoder();
+        // this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;

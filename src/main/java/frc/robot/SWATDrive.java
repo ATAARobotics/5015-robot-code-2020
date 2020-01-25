@@ -18,9 +18,8 @@ public class SWATDrive {
     private double maxStraightSpeed;
     private RobotMap robotMap;
 
-    public SWATDrive(RobotMap roboMap) {
-
-        robotMap = roboMap;
+    public SWATDrive(RobotMap robotMap) {
+        this.robotMap = robotMap;
         maxStraightSpeed = 1;
         maxTurnSpeed = 0.8;
     }

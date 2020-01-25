@@ -47,7 +47,7 @@ public class RobotMap {
     // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
     // private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder); // Group
     // Shooter
-    private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
+    private CANEncoder shooterEncoders = new CANEncoder(shooterMotor);
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
@@ -67,7 +67,7 @@ public class RobotMap {
 
     public RobotMap() {
 
-        // TODO: Uncomment/add camera code
+        // TODO: Reenable camera code
         // UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
         // Shuffleboard.getTab("Camera").add(camera);
         // camera.setFPS(30);
@@ -78,6 +78,7 @@ public class RobotMap {
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
         shooter = new Shooter(this);
+
         // Make each side controlled with only one motor object each
         rearLeftMotor.follow(frontLeftMotor);
         rearRightMotor.follow(frontRightMotor);
@@ -85,56 +86,96 @@ public class RobotMap {
         NavX.initializeNavX();
     }
 
-    public SpeedControllerGroup getLeftMotors() {
-        return leftMotors;
-    }
+    // Drive train
 
-    public SpeedControllerGroup getRightMotors() {
-        return rightMotors;
-    }
+    /**
+     * Returns the double solenoid accessed with the gear shifting functionality
+     * TODO: make a wrapper class for this.
+     */
+    // public DoubleSolenoid getGearShift() {
+    //     return gearShiftSolenoid;
+    // }
 
-    /*public DoubleSolenoid getGearShift() {
-        return gearShiftSolenoid;
-    }*/
+    /**
+     * Returns the encoders associated with the drive train.
+     * TODO: make a wrapper class for this.
+     */
+    // public Encoders getDriveEncoders() {
+    //     return driveEncoders;
+    // }
 
-    /*public Encoders getDriveEncoder() {
-        return driveEncoder;
-    }*/
-
-    public CANEncoder getShooterEncoder() {
-        return shooterEncoder;
-    }
-
-    public DifferentialDrive getDriveTrain() {
+    /**
+     * For internal use in SWATDrive.java.
+     * Returns the DifferentialDrive object associated with the drive train.
+     */
+    protected DifferentialDrive getDriveTrain() {
         return driveTrain;
     }
 
+    /**
+     * Returns the navx attached to the robot.
+     * TODO: make a wrapper class for this.
+     */
     public Gyro getGyro() {
         return NavX;
     }
 
-    public CANSparkMax getShooterMotor() {
+    // Shooter / Elevator
+
+    /**
+     * For internal use in Shooter.java.
+     * Returns the hardware encoder on the shooter motor.
+     */
+    protected CANEncoder getShooterEncoder() {
+        return shooterEncoder;
+    }
+
+    /**
+     * For internal use in Shooter.java.
+     * Returns the hardware shooter motor.
+     */
+    protected CANSparkMax getShooterMotor() {
         return shooterMotor;
     }
 
-    public VictorSPX getElevatorMotor1() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the first elevator motor.
+     */
+    protected VictorSPX getElevatorMotor1() {
         return elevatorMotor1;
     }
 
-    public VictorSPX getElevatorMotor2() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the seconed elevator motor.
+     */
+    protected VictorSPX getElevatorMotor2() {
         return elevatorMotor2;
     }
 
-    public DigitalInput getIntakeDetector() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the detector for balls waiting at the intake
+     */
+    protected DigitalInput getIntakeDetector() {
         return intakeDetector;
     }
 
-    public DigitalInput getShooterDetector() {
+    /**
+     * For internal use in Shooter.java.
+     * TODO: Replace this with a detector for the shooter encoder slowing down.
+     * Returns the shooting detector, which detects balls exiting the robot
+     */
+    protected DigitalInput getShooterDetector() {
         return shooterDetector;
     }
 
-    public ColorSensorV3 getColorSensor() {
+    /**
+     * For internal use in Shooter.java.
+     * Returns the hardware color sensor for the control panel.
+     */
+    protected ColorSensorV3 getColorSensor() {
         return colorSensorHardware;
-
     }
 }

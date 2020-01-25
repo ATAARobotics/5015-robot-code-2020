@@ -79,7 +79,7 @@ public class Shooter {
         this.shootDetector = robotMap.getShooterDetector();
 
         try {
-            this.pidSocket = new Socket("0.0.0.0", 54345);
+            this.pidSocket = new Socket("0.0.0.0", 54345); // TODO: Get driver station's ip automatically
             this.pidStream = new PrintWriter(pidSocket.getOutputStream(), true);
         } catch(IOException ex) {
             DriverStation.reportError(String.format("Error initializing pidStuff: %s", ex.toString()), false);
