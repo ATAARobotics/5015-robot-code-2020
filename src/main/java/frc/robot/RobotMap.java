@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import frc.robot.vision.LimeLight;
+
 /**
  * A centralized file that keeps track of all robot actuators and physical components
  *
@@ -19,7 +21,7 @@ import edu.wpi.first.wpilibj.SpeedControllerGroup;
 public class RobotMap {
     // Color wheel / Control Panel
     private final I2C.Port colorPort = I2C.Port.kOnboard;
-    private final ColorSensorV3 colorSensor = new ColorSensorV3(colorPort);
+    private final ColorSensorV3 colorSensorHardware = new ColorSensorV3(colorPort);
 
     // Motors
     // Drive
@@ -35,17 +37,17 @@ public class RobotMap {
     private VictorSPX elevatorMotor2 = new VictorSPX(6);
 
     // Shooter
-    private CANSparkMax shooter = new CANSparkMax(7, MotorType.kBrushless);
+    private CANSparkMax shooterMotor = new CANSparkMax(7, MotorType.kBrushless);
     private DigitalInput intakeDetector = new DigitalInput(0);
     private DigitalInput shooterDetector = new DigitalInput(1);
 
-    //Encoders
+    // Encoders
     // Drive
     // private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
     // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
     // private Encoders driveEncoder = new Encoders(leftEncoder, rightEncoder); // Group
     // Shooter
-    private CANEncoder shooterEncoder = new CANEncoder(shooter);
+    private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
@@ -56,6 +58,12 @@ public class RobotMap {
     // Gyro
     private Gyro NavX = new Gyro();
 
+    // Controllers for specific actions on the robot, these classes should be
+    // accessed directly because they have nice interfaces
+    public SWATDrive swatDrive;
+    public ColorSensor colorSensor;
+    public LimeLight limeLight;
+    public Shooter shooter;
 
     public RobotMap() {
 
@@ -65,6 +73,11 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
+        // Init submodules
+        swatDrive = new SWATDrive(this);
+        colorSensor = new ColorSensor(this);
+        limeLight = new LimeLight();
+        shooter = new Shooter(this);
         // Make each side controlled with only one motor object each
         rearLeftMotor.follow(frontLeftMotor);
         rearRightMotor.follow(frontRightMotor);
@@ -100,8 +113,8 @@ public class RobotMap {
         return NavX;
     }
 
-    public CANSparkMax getShooter() {
-        return shooter;
+    public CANSparkMax getShooterMotor() {
+        return shooterMotor;
     }
 
     public VictorSPX getElevatorMotor1() {
@@ -121,7 +134,7 @@ public class RobotMap {
     }
 
     public ColorSensorV3 getColorSensor() {
-        return colorSensor;
+        return colorSensorHardware;
 
     }
 }
