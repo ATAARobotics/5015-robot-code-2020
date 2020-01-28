@@ -69,13 +69,13 @@ public class Shooter {
 
 
     /**
-     * Constructs a shooter object with the motors for the shooter and the intake/elevator,
+     * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as limit switches for the intake and shooter.
      * @param shooterMotor The motor that shoots balls
-     * @param intakeMotor1 The first motor in the elevator
-     * @param intakeMotor1 The second motor in the elevator
-     * @param intakeDetector The bool of weather there is a ball ready to be intook
-     * @param shootDetector The bool of weather there is a ball being shot
+     * @param intakeMotor1 The first motor in the conveyor
+     * @param intakeMotor1 The second motor in the conveyor
+     * @param intakeDetector The boolean of whether there is a ball ready to be intook
+     * @param shootDetector The boolean of whether there is a ball being shot
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, DigitalInput intakeDetector, DigitalInput shootDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;

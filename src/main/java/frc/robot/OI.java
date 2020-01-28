@@ -5,17 +5,18 @@ class OI {
 
     //Driver Variables
     private XboxController driveStick = new XboxController(0);
-    //private String driverScheme = "Default";
+    private String driverScheme = "Default";
     private double XSpeed;
     private double ZRotation;
     private boolean gearShift;
     private boolean slow;
     private boolean visionButton;
     private boolean shoot;
+    private boolean climbToggle;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
-    //private String gunnerScheme = "Default";
+    private String gunnerScheme = "Default";
     private boolean discoToggle;
 
     //Special Function variables
@@ -30,33 +31,32 @@ class OI {
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
         visionButton = driveStick.getBackButtonReleased();
-        shoot = driveStick.getBButton();
-        //TODO Add any new controls for driver
+        climbToggle = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
 
         //Switch statement to determine controls for the driver
-        /*switch (driverScheme) {
+        switch (driverScheme) {
             case "Reverse Turning":
                 XSpeed = -driveStick.getY(Hand.kLeft);
                 ZRotation = driveStick.getX(Hand.kRight);
                 break;
-            default:*/
+            default:
                 XSpeed = driveStick.getY(Hand.kLeft);
                 ZRotation = -driveStick.getX(Hand.kRight);
-                //break;
-        //}
+                break;
+        }
 
-        //TODO Add controls for gunner
-
-        //Switch statement to detirmine controls for the gunner
-
-        /*switch (gunnerScheme) {
+        //Switch statement to determine controls for the gunner
+        switch (gunnerScheme) {
             case "Fun Mode":
+
                 discoToggle = gunnerStick.getStartButtonReleased();
                 break;
+
             default:
 
+                shoot = gunnerStick.getBButton();
                 break;
-        }*/
+        }
     }
 
     //Getter functions for controls
@@ -89,5 +89,9 @@ class OI {
     }*/
 	public boolean getShoot() {
 		return shoot;
-	}
+    }
+    
+    public boolean getClimbButton() {
+        return climbToggle;
+    }
 }

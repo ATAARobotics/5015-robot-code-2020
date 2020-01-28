@@ -34,25 +34,32 @@ public class RobotMap {
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
 
-    // Elevator
-    private VictorSPX elevatorMotor1 = new VictorSPX(5);
-    private VictorSPX elevatorMotor2 = new VictorSPX(6);
+    //Ball conveyor
+    private VictorSPX conveyorMotor1 = new VictorSPX(5);
+    private VictorSPX conveyorMotor2 = new VictorSPX(6);
     
-    //Add shooter and conveyor belt
+    //Add shooter
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
     private CANPIDController shootController = shootMotor.getPIDController();
     private DigitalInput intakeDetector = new DigitalInput(0);
     private DigitalInput shooterDetector = new DigitalInput(1);
 
+    //Add climber
+    private CANSparkMax leftClimbMotor = new CANSparkMax(8, MotorType.kBrushless);
+    private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
+
     //Encoders
     //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
     //private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
     private CANEncoder shooterEncoder = shootMotor.getEncoder();
+    private CANEncoder climbEncoder = getClimberMotors().getEncoder();
 
     //Add drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     // Pneumatics
+    private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
+
     // private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
 
     // Gyro
@@ -68,6 +75,10 @@ public class RobotMap {
         // Shuffleboard.getTab("Camera").add(camera);
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
+
+        //
+        leftClimbMotor.setInverted(true);
+        leftClimbMotor.follow(rightClimbMotor);
 
         // Make each side controlled with only one motor object each
         rearLeftMotor.follow(frontLeftMotor);
@@ -130,18 +141,18 @@ public class RobotMap {
 
     /**
      * For internal use in Shooter.java.
-     * Returns the first elevator motor.
+     * Returns the first conveyor motor.
      */
-    protected VictorSPX getElevatorMotor1() {
-        return elevatorMotor1;
+    protected VictorSPX getConveyorMotor1() {
+        return conveyorMotor1;
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the seconed elevator motor.
+     * Returns the seconed conveyor motor.
      */
-    protected VictorSPX getElevatorMotor2() {
-        return elevatorMotor2;
+    protected VictorSPX getConveyorMotor2() {
+        return conveyorMotor2;
     }
 
     /**
@@ -171,5 +182,17 @@ public class RobotMap {
 
 	public CANPIDController getShooterController() {
 		return shootController;
+    }
+
+    public CANSparkMax getClimberMotors() {
+        return rightClimbMotor;
+    }
+
+    public DoubleSolenoid getClimberSolenoid() {
+        return climberSolenoid;
+    }
+
+    public CANEncoder getClimbEncoder() {
+        return climbEncoder;
     }
 }

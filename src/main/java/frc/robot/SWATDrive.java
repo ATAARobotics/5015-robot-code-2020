@@ -9,10 +9,10 @@ import edu.wpi.first.wpilibj.DoubleSolenoid;
  */
 public class SWATDrive {
 
-    //slow variable
+    /* //slow variable
     private boolean slow = false;
     //low gear variable
-    private static boolean lowGear = true;
+    private static boolean lowGear = true; */
 
     private double maxTurnSpeed;
     private double maxStraightSpeed;
@@ -28,8 +28,7 @@ public class SWATDrive {
         lowGear = !lowGear;
         if(lowGear) {
             robotMap.getGearShift().set(DoubleSolenoid.Value.kReverse);
-        }
-        else {
+        } else {
             robotMap.getGearShift().set(DoubleSolenoid.Value.kForward);
         }
     }
@@ -42,8 +41,7 @@ public class SWATDrive {
             robotMap.getDriveTrain().setMaxOutput(0.7);
             maxTurnSpeed = 0.7;
             maxStraightSpeed = 0.7;
-        }
-        else {
+        } else {
             robotMap.getDriveTrain().setMaxOutput(1);
             maxTurnSpeed = 0.8;
             maxStraightSpeed = 1;
