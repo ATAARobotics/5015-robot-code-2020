@@ -37,10 +37,10 @@ public class RobotMap {
     //Ball conveyor
     private VictorSPX conveyorMotor1 = new VictorSPX(5);
     private VictorSPX conveyorMotor2 = new VictorSPX(6);
-    
-    //Add shooter
-    private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
-    private CANPIDController shootController = shootMotor.getPIDController();
+
+    // Shooter
+    private CANSparkMax shooterMotor = new CANSparkMax(7, MotorType.kBrushless);
+    private CANPIDController shootController = shooterMotor.getPIDController();
     private DigitalInput intakeDetector = new DigitalInput(0);
     private DigitalInput shooterDetector = new DigitalInput(1);
 
@@ -48,25 +48,33 @@ public class RobotMap {
     private CANSparkMax leftClimbMotor = new CANSparkMax(8, MotorType.kBrushless);
     private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
 
-    //Encoders
-    //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
-    //private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
-    private CANEncoder shooterEncoder = shootMotor.getEncoder();
+    // Encoders
+    // Drive
+    // private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
+    // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
+    // Shooter
+    private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
+    // Climber
     private CANEncoder climbEncoder = getClimberMotors().getEncoder();
 
-    //Add drivetrain
+    // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     // Pneumatics
+    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
     private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
 
-    // private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
 
     // Gyro
     private Gyro NavX = new Gyro();
 
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
+    public SWATDrive swatDrive;
+    public ColorSensor colorSensor;
+    public LimeLight limeLight;
+    public Shooter shooter;
+    public Climber climber;
 
     public RobotMap() {
 
@@ -80,13 +88,20 @@ public class RobotMap {
         leftClimbMotor.setInverted(true);
         leftClimbMotor.follow(rightClimbMotor);
 
+        // Init submodules
+        swatDrive = new SWATDrive(this);
+        colorSensor = new ColorSensor(this);
+        limeLight = new LimeLight();
+        shooter = new Shooter(this);
+        climber = new Climber(this);
+
         // Make each side controlled with only one motor object each
         rearLeftMotor.follow(frontLeftMotor);
         rearRightMotor.follow(frontRightMotor);
-
-        NavX.initializeNavX();
         // PID coefficients
 
+
+        NavX.initializeNavX();
     }
 
     // Drive train
@@ -123,6 +138,8 @@ public class RobotMap {
         return NavX;
     }
 
+    // Shooter / Elevator
+
     /**
      * For internal use in Shooter.java.
      * Returns the hardware encoder on the shooter motor.
@@ -136,7 +153,7 @@ public class RobotMap {
      * Returns the hardware shooter motor.
      */
     protected CANSparkMax getShooterMotor() {
-        return shootMotor;
+        return shooterMotor;
     }
 
     /**
@@ -180,8 +197,8 @@ public class RobotMap {
         return colorSensorHardware;
     }
 
-	public CANPIDController getShooterController() {
-		return shootController;
+    public CANPIDController getShooterController() {
+        return shootController;
     }
 
     public CANSparkMax getClimberMotors() {

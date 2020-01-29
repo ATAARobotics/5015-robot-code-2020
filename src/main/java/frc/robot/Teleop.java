@@ -28,17 +28,17 @@ public class Teleop {
     private double D = 0.05;
     private double tolerance = 0.2;
 
-    public Teleop(SWATDrive driveTrain, Encoders encoders, ColorSensor colorSensor, LimeLight limeLight, Shooter shooter, Climber climber) {
+    public Teleop(RobotMap robotMap) {
         //Initialize Classes
         joysticks = new OI();
-        this.driveTrain = driveTrain;
-        this.encoders = encoders;
-        this.limeLight = limeLight;
-        this.shooter = shooter;
-        this.climber = climber;
-        this.colorSensor = colorSensor;
+        this.driveTrain = robotMap.swatDrive;
+        // this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
+        this.limeLight = robotMap.limeLight;
+        this.shooter = robotMap.shooter;
+        this.colorSensor = robotMap.colorSensor;
+        this.climber = robotMap.climber;
     }
-  
+
     public void teleopInit() {
         //encoders.reset();
 

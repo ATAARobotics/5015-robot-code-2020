@@ -77,14 +77,14 @@ public class Shooter {
      * @param intakeDetector The boolean of whether there is a ball ready to be intook
      * @param shootDetector The boolean of whether there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, DigitalInput intakeDetector, DigitalInput shootDetector, CANPIDController shooterController) {
-        this.shooterMotor = shooterMotor;
-        this.intakeMotor1 = intakeMotor1;
-        this.intakeMotor2 = intakeMotor2;
-        this.shooterEncoder = shooterEncoder;
-        this.intakeDetector = intakeDetector;
-        this.shootDetector = shootDetector;
-        this.shooterController = shooterController;
+    public Shooter(RobotMap robotMap) {
+        this.shooterMotor = robotMap.getShooterMotor();
+        this.intakeMotor1 = robotMap.getConveyorMotor1();
+        this.intakeMotor2 = robotMap.getConveyorMotor2();
+        this.shooterEncoder = robotMap.getShooterEncoder();
+        this.intakeDetector = robotMap.getIntakeDetector();
+        this.shootDetector = robotMap.getShooterDetector();
+        this.shooterController = robotMap.getShooterController();
 
         try {
             this.pidSocket = new Socket("172.22.11.1", 21);
@@ -100,12 +100,12 @@ public class Shooter {
      */
     public void PIDInit() {
         // set PID coefficients
-        kP = 0; 
+        kP = 0;
         kI = 0;
-        kD = 0; 
-        kIz = 0; 
-        kFF = 0; 
-        kMaxOutput = 1; 
+        kD = 0;
+        kIz = 0;
+        kFF = 0;
+        kMaxOutput = 1;
         kMinOutput = -1;
         maxRPM = 5700;
         shooterController.setP(kP);
@@ -159,9 +159,9 @@ public class Shooter {
         }
         if ((max != kMaxOutput) || (min != kMinOutput)) {
             shooterController.setOutputRange(min, max);
-            kMinOutput = min; kMaxOutput = max; 
+            kMinOutput = min; kMaxOutput = max;
         }
-    
+
         SmartDashboard.putNumber("SetPoint", setPoint);
         SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
 

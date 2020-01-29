@@ -90,7 +90,7 @@ class OI {
 	public boolean getShoot() {
 		return shoot;
     }
-    
+
     public boolean getClimbButton() {
         return climbToggle;
     }

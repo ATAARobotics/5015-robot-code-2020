@@ -22,10 +22,10 @@ public class Climber {
 
     private CANEncoder climbEncoder = null;
 
-    public Climber(CANSparkMax climberMotors, DoubleSolenoid climberSolenoid, CANEncoder climbEncoder) {
-        this.climberMotors = climberMotors;
-        this.climberSolenoid = climberSolenoid;
-        this.climbEncoder = climbEncoder;
+    public Climber(RobotMap robotMap) {
+        this.climberMotors = robotMap.getClimberMotors();
+        this.climberSolenoid = robotMap.getClimberSolenoid();
+        this.climbEncoder = robotMap.getClimbEncoder();
     }
 
     public void moveClimber() {
@@ -42,7 +42,7 @@ public class Climber {
 
                     switch (step) {
                         case 0:
-                            
+
                             climberMotors.set(-1.0);
                             step++;
                             climbEncoder.setPosition(0);
@@ -57,21 +57,21 @@ public class Climber {
                             }
 
                             break;
-                    
+
                         default:
 
                             DriverStation.reportError("Invalid climb step of " + step, false);
                             break;
                     }
-                    
+
                     break;
-                
+
                 case 2:
 
                     climberMotors.set(0);
                     climberSolenoid.set(DoubleSolenoid.Value.kForward);
                     climbing = false;
-            
+
                 default:
 
                     DriverStation.reportError("Invalid climberState of " + climberState, false);
@@ -91,7 +91,7 @@ public class Climber {
             DriverStation.reportError("CLIMB ABORTED BY DRIVER", false);
         }
     }
-    
+
     public boolean getClimbing() {
         return climbing;
     }
