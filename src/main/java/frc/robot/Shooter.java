@@ -104,7 +104,10 @@ public class Shooter {
         kI = 0;
         kD = 0;
         kIz = 0;
-        kFF = 0;
+
+        //Max rpm
+        kFF = 5600;
+        
         kMaxOutput = 1;
         kMinOutput = -1;
         maxRPM = 5700;
@@ -168,6 +171,7 @@ public class Shooter {
     }
     public void shooterPeriodic() {
         setShooter(shooterActive);
+        PIDPeriodic();
     }
     private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
         if (running) {
@@ -189,8 +193,8 @@ public class Shooter {
         } else {
             setPoint = 0 * maxRPM;
         }
-        shooterController.setReference(setPoint, ControlType.kVelocity);
-
+        //shooterController.setReference(setPoint, ControlType.kVelocity);
+        shooterMotor.set(1.0);
     }
 
     /**

@@ -21,7 +21,7 @@ public class Robot extends TimedRobot {
     LimeLight limeLight = null;
     RobotMap robotMap = null;
     Shooter shooter = null;
-    Climber climber = null;
+    //Climber climber = null;
     SWATDrive driveTrain = null;
     Gyro gyro = null;
 
@@ -63,6 +63,8 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putNumber("Balls Stored", 3.0);
 
+        robotMap.shooter.PIDInit();
+
         teleop.teleopInit();
         auto.AutoInit();
         robotMap.limeLight.ledOff();
@@ -91,7 +93,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        shooter.setBallsStored((int)SmartDashboard.getNumber("Balls Stored", 3));
+        robotMap.shooter.setBallsStored((int)SmartDashboard.getNumber("Balls Stored", 3));
     }
 
     @Override

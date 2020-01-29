@@ -7,13 +7,13 @@ import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
 
 public class Teleop {
-    // Vairables for robot classes
+    // Variables for robot classes
     private SWATDrive driveTrain = null;
     private Encoders encoders = null;
     private OI joysticks = null;
     private LimeLight limeLight = null;
     private Shooter shooter = null;
-    private Climber climber = null;
+    //private Climber climber = null;
     private ColorSensor colorSensor = null;
 
     public boolean PIDEnabled = false;
@@ -36,7 +36,7 @@ public class Teleop {
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
-        this.climber = robotMap.climber;
+        //this.climber = robotMap.climber;
     }
 
     public void teleopInit() {
@@ -73,7 +73,7 @@ public class Teleop {
             shooter.shoot(shootButton);
             shooter.shooterPeriodic();
             //visionAlignPID.setAbsoluteTolerance(tolerance);
-            //drive
+            drive(joysticks.getXSpeed(), joysticks.getZRotation(), true);
 
             if(joysticks.getVisionButton()) {
                 visionActive = !visionActive;
@@ -133,26 +133,28 @@ public class Teleop {
                 }
                 /*if(joysticks.getGearShift()) {
                     driveTrain.gearShift();
-                }
+                }*/
+
                 if (joysticks.getSlow()) {
                     driveTrain.slow();
-                }*/
+                }
             }
         }
 
-        if (joysticks.getClimbButton()) {
+        /* if (joysticks.getClimbButton()) {
             climber.toggleClimb();
-        }
+        } */
     }
 
-	/*public void drive(double speedA, double speedB, boolean arcade) {
+	public void drive(double speedA, double speedB, boolean arcade) {
+
         if(arcade) {
             driveTrain.arcadeDrive(speedA, speedB);
         }
         else {
             driveTrain.tankDrive(speedA, speedB);
         }
-	}*/
+	}
 
     // -- Vision: --
     // Start alignment PID
@@ -180,11 +182,11 @@ public class Teleop {
         //driveTrain.gearShiftSafe();
         joysticks.checkInputs();
 
-        /*driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
+        driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
         if (joysticks.getSlow()) {
             driveTrain.slow();
         }
-        else;*/
+        else;
     }
     /*public void setDriveScheme(String driveScheme){
         joysticks.setDriveScheme(driveScheme);

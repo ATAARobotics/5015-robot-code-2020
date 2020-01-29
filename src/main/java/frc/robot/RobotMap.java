@@ -5,6 +5,8 @@ import com.revrobotics.ColorSensorV3;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 
@@ -27,10 +29,10 @@ public class RobotMap {
 
     // Motors
     // Drive
-    private CANSparkMax frontLeftMotor = new CANSparkMax(1, MotorType.kBrushless);
-    private CANSparkMax rearLeftMotor = new CANSparkMax(4, MotorType.kBrushless);
-    private CANSparkMax frontRightMotor = new CANSparkMax(3, MotorType.kBrushless);
-    private CANSparkMax rearRightMotor = new CANSparkMax(2, MotorType.kBrushless);
+    private WPI_VictorSPX frontLeftMotor = new WPI_VictorSPX(2);
+    private WPI_TalonSRX rearLeftMotor = new WPI_TalonSRX(1);
+    private WPI_VictorSPX frontRightMotor = new WPI_VictorSPX(4);
+    private WPI_TalonSRX rearRightMotor = new WPI_TalonSRX(3);
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
 
@@ -45,8 +47,8 @@ public class RobotMap {
     private DigitalInput shooterDetector = new DigitalInput(1);
 
     //Add climber
-    private CANSparkMax leftClimbMotor = new CANSparkMax(8, MotorType.kBrushless);
-    private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
+    //private CANSparkMax leftClimbMotor = new CANSparkMax(8, MotorType.kBrushless);
+    //private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
 
     // Encoders
     // Drive
@@ -55,14 +57,14 @@ public class RobotMap {
     // Shooter
     private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
     // Climber
-    private CANEncoder climbEncoder = getClimberMotors().getEncoder();
+    //private CANEncoder climbEncoder = getClimberMotors().getEncoder();
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     // Pneumatics
-    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
-    private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
+    //private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
+    //private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
 
 
     // Gyro
@@ -74,7 +76,7 @@ public class RobotMap {
     public ColorSensor colorSensor;
     public LimeLight limeLight;
     public Shooter shooter;
-    public Climber climber;
+    //public Climber climber;
 
     public RobotMap() {
 
@@ -85,19 +87,19 @@ public class RobotMap {
         // camera.setResolution(160, 120);
 
         //
-        leftClimbMotor.setInverted(true);
-        leftClimbMotor.follow(rightClimbMotor);
+        //leftClimbMotor.setInverted(true);
+        //leftClimbMotor.follow(rightClimbMotor);
 
         // Init submodules
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
         shooter = new Shooter(this);
-        climber = new Climber(this);
+        //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
-        rearLeftMotor.follow(frontLeftMotor);
-        rearRightMotor.follow(frontRightMotor);
+        frontLeftMotor.follow(rearLeftMotor);
+        frontRightMotor.follow(rearRightMotor);
         // PID coefficients
 
 
@@ -201,7 +203,7 @@ public class RobotMap {
         return shootController;
     }
 
-    public CANSparkMax getClimberMotors() {
+    /* public CANSparkMax getClimberMotors() {
         return rightClimbMotor;
     }
 
@@ -211,5 +213,5 @@ public class RobotMap {
 
     public CANEncoder getClimbEncoder() {
         return climbEncoder;
-    }
+    }*/
 }

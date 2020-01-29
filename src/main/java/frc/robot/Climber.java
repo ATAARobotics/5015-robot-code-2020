@@ -1,4 +1,4 @@
-package frc.robot;
+/* package frc.robot;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -96,3 +96,4 @@ public class Climber {
         return climbing;
     }
 }
+ */
