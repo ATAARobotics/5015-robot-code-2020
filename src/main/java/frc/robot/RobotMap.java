@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import frc.robot.vision.LimeLight;
 
 /**
@@ -41,8 +42,8 @@ public class RobotMap {
     //Add shooter and conveyor belt
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
     private CANPIDController shootController = shootMotor.getPIDController();
-    private DigitalInput intakeDetector = new DigitalInput(0);
-    private DigitalInput shooterDetector = new DigitalInput(1);
+    private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
+    private Ultrasonic shooterDetector = new Ultrasonic(2, 3);
 
     //Encoders
     //private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
@@ -148,7 +149,7 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the detector for balls waiting at the intake
      */
-    protected DigitalInput getIntakeDetector() {
+    protected Ultrasonic getIntakeDetector() {
         return intakeDetector;
     }
 
@@ -157,7 +158,7 @@ public class RobotMap {
      * TODO: Replace this with a detector for the shooter encoder slowing down.
      * Returns the shooting detector, which detects balls exiting the robot
      */
-    protected DigitalInput getShooterDetector() {
+    protected Ultrasonic getShooterDetector() {
         return shooterDetector;
     }
 
