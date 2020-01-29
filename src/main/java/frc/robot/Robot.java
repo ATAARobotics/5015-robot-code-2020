@@ -21,6 +21,7 @@ public class Robot extends TimedRobot {
     LimeLight limeLight = null;
     RobotMap robotMap = null;
     Shooter shooter = null;
+    Climber climber = null;
     SWATDrive driveTrain = null;
     Gyro gyro = null;
 
@@ -42,16 +43,8 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         robotMap = new RobotMap();
-        //encoders = robotMap.getDriveEncoder();
-        driveTrain = new SWATDrive(robotMap);
-        gyro = robotMap.getGyro();
-        colorSensor = new ColorSensor(robotMap.getColorSensor());
-        limeLight = new LimeLight();
-        shooter = new Shooter(robotMap.getShooterMotor(), robotMap.getElevatorMotor1(), 
-                robotMap.getElevatorMotor2(), robotMap.getShooterEncoder(), robotMap.getIntakeDetector(), 
-                robotMap.getShooterDetector(), robotMap.getShooterController());
-        teleop = new Teleop(driveTrain, encoders, colorSensor, limeLight, shooter);
-        auto = new Auto(driveTrain, encoders, gyro);
+        teleop = new Teleop(robotMap);
+        auto = new Auto(robotMap);
     }
 
     @Override
@@ -72,7 +65,7 @@ public class Robot extends TimedRobot {
 
         teleop.teleopInit();
         auto.AutoInit();
-        limeLight.ledOff();
+        robotMap.limeLight.ledOff();
     }
 
     /**
