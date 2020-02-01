@@ -41,6 +41,7 @@ public class RobotMap {
     
     //Add shooter and conveyor belt
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
+    private VictorSPX intakeMotor = new VictorSPX(8);
     private CANPIDController shootController = shootMotor.getPIDController();
     private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
     private Ultrasonic shooterDetector = new Ultrasonic(2, 3);
@@ -93,7 +94,7 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, shooterEncoder, intakeDetector, shooterDetector, shootController);
+        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, intakeDetector, shooterDetector, shootController);
         //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each

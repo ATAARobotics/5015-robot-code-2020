@@ -52,8 +52,9 @@ public class Shooter {
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
     private CANPIDController shooterController = null;
-    private VictorSPX intakeMotor1 = null;
-    private VictorSPX intakeMotor2 = null;
+    private VictorSPX magazineMotor1 = null;
+    private VictorSPX magazineMotor2 = null;
+    private VictorSPX intakeMotor = null;
     private Ultrasonic intakeDetector = null;
     private Ultrasonic shootDetector = null;
     private Socket pidSocket = null;
@@ -73,16 +74,18 @@ public class Shooter {
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as limit switches for the intake and shooter.
      * @param shooterMotor The motor that shoots balls
-     * @param intakeMotor1 The first motor in the elevator
-     * @param intakeMotor1 The second motor in the elevator
+     * @param magazineMotor1 The first motor in the elevator
+     * @param magazineMotor2 The second motor in the elevator
+     * @param intakeMotor The intake motor
      * @param digitalInput The bool of weather there is a ball ready to be intook
      * @param digitalInput2 The bool of weather there is a ball being shot
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, 
+    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor1, VictorSPX magazineMotor2, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
             Ultrasonic intakeDetector, Ultrasonic shootDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
-        this.intakeMotor1 = intakeMotor1;
-        this.intakeMotor2 = intakeMotor2;
+        this.magazineMotor1 = magazineMotor1;
+        this.magazineMotor2 = magazineMotor2;
+        this.intakeMotor = intakeMotor;
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
@@ -177,11 +180,13 @@ public class Shooter {
     }
     private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
         if (running) {
-            intakeMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
-            intakeMotor2.set(ControlMode.PercentOutput,intakeSpeed);
+            magazineMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
+            magazineMotor2.set(ControlMode.PercentOutput,intakeSpeed);
+            intakeMotor.set(ControlMode.PercentOutput, 0.15);
         } else {
-            intakeMotor1.set(ControlMode.PercentOutput,0.0);
-            intakeMotor2.set(ControlMode.PercentOutput,0.0);
+            magazineMotor1.set(ControlMode.PercentOutput,0.0);
+            magazineMotor2.set(ControlMode.PercentOutput,0.0);
+            intakeMotor.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
