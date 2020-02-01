@@ -79,13 +79,13 @@ public class Shooter {
      * @param digitalInput2 The bool of weather there is a ball being shot
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, 
-            Ultrasonic ultrasonic, Ultrasonic ultrasonic2, CANPIDController shooterController) {
+            Ultrasonic intakeDetector, Ultrasonic shootDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.intakeMotor1 = intakeMotor1;
         this.intakeMotor2 = intakeMotor2;
         this.shooterEncoder = shooterEncoder;
-        this.intakeDetector = ultrasonic;
-        this.shootDetector = ultrasonic2;
+        this.intakeDetector = intakeDetector;
+        this.shootDetector = shootDetector;
         this.shooterController = shooterController;
 
         try {
