@@ -229,8 +229,7 @@ public class Shooter {
         } else {
             setPoint = 0 * maxRPM;
         }
-        //shooterController.setReference(setPoint, ControlType.kVelocity);
-        shooterMotor.set(1.0);
+        shooterController.setReference(setPoint, ControlType.kVelocity);
     }
 
     /**
