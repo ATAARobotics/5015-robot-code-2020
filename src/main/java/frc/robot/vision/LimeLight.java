@@ -16,6 +16,7 @@ public class LimeLight {
     NetworkTableEntry tx;
     NetworkTableEntry ty;
     NetworkTableEntry ta;
+    NetworkTableEntry tc;
     NetworkTableEntry ledMode;
     NetworkTableEntry camMode;
 
@@ -25,6 +26,7 @@ public class LimeLight {
         tx = table.getEntry("tx");
         ty = table.getEntry("ty");
         ta = table.getEntry("ta");
+        tc = table.getEntry("tc");
         ledMode =  table.getEntry("ledMode");
         camMode = table.getEntry("camMode");
 
@@ -60,6 +62,14 @@ public class LimeLight {
      */
     public double getTa(){
         return ta.getDouble(0);
+    }
+
+    /**
+     * Returns rgb values at the target's crosshair
+     * @return Red, Green and Blue values at crosshair location
+     */
+    public double getTc(){
+        return tc.getDouble(0);
     }
 
     /**
