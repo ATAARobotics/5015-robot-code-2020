@@ -55,7 +55,7 @@ public class SWATDrive {
     }
 
     public void arcadeDrive(double speed, double rotation) {
-        robotMap.getDriveTrain().arcadeDrive(-speed, -rotation);
+        robotMap.getDriveTrain().arcadeDrive(-speed, rotation);
     }
 
     public void tankDrive(double lSpeed, double rSpeed) {

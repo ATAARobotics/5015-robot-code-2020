@@ -115,7 +115,7 @@ public class Shooter {
         
         kMaxOutput = 1;
         kMinOutput = -1;
-        maxRPM = 5700;
+        maxRPM = 5600;
         shooterController.setP(kP);
         shooterController.setI(kI);
         shooterController.setD(kD);
@@ -182,7 +182,7 @@ public class Shooter {
         if (running) {
             magazineMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
             magazineMotor2.set(ControlMode.PercentOutput,intakeSpeed);
-            intakeMotor.set(ControlMode.PercentOutput, 0.15);
+            intakeMotor.set(ControlMode.PercentOutput, -0.5);
         } else {
             magazineMotor1.set(ControlMode.PercentOutput,0.0);
             magazineMotor2.set(ControlMode.PercentOutput,0.0);
