@@ -1,20 +1,19 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.I2C;
-import com.revrobotics.ColorSensorV3;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.ColorSensorV3;
 
-import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
+import edu.wpi.first.wpilibj.Ultrasonic;
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+
 import frc.robot.vision.LimeLight;
 
 /**
@@ -36,15 +35,15 @@ public class RobotMap {
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
 
-    //Ball conveyor
-    private VictorSPX conveyorMotor1 = new VictorSPX(5);
-    private VictorSPX conveyorMotor2 = new VictorSPX(6);
-
-    // Shooter
-    private CANSparkMax shooterMotor = new CANSparkMax(7, MotorType.kBrushless);
-    private CANPIDController shootController = shooterMotor.getPIDController();
-    private DigitalInput intakeDetector = new DigitalInput(0);
-    private DigitalInput shooterDetector = new DigitalInput(1);
+    // Elevator
+    private VictorSPX elevatorMotor1 = new VictorSPX(5);
+    private VictorSPX elevatorMotor2 = new VictorSPX(6);
+    
+    //Add shooter and conveyor belt
+    private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
+    private CANPIDController shootController = shootMotor.getPIDController();
+    private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
+    private Ultrasonic shooterDetector = new Ultrasonic(2, 3);
 
     //Add climber
     //private CANSparkMax leftClimbMotor = new CANSparkMax(8, MotorType.kBrushless);
@@ -55,7 +54,7 @@ public class RobotMap {
     // private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
     // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
     // Shooter
-    private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
+    private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
     // Climber
     //private CANEncoder climbEncoder = getClimberMotors().getEncoder();
 
@@ -86,7 +85,7 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
-        //
+        
         //leftClimbMotor.setInverted(true);
         //leftClimbMotor.follow(rightClimbMotor);
 
@@ -94,7 +93,7 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        shooter = new Shooter(this);
+        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, shooterEncoder, intakeDetector, shooterDetector, shootController);
         //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
@@ -155,7 +154,7 @@ public class RobotMap {
      * Returns the hardware shooter motor.
      */
     protected CANSparkMax getShooterMotor() {
-        return shooterMotor;
+        return shootMotor;
     }
 
     /**
@@ -163,7 +162,7 @@ public class RobotMap {
      * Returns the first conveyor motor.
      */
     protected VictorSPX getConveyorMotor1() {
-        return conveyorMotor1;
+        return elevatorMotor1;
     }
 
     /**
@@ -171,14 +170,14 @@ public class RobotMap {
      * Returns the seconed conveyor motor.
      */
     protected VictorSPX getConveyorMotor2() {
-        return conveyorMotor2;
+        return elevatorMotor2;
     }
 
     /**
      * For internal use in Shooter.java.
      * Returns the detector for balls waiting at the intake
      */
-    protected DigitalInput getIntakeDetector() {
+    protected Ultrasonic getIntakeDetector() {
         return intakeDetector;
     }
 
@@ -187,7 +186,7 @@ public class RobotMap {
      * TODO: Replace this with a detector for the shooter encoder slowing down.
      * Returns the shooting detector, which detects balls exiting the robot
      */
-    protected DigitalInput getShooterDetector() {
+    protected Ultrasonic getShooterDetector() {
         return shooterDetector;
     }
 

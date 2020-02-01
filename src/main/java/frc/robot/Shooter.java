@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import java.lang.Math;
@@ -53,8 +54,8 @@ public class Shooter {
     private CANPIDController shooterController = null;
     private VictorSPX intakeMotor1 = null;
     private VictorSPX intakeMotor2 = null;
-    private DigitalInput intakeDetector = null;
-    private DigitalInput shootDetector = null;
+    private Ultrasonic intakeDetector = null;
+    private Ultrasonic shootDetector = null;
     private Socket pidSocket = null;
     private PrintWriter pidStream = null;
 
@@ -72,19 +73,20 @@ public class Shooter {
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as limit switches for the intake and shooter.
      * @param shooterMotor The motor that shoots balls
-     * @param intakeMotor1 The first motor in the conveyor
-     * @param intakeMotor1 The second motor in the conveyor
-     * @param intakeDetector The boolean of whether there is a ball ready to be intook
-     * @param shootDetector The boolean of whether there is a ball being shot
+     * @param intakeMotor1 The first motor in the elevator
+     * @param intakeMotor1 The second motor in the elevator
+     * @param digitalInput The bool of weather there is a ball ready to be intook
+     * @param digitalInput2 The bool of weather there is a ball being shot
      */
-    public Shooter(RobotMap robotMap) {
-        this.shooterMotor = robotMap.getShooterMotor();
-        this.intakeMotor1 = robotMap.getConveyorMotor1();
-        this.intakeMotor2 = robotMap.getConveyorMotor2();
-        this.shooterEncoder = robotMap.getShooterEncoder();
-        this.intakeDetector = robotMap.getIntakeDetector();
-        this.shootDetector = robotMap.getShooterDetector();
-        this.shooterController = robotMap.getShooterController();
+    public Shooter(CANSparkMax shooterMotor, VictorSPX intakeMotor1, VictorSPX intakeMotor2, CANEncoder shooterEncoder, 
+            Ultrasonic ultrasonic, Ultrasonic ultrasonic2, CANPIDController shooterController) {
+        this.shooterMotor = shooterMotor;
+        this.intakeMotor1 = intakeMotor1;
+        this.intakeMotor2 = intakeMotor2;
+        this.shooterEncoder = shooterEncoder;
+        this.intakeDetector = ultrasonic;
+        this.shootDetector = ultrasonic2;
+        this.shooterController = shooterController;
 
         try {
             this.pidSocket = new Socket("172.22.11.1", 21);
@@ -187,6 +189,35 @@ public class Shooter {
      * Sets the shooter on or off, uses shootSpeed for the power if on.
      * @param running Whether the shooter wheel should be spinning
      */
+    private boolean getIntakeDectector() {
+          
+        if(intakeDetector.getRangeInches() < 2.0 || intakeDetector.getRangeInches() > 245.0 && intakeDetector.getRangeInches() != 0.0){
+
+            return true;
+
+          }else if(intakeDetector.getRangeInches() == 0.0){
+              return false;
+
+          }else{
+              return false;
+          }
+      
+        
+    }
+
+    private boolean getShooterDectector() {
+
+        if(shootDetector.getRangeInches() < 2.0 || shootDetector.getRangeInches() > 245.0 && shootDetector.getRangeInches() != 0.0){
+
+            return true;
+            
+          }else if(shootDetector.getRangeInches() == 0.0){
+              return false;
+
+          }else{
+              return false;
+          }
+    }
     private void setShooter(boolean running) {
         if (running) {
             setPoint = shooterSpeed * maxRPM;
@@ -216,14 +247,14 @@ public class Shooter {
     public void intake(boolean override) {
         switch (intakeCase) {
             case WAITING:
-                if ((ballsStored < 5 || override) && intakeDetector.get()) {
+                if ((ballsStored < 5 || override) && getIntakeDectector()) {
                     setIntake(true);
                     intakeCase = IntakeCase.RUNNING;
                 }
 
                 break;
             case RUNNING:
-                if(!intakeDetector.get()) {
+                if(!getIntakeDectector()) {
                     setIntake(false);
                     ballsStored++;
                     intakeCase = IntakeCase.WAITING;
@@ -260,13 +291,13 @@ public class Shooter {
 
                     break;
                 case RUNNING_BEFORE_BALL: // Shooter running, before sensor sees a ball
-                    if (shootDetector.get()) {
+                    if (getShooterDectector()) {
                         shootCase = ShootCase.RUNNING_DURING_BALL;
                     }
 
                     break;
                 case RUNNING_DURING_BALL: // Shooter running, while sensor is seeing a ball
-                    if (!shootDetector.get()) {
+                    if (!getShooterDectector()) {
                         setIntake(false);
                         ballsStored--;
                         shooterStartTime = shooterCooldown;
