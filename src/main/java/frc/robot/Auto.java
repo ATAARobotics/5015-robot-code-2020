@@ -1,7 +1,8 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.wpilibj.controller.PIDController;
 //import frc.robot.pathweaver.PathFinder;
+
 
 /**
  * A file dedicated to all auto related code
@@ -28,8 +29,8 @@ public class Auto {
 
     double turn = 0;
 
-    PIDSubsystem drivePID;
-    PIDSubsystem turnPID;
+    PIDController drivePID;
+    PIDController turnPID;
 
     boolean driveIsEnabled;
     boolean turnIsEnabled;
@@ -57,80 +58,18 @@ public class Auto {
         gyro.reset();
 
         // Speed PID
-        drivePID = new PIDSubsystem(Dp, Di, Dd) {
+        drivePID = new PIDController(Dp, Di, Dd);
 
-            @Override
-            protected void initDefaultCommand() {
-
-            }
-
-            @Override
-            protected void usePIDOutput(double output) {
-                speed = output;
-            }
-
-            @Override
-            protected double returnPIDInput() {
-                return -encoders.getLeftDistance();
-            }
-
-            @Override
-            public void enable() {
-                // Enable PID
-                super.enable();
-                // Set enabled variable to true
-                driveIsEnabled = true;
-            }
-
-            @Override
-            public void disable() {
-                // Disable PID
-                super.disable();
-                // Set enabled variable to false
-                driveIsEnabled = false;
-            }
-        };
-        drivePID.setAbsoluteTolerance(1.0);
-        drivePID.setOutputRange(-1.0, 1.0);
+        drivePID.setTolerance(1.0);
+        drivePID.setIntegratorRange(-1.0, 1.0);
 
         // Turn PID
-        turnPID = new PIDSubsystem(Tp, Ti, Td) {
+        turnPID = new PIDController(Tp, Ti, Td);
 
-            @Override
-            protected void initDefaultCommand() {
-
-            }
-
-            @Override
-            protected void usePIDOutput(double output) {
-                turn = output;
-            }
-
-            @Override
-            protected double returnPIDInput() {
-                // GYRO
-                return -gyro.getAngle();
-            }
-
-            @Override
-            public void enable() {
-                // Enabled PID
-                super.enable();
-                // Set enabled variable to true
-                turnIsEnabled = true;
-            }
-
-            @Override
-            public void disable() {
-                // Disable PID
-                super.disable();
-                // Set enabled variable to false
-                turnIsEnabled = false;
-            }
-        };
-        turnPID.setAbsoluteTolerance(2.0);
-        turnPID.setOutputRange(-1.0, 1.0);
+        turnPID.setTolerance(2.0);
+        turnPID.setIntegratorRange(-1.0, 1.0);
         turnPID.setSetpoint(0.0);
+
     }
 
     /**
@@ -159,8 +98,7 @@ public class Auto {
      * Function that contains tasks designed to be ran when the robot is disabled.
      */
     public void AutoDisabled() {
-        drivePID.disable();
-        turnPID.disable();
+        
     }
 
     public void setAutoMode(String autoMode) {

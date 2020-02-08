@@ -7,7 +7,6 @@ import com.revrobotics.ControlType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -34,6 +33,7 @@ enum ShootCase {
     RUNNING_BEFORE_BALL,
     RUNNING_DURING_BALL,
 }
+
 
 /**
  * The shooter class controls the ball intake, storage, and shooter.
@@ -69,6 +69,8 @@ public class Shooter {
     private double setPoint = 0;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
+    private boolean safetyOverride = false;
+
 
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
@@ -81,7 +83,7 @@ public class Shooter {
      * @param digitalInput2 The bool of weather there is a ball being shot
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor1, VictorSPX magazineMotor2, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
-            Ultrasonic intakeDetector, Ultrasonic shootDetector, CANPIDController shooterController) {
+        Ultrasonic intakeDetector, Ultrasonic shootDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor1 = magazineMotor1;
         this.magazineMotor2 = magazineMotor2;
@@ -178,7 +180,8 @@ public class Shooter {
         setShooter(shooterActive);
         PIDPeriodic();
     }
-    private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
+
+    private void setIntake(boolean running) {
         if (running) {
             magazineMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
             magazineMotor2.set(ControlMode.PercentOutput,intakeSpeed);
@@ -323,5 +326,7 @@ public class Shooter {
             shootCase = ShootCase.INITIAL;
         }
     }
-
+    public void toggleOverride() {
+        safetyOverride = !safetyOverride;
+    }
 }

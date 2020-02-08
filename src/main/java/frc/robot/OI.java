@@ -11,12 +11,13 @@ class OI {
     private boolean gearShift;
     private boolean slow;
     private boolean visionButton;
-    private boolean shoot;
     //private boolean climbToggle;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
     private String gunnerScheme = "Default";
+    private boolean shoot;
+    private boolean overrideSafeties;
     private boolean discoToggle;
 
     //Special Function variables
@@ -55,6 +56,7 @@ class OI {
             default:
 
                 shoot = gunnerStick.getBButton();
+                overrideSafeties = (gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75);
                 break;
         }
     }
@@ -89,6 +91,10 @@ class OI {
     }*/
 	public boolean getShoot() {
 		return shoot;
+    }
+
+    public boolean getOverride() {
+        return overrideSafeties;
     }
 
     /* public boolean getClimbButton() {

@@ -87,8 +87,6 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledInit() {
         super.disabledInit();
-        auto.drivePID.disable();
-        auto.turnPID.disable();
     }
 
     @Override

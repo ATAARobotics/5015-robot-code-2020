@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.CameraMode;
@@ -21,7 +20,7 @@ public class Teleop {
     public boolean aligning = false;
     private boolean discoOn = false;
     private int onTargetCounter = 0;
-    private PIDController visionAlignPID;
+    private PIDController visionAlignPID = null;
     private boolean visionActive = false;
     private boolean climbing = false;
     private double P = 0.05;
@@ -57,6 +56,9 @@ public class Teleop {
         joysticks.checkInputs();
 
         if (!climbing) {
+            if (joysticks.getOverride()) {
+                shooter.toggleOverride();
+            }
             shooter.intake(false);
             boolean shootButton = joysticks.getShoot();
             shooter.shoot(shootButton);
