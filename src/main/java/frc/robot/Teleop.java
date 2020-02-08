@@ -97,14 +97,14 @@ public class Teleop {
                 } else {
                     DriverStation.reportWarning("Not on target", false);
                     //Rotate using values from the limelight
-                    drive(0.0, visionAlignPID.calculate(limeLight.getTx(), 0.0), true);
+                    driveTrain.arcadeDrive(0.0, visionAlignPID.calculate(limeLight.getTx(), 0.0));
 
                 }
             // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
             }else{
 
                 //This is where the robot is driven (disabled during vision)
-                drive(joysticks.getXSpeed(), joysticks.getZRotation(), true);
+				driveTrain.arcadeDrive(joysticks.getXSpeed(), joysticks.getZRotation());
 
                 if(joysticks.getDiscoButton()){
                     discoOn = !discoOn;
@@ -148,7 +148,8 @@ public class Teleop {
     }
 
     // -- End Vision --
-
+    */
+    }
 	public void TestPeriodic() {
         //safe mode
         //driveTrain.gearShiftSafe();

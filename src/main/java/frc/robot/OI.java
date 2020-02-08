@@ -32,7 +32,7 @@ class OI {
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
         visionButton = driveStick.getBackButtonReleased();
-        climbToggle = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
+        //climbToggle = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
@@ -99,5 +99,5 @@ class OI {
 
     /* public boolean getClimbButton() {
         return climbToggle;
-    }
+    }*/
 }
