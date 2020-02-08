@@ -98,8 +98,8 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, rangeFinder, shootController);
         rangeFinder = new RangeFinder(laserShark);
+        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, rangeFinder, shootController);
         //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each

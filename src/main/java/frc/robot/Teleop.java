@@ -61,9 +61,9 @@ public class Teleop {
             if (joysticks.getOverride()) {
                 shooter.toggleOverride();
             }
-            shooter.intake(false);
-            //boolean shootButton = joysticks.getShoot();
-            //shooter.shoot(shootButton);
+            shooter.intake();
+            boolean shootButton = joysticks.getShoot();
+            shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
             if(joysticks.getVisionButton()) {
