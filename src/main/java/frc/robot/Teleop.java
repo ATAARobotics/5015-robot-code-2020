@@ -21,6 +21,8 @@ public class Teleop {
     public boolean aligning = false;
     private boolean discoOn = false;
     private int onTargetCounter = 0;
+
+    //vision vars
     private PIDController visionAlignPID = null;
     private boolean visionActive = false;
     private boolean climbing = false;
@@ -28,6 +30,19 @@ public class Teleop {
     private double I = 0.0026;
     private double D = 0.05;
     private double tolerance = 0.2;
+
+    private double targetHeight;
+    private double limelightHeight;
+    private double yAngleToTarget;
+    private double xAngleToTarget;
+    private double limelightAngle;
+    private double distanceToWall;
+    private double nx;
+    private double ny;
+    private double viewWidth;
+    private double viewHeight;
+    private double xval;
+    private double yval;
 
     public Teleop(RobotMap robotMap) {
         //Initialize Classes
@@ -52,6 +67,20 @@ public class Teleop {
         limeLight.setCameraMode(CameraMode.Drive);
         SmartDashboard.putNumber("Tolerance", tolerance);
         SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
+
+        //limelight distance trig
+        //TODO: Test if this works (I have no idea if this does)
+        nx = 1/160 * -159.5;
+        ny = 1/120 * 119.5;
+        viewHeight = 2.0*Math.tan(120);
+        viewWidth = 2.0*Math.tan(160);
+
+        xval = viewWidth/2*nx;
+        yval = viewHeight/2*ny;
+
+        yAngleToTarget = Math.atan2(1,yval);
+        xAngleToTarget = Math.atan2(1, xval);
+        //distanceToWall = (targetHeight-limelightHeight) / Math.tan(limelightHeight+yAngleToTarget);
     }
 
     public void TeleopPeriodic() {
