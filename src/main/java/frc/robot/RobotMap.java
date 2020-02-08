@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.cuforge.libcu.Lasershark;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
@@ -71,13 +72,16 @@ public class RobotMap {
     // Gyro
     private Gyro NavX = new Gyro();
 
+    private Lasershark laserShark = new Lasershark(5);
+
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
     public SWATDrive swatDrive;
     public ColorSensor colorSensor;
     public LimeLight limeLight;
     public Shooter shooter;
-    public Climber climber;
+    public RangeFinder rangeFinder;
+    //public Climber climber;
 
     public RobotMap() {
 
@@ -95,8 +99,9 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, intakeDetector, shooterDetector, shootController);
-        climber = new Climber(this);
+        rangeFinder = new RangeFinder(laserShark);
+        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, rangeFinder, shootController);
+        //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
         frontLeftMotor.follow(rearLeftMotor);

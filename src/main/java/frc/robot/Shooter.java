@@ -24,15 +24,16 @@ import java.io.IOException;
 
 enum IntakeCase {
     WAITING,
+    STARTING,
     RUNNING,
 }
 
 enum ShootCase {
     INITIAL,
-    COOLDOWN,
-    RUNNING_BEFORE_BALL,
-    RUNNING_DURING_BALL,
+    WARMUP,
+    RUNNING,
 }
+
 
 /**
  * The shooter class controls the ball intake, storage, and shooter.
@@ -43,9 +44,7 @@ public class Shooter {
     private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
-    private /*final*/ double shooterSpeed = 0.65; // TODO: Configure shooter speed
-    private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
-    private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
+    private final double shooterSpeed = 0.7; // TODO: Configure shooter speed
     private boolean shooterActive = false;
 
     private CANSparkMax shooterMotor = null;
@@ -54,40 +53,37 @@ public class Shooter {
     private VictorSPX magazineMotor1 = null;
     private VictorSPX magazineMotor2 = null;
     private VictorSPX intakeMotor = null;
-    private Ultrasonic intakeDetector = null;
-    private Ultrasonic shootDetector = null;
+    private RangeFinder intakeDetector = null;
     private Socket pidSocket = null;
     private PrintWriter pidStream = null;
 
-    private Timer shooterTimer = new Timer();
+    private Timer magazineTimer = new Timer();
 
-    private double ballsStored = 3;
-    private double shooterStartTime = 0.0;
+    private double ballsStored = 0;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
     private double setPoint = 0;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
+    private boolean safetyOverride = false;
+
 
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
-     * as well as limit switches for the intake and shooter.
+     * as well as the lasershark for the intake.
      * @param shooterMotor The motor that shoots balls
      * @param magazineMotor1 The first motor in the elevator
      * @param magazineMotor2 The second motor in the elevator
      * @param intakeMotor The intake motor
-     * @param digitalInput The bool of weather there is a ball ready to be intook
-     * @param digitalInput2 The bool of weather there is a ball being shot
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor1, VictorSPX magazineMotor2, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
-            Ultrasonic intakeDetector, Ultrasonic shootDetector, CANPIDController shooterController) {
+        RangeFinder intakeDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor1 = magazineMotor1;
         this.magazineMotor2 = magazineMotor2;
         this.intakeMotor = intakeMotor;
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
-        this.shootDetector = shootDetector;
         this.shooterController = shooterController;
 
         try {
@@ -110,7 +106,7 @@ public class Shooter {
         kIz = 0;
 
         //Max rpm
-        kFF = 0.000237;
+        kFF = 0.00018;
         
         kMaxOutput = 1;
         kMinOutput = 0;
@@ -119,18 +115,14 @@ public class Shooter {
         shooterController.setI(kI);
         shooterController.setD(kD);
         shooterController.setIZone(kIz);
-        shooterController.setFF(kFF);
+        //shooterController.setFF(kFF);
         shooterController.setOutputRange(kMinOutput, kMaxOutput);
 
         // display PID coefficients on SmartDashboard
-        SmartDashboard.putNumber("P Gain", kP);
-        /*SmartDashboard.putNumber("I Gain", kI);
+        SmartDashboard.putNumber("I Gain", kI);
         SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("I Zone", kIz);*/
+        SmartDashboard.putNumber("P Gain", kP);
         SmartDashboard.putNumber("Feed Forward", kFF);
-        SmartDashboard.putNumber("Max Output", kMaxOutput);
-        SmartDashboard.putNumber("Min Output", kMinOutput);
-        SmartDashboard.putNumber("Speed Number", shooterSpeed);
     }
 
     public void PIDPeriodic() {
@@ -138,19 +130,9 @@ public class Shooter {
         double p = SmartDashboard.getNumber("P Gain", 0);
         double i = SmartDashboard.getNumber("I Gain", 0);
         double d = SmartDashboard.getNumber("D Gain", 0);
-        double iz = SmartDashboard.getNumber("I Zone", 0);
-        double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        double max = SmartDashboard.getNumber("Max Output", 0);
-        double min = SmartDashboard.getNumber("Min Output", 0);
-        double speed = SmartDashboard.getNumber("Speed Number", 0);
-        shooterSpeed = speed;
 
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller
-        if ((p != kP)) {
-            shooterController.setP(p);
-            kP = p;
-        }
         if ((i != kI)) {
             shooterController.setI(i);
             kI = i;
@@ -159,17 +141,9 @@ public class Shooter {
             shooterController.setD(d);
             kD = d;
         }
-        if ((iz != kIz)) {
-            shooterController.setIZone(iz);
-            kIz = iz;
-        }
-        if ((ff != kFF)) {
-            shooterController.setFF(ff);
-            kFF = ff;
-        }
-        if ((max != kMaxOutput) || (min != kMinOutput)) {
-            shooterController.setOutputRange(min, max);
-            kMinOutput = min; kMaxOutput = max;
+        if ((p != kP)) {
+            shooterController.setP(p);
+            kP = p;
         }
 
         SmartDashboard.putNumber("SetPoint", setPoint);
@@ -177,54 +151,44 @@ public class Shooter {
 
     }
     public void shooterPeriodic() {
+        SmartDashboard.putNumber("Balls Stored", ballsStored);
         setShooter(shooterActive);
         PIDPeriodic();
     }
-    private void setIntake(boolean running) { // TODO: Connect this to the Victor SPX motor (not in WPI lib)
+
+    private void setMagazine(boolean running) {
         if (running) {
             magazineMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
             magazineMotor2.set(ControlMode.PercentOutput,intakeSpeed);
-            intakeMotor.set(ControlMode.PercentOutput, -0.5);
         } else {
             magazineMotor1.set(ControlMode.PercentOutput,0.0);
             magazineMotor2.set(ControlMode.PercentOutput,0.0);
-            intakeMotor.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
     /**
      * Sets the shooter on or off, uses shootSpeed for the power if on.
-     * @param running Whether the shooter wheel should be spinning
+     * 
+     * @param running Whether the magazine should be moving
      */
     private boolean getIntakeDectector() {
           
-        if(intakeDetector.getRangeInches() < 2.0 || intakeDetector.getRangeInches() > 245.0 && intakeDetector.getRangeInches() != 0.0){
+        if(intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0){
 
             return true;
 
-          }else if(intakeDetector.getRangeInches() == 0.0){
-              return false;
+        }else if(intakeDetector.getDistance() == 0.0){
 
-          }else{
-              return false;
-          }
+            DriverStation.reportError("Lasershark Disconnected", false);
+            return false;
+
+        }else{
+            return false;
+        }
       
         
     }
 
-    private boolean getShooterDectector() {
-
-        if(shootDetector.getRangeInches() < 2.0 || shootDetector.getRangeInches() > 245.0 && shootDetector.getRangeInches() != 0.0){
-
-            return true;
-            
-          }else if(shootDetector.getRangeInches() == 0.0){
-              return false;
-
-          }else{
-              return false;
-          }
-    }
     private void setShooter(boolean running) {
         if (running) {
             setPoint = shooterSpeed * maxRPM;
@@ -248,25 +212,57 @@ public class Shooter {
 
     /**
      * Main update loop for intaking balls automatically.
-     * @param override Overrides the protection limit of five balls, in case the ballsStored variable is incorrect.
      */
-    public void intake(boolean override) {
+    public void intake() {
         switch (intakeCase) {
             case WAITING:
-                if ((ballsStored < 5 || override) && getIntakeDectector()) {
-                    setIntake(true);
+                if (ballsStored < 5 || safetyOverride) {
+                    setMagazine(false);
+                    intakeMotor.set(ControlMode.PercentOutput, -0.5);
+                } else {
+                    setMagazine(false);
+                    intakeMotor.set(ControlMode.PercentOutput, 0.0);
+                }
+
+                if (getIntakeDectector() && ballsStored != 5) {
+                    intakeCase = IntakeCase.STARTING;
+                }
+
+                break;
+
+            case STARTING:
+                if (ballsStored < 4) {
+                    if (getIntakeDectector()) {
+                        setMagazine(true);
+                    } else {
+                        magazineTimer.reset();
+                        magazineTimer.start();
+                        intakeCase = IntakeCase.RUNNING;
+                    }
+                } else {
                     intakeCase = IntakeCase.RUNNING;
                 }
 
                 break;
-            case RUNNING:
-                if(!getIntakeDectector()) {
-                    setIntake(false);
-                    ballsStored++;
-                    intakeCase = IntakeCase.WAITING;
-                }
 
+            case RUNNING:
+                if(ballsStored < 4) {
+                    if(magazineTimer.get() < 0.5) {
+                        setMagazine(true);
+                    } else {
+                        ballsStored++;
+                        intakeCase = IntakeCase.WAITING;
+                    }
+                } else {
+                    if(magazineTimer.get() < 0.2) {
+                        setMagazine(true);
+                    } else {
+                        ballsStored++;
+                        intakeCase = IntakeCase.WAITING;
+                    }
+                }
                 break;
+
             default:
                 DriverStation.reportError(String.format("Invalid Intake Case: %d", intakeCase), false); // TODO: Pretty print the enum value
         }
@@ -281,49 +277,43 @@ public class Shooter {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
-                    shooterTimer.reset();
-                    shooterTimer.start();
                     shooterActive = true;
-                    shooterStartTime = shooterSpeedup;
-                    shootCase = ShootCase.COOLDOWN;
+                    shootCase = ShootCase.WARMUP;
                     DriverStation.reportWarning("Switching to cooldown", false); // TODO: Pretty print the enum value
 
                     break;
-                case COOLDOWN: // Shooter speeding up
-                    if (shooterTimer.get() > shooterStartTime) {
-                        setIntake(true);
-                        shootCase = ShootCase.RUNNING_BEFORE_BALL;
+                case WARMUP: // Shooter speeding up
+                    if (!(shooterEncoder.getVelocity() < setPoint)) {
+                        shootCase = ShootCase.RUNNING;
                     }
-
                     break;
-                case RUNNING_BEFORE_BALL: // Shooter running, before sensor sees a ball
-                    if (getShooterDectector()) {
-                        shootCase = ShootCase.RUNNING_DURING_BALL;
-                    }
 
-                    break;
-                case RUNNING_DURING_BALL: // Shooter running, while sensor is seeing a ball
-                    if (!getShooterDectector()) {
-                        setIntake(false);
-                        ballsStored--;
-                        shooterStartTime = shooterCooldown;
-                        shootCase = ShootCase.COOLDOWN;
+                case RUNNING: // Shooter running
+                
+                    setMagazine(true);
+
+                    if (shooterEncoder.getVelocity() < (setPoint - 25)) {
+                        if (ballsStored != 0) {
+                            ballsStored--;
+                        }
+                        //shootCase = ShootCase.WARMUP;
                     }
 
                     break;
                 default:
                     DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
             }
-        } else if (shootCase == ShootCase.COOLDOWN ||
-            shootCase == ShootCase.RUNNING_BEFORE_BALL ||
-            shootCase == ShootCase.RUNNING_DURING_BALL) { // User released the button
+        } else if (shootCase == ShootCase.WARMUP ||
+            shootCase == ShootCase.RUNNING) { // User released the button
 
-            setIntake(false);
+            setMagazine(false);
             shooterActive = false;
-            shooterTimer.stop();
 
             shootCase = ShootCase.INITIAL;
         }
     }
 
+    public void toggleOverride() {
+        safetyOverride = !safetyOverride;
+    }
 }

@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.CameraMode;
@@ -16,12 +15,13 @@ public class Teleop {
     private Shooter shooter = null;
     private Climber climber = null;
     private ColorSensor colorSensor = null;
+    private RangeFinder rangeFinder = null;
 
     public boolean PIDEnabled = false;
     public boolean aligning = false;
     private boolean discoOn = false;
     private int onTargetCounter = 0;
-    private PIDController visionAlignPID;
+    private PIDController visionAlignPID = null;
     private boolean visionActive = false;
     private boolean climbing = false;
     private double P = 0.05;
@@ -37,7 +37,8 @@ public class Teleop {
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
-        this.climber = robotMap.climber;
+        this.rangeFinder = robotMap.rangeFinder;
+        //this.climber = robotMap.climber;
     }
 
     public void teleopInit() {
@@ -57,7 +58,10 @@ public class Teleop {
         joysticks.checkInputs();
 
         if (!climbing) {
-            shooter.intake(false);
+            if (joysticks.getOverride()) {
+                shooter.toggleOverride();
+            }
+            shooter.intake();
             boolean shootButton = joysticks.getShoot();
             shooter.shoot(shootButton);
             shooter.shooterPeriodic();
@@ -120,7 +124,9 @@ public class Teleop {
             }
         }
 
-        if (joysticks.getClimbButton()) {
+        SmartDashboard.putNumber("Lasershark Distance", rangeFinder.getDistance());
+
+        /* if (joysticks.getClimbButton()) {
             climber.toggleClimb();
         }
     }
