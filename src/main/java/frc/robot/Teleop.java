@@ -14,7 +14,7 @@ public class Teleop {
     private OI joysticks = null;
     private LimeLight limeLight = null;
     private Shooter shooter = null;
-    //private Climber climber = null;
+    private Climber climber = null;
     private ColorSensor colorSensor = null;
 
     public boolean PIDEnabled = false;
@@ -37,7 +37,7 @@ public class Teleop {
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
-        //this.climber = robotMap.climber;
+        this.climber = robotMap.climber;
     }
 
     public void teleopInit() {
@@ -120,9 +120,9 @@ public class Teleop {
             }
         }
 
-        /* if (joysticks.getClimbButton()) {
+        if (joysticks.getClimbButton()) {
             climber.toggleClimb();
-        } */
+        }
     }
 
 	public void drive(double speedA, double speedB, boolean arcade) {

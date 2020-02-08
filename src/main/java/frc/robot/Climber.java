@@ -1,4 +1,4 @@
-/* package frc.robot;
+package frc.robot;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -24,13 +24,14 @@ public class Climber {
 
     public Climber(RobotMap robotMap) {
         this.climberMotors = robotMap.getClimberMotors();
-        this.climberSolenoid = robotMap.getClimberSolenoid();
+        //this.climberSolenoid = robotMap.getClimberSolenoid();
         this.climbEncoder = robotMap.getClimbEncoder();
     }
 
     public void moveClimber() {
         if (climbing) {
-            switch (climberState) {
+            climberMotors.set(0.1);
+            /*switch (climberState) {
                 case 0:
 
                     climberSolenoid.set(DoubleSolenoid.Value.kReverse);
@@ -76,7 +77,7 @@ public class Climber {
 
                     DriverStation.reportError("Invalid climberState of " + climberState, false);
                     break;
-            }
+                }*/
         }
     }
 
@@ -96,4 +97,3 @@ public class Climber {
         return climbing;
     }
 }
- */

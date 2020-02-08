@@ -7,7 +7,6 @@ import com.revrobotics.ControlType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -44,7 +43,7 @@ public class Shooter {
     private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
-    private final double shooterSpeed = 0.65; // TODO: Configure shooter speed
+    private /*final*/ double shooterSpeed = 0.65; // TODO: Configure shooter speed
     private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
     private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
     private boolean shooterActive = false;
@@ -105,16 +104,16 @@ public class Shooter {
      */
     public void PIDInit() {
         // set PID coefficients
-        kP = 0;
+        kP = 0.0015;
         kI = 0;
         kD = 0;
         kIz = 0;
 
         //Max rpm
-        kFF = 5600;
+        kFF = 0.000237;
         
         kMaxOutput = 1;
-        kMinOutput = -1;
+        kMinOutput = 0;
         maxRPM = 5600;
         shooterController.setP(kP);
         shooterController.setI(kI);
@@ -125,12 +124,13 @@ public class Shooter {
 
         // display PID coefficients on SmartDashboard
         SmartDashboard.putNumber("P Gain", kP);
-        SmartDashboard.putNumber("I Gain", kI);
+        /*SmartDashboard.putNumber("I Gain", kI);
         SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("I Zone", kIz);
+        SmartDashboard.putNumber("I Zone", kIz);*/
         SmartDashboard.putNumber("Feed Forward", kFF);
         SmartDashboard.putNumber("Max Output", kMaxOutput);
         SmartDashboard.putNumber("Min Output", kMinOutput);
+        SmartDashboard.putNumber("Speed Number", shooterSpeed);
     }
 
     public void PIDPeriodic() {
@@ -142,6 +142,8 @@ public class Shooter {
         double ff = SmartDashboard.getNumber("Feed Forward", 0);
         double max = SmartDashboard.getNumber("Max Output", 0);
         double min = SmartDashboard.getNumber("Min Output", 0);
+        double speed = SmartDashboard.getNumber("Speed Number", 0);
+        shooterSpeed = speed;
 
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller

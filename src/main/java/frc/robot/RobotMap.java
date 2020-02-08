@@ -9,6 +9,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Ultrasonic;
@@ -47,8 +48,8 @@ public class RobotMap {
     private Ultrasonic shooterDetector = new Ultrasonic(2, 3);
 
     //Add climber
-    //private CANSparkMax leftClimbMotor = new CANSparkMax(8, MotorType.kBrushless);
-    //private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
+    private CANSparkMax leftClimbMotor = new CANSparkMax(10, MotorType.kBrushless);
+    private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
 
     // Encoders
     // Drive
@@ -57,7 +58,7 @@ public class RobotMap {
     // Shooter
     private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
     // Climber
-    //private CANEncoder climbEncoder = getClimberMotors().getEncoder();
+    private CANEncoder climbEncoder = getClimberMotors().getEncoder();
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
@@ -76,7 +77,7 @@ public class RobotMap {
     public ColorSensor colorSensor;
     public LimeLight limeLight;
     public Shooter shooter;
-    //public Climber climber;
+    public Climber climber;
 
     public RobotMap() {
 
@@ -86,16 +87,16 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
-        
         //leftClimbMotor.setInverted(true);
-        //leftClimbMotor.follow(rightClimbMotor);
+        //TODO: Re-enable second climber
+        rightClimbMotor.follow(leftClimbMotor, true);
 
         // Init submodules
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
         shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, intakeDetector, shooterDetector, shootController);
-        //climber = new Climber(this);
+        climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
         frontLeftMotor.follow(rearLeftMotor);
@@ -203,15 +204,15 @@ public class RobotMap {
         return shootController;
     }
 
-    /* public CANSparkMax getClimberMotors() {
-        return rightClimbMotor;
+     public CANSparkMax getClimberMotors() {
+        return leftClimbMotor;
     }
 
-    public DoubleSolenoid getClimberSolenoid() {
+    /*public DoubleSolenoid getClimberSolenoid() {
         return climberSolenoid;
-    }
+    }*/
 
     public CANEncoder getClimbEncoder() {
         return climbEncoder;
-    }*/
+    }
 }
