@@ -33,16 +33,10 @@ public class Teleop {
 
     private double targetHeight;
     private double limelightHeight;
-    private double yAngleToTarget;
-    private double xAngleToTarget;
+    private double angleToTarget;
     private double limelightAngle;
     private double distanceToWall;
-    private double nx;
-    private double ny;
-    private double viewWidth;
-    private double viewHeight;
-    private double xval;
-    private double yval;
+
 
     public Teleop(RobotMap robotMap) {
         //Initialize Classes
@@ -70,16 +64,7 @@ public class Teleop {
 
         //limelight distance trig
         //TODO: Test if this works (I have no idea if this does)
-        nx = 1/160 * -159.5;
-        ny = 1/120 * 119.5;
-        viewHeight = 2.0*Math.tan(120);
-        viewWidth = 2.0*Math.tan(160);
-
-        xval = viewWidth/2*nx;
-        yval = viewHeight/2*ny;
-
-        yAngleToTarget = Math.atan2(1,yval);
-        xAngleToTarget = Math.atan2(1, xval);
+        angleToTarget = limeLight.getTy();
         //distanceToWall = (targetHeight-limelightHeight) / Math.tan(limelightHeight+yAngleToTarget);
     }
 
