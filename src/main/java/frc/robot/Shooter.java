@@ -141,6 +141,10 @@ public class Shooter {
             shooterController.setD(d);
             kD = d;
         }
+        if ((p != kP)) {
+            shooterController.setP(p);
+            kP = p;
+        }
 
         SmartDashboard.putNumber("SetPoint", setPoint);
         SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
