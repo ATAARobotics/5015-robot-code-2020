@@ -45,8 +45,9 @@ public class Shooter {
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
     private final double shooterSpeed = 0.65; // TODO: Configure shooter speed
-    private final double shooterSpeedup = 0.2; // TODO: Configure shooter startup time
-    private final double shooterCooldown = 0.1; // TODO: Configure shooter cooldown time
+    //TODO: Replace these timers with checking motor speeds
+    private final double shooterSpeedup = 0.2;
+    private final double shooterCooldown = 0.1; 
     private boolean shooterActive = false;
 
     private CANSparkMax shooterMotor = null;
@@ -55,8 +56,7 @@ public class Shooter {
     private VictorSPX magazineMotor1 = null;
     private VictorSPX magazineMotor2 = null;
     private VictorSPX intakeMotor = null;
-    private Ultrasonic intakeDetector = null;
-    private Ultrasonic shootDetector = null;
+    private RangeFinder intakeDetector = null;
     private Socket pidSocket = null;
     private PrintWriter pidStream = null;
 
@@ -79,18 +79,15 @@ public class Shooter {
      * @param magazineMotor1 The first motor in the elevator
      * @param magazineMotor2 The second motor in the elevator
      * @param intakeMotor The intake motor
-     * @param digitalInput The bool of weather there is a ball ready to be intook
-     * @param digitalInput2 The bool of weather there is a ball being shot
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor1, VictorSPX magazineMotor2, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
-        Ultrasonic intakeDetector, Ultrasonic shootDetector, CANPIDController shooterController) {
+        RangeFinder intakeDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor1 = magazineMotor1;
         this.magazineMotor2 = magazineMotor2;
         this.intakeMotor = intakeMotor;
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
-        this.shootDetector = shootDetector;
         this.shooterController = shooterController;
 
         try {
@@ -195,15 +192,16 @@ public class Shooter {
 
     /**
      * Sets the shooter on or off, uses shootSpeed for the power if on.
+     * 
      * @param running Whether the shooter wheel should be spinning
      */
     private boolean getIntakeDectector() {
           
-        if(intakeDetector.getRangeInches() < 2.0 || intakeDetector.getRangeInches() > 245.0 && intakeDetector.getRangeInches() != 0.0){
+        if(intakeDetector.getDistance() < 2.0 || intakeDetector.getDistance() > 245.0 && intakeDetector.getDistance() != 0.0){
 
             return true;
 
-          }else if(intakeDetector.getRangeInches() == 0.0){
+          }else if(intakeDetector.getDistance() == 0.0){
               return false;
 
           }else{
@@ -213,19 +211,6 @@ public class Shooter {
         
     }
 
-    private boolean getShooterDectector() {
-
-        if(shootDetector.getRangeInches() < 2.0 || shootDetector.getRangeInches() > 245.0 && shootDetector.getRangeInches() != 0.0){
-
-            return true;
-            
-          }else if(shootDetector.getRangeInches() == 0.0){
-              return false;
-
-          }else{
-              return false;
-          }
-    }
     private void setShooter(boolean running) {
         if (running) {
             setPoint = shooterSpeed * maxRPM;
@@ -277,7 +262,7 @@ public class Shooter {
      * Main update loop for the shooter, when not active, just shuts off the shooter.
      * @param active Whether the shooter should be shooting.
      */
-    public void shoot(boolean active) {
+    /* public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
             switch (shootCase) {
@@ -325,7 +310,7 @@ public class Shooter {
 
             shootCase = ShootCase.INITIAL;
         }
-    }
+    } */
     public void toggleOverride() {
         safetyOverride = !safetyOverride;
     }

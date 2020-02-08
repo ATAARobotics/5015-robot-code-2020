@@ -15,6 +15,7 @@ public class Teleop {
     private Shooter shooter = null;
     //private Climber climber = null;
     private ColorSensor colorSensor = null;
+    private RangeFinder rangeFinder = null;
 
     public boolean PIDEnabled = false;
     public boolean aligning = false;
@@ -36,6 +37,7 @@ public class Teleop {
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
+        this.rangeFinder = robotMap.rangeFinder;
         //this.climber = robotMap.climber;
     }
 
@@ -60,8 +62,8 @@ public class Teleop {
                 shooter.toggleOverride();
             }
             shooter.intake(false);
-            boolean shootButton = joysticks.getShoot();
-            shooter.shoot(shootButton);
+            //boolean shootButton = joysticks.getShoot();
+            //shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
             if(joysticks.getVisionButton()) {
@@ -121,6 +123,8 @@ public class Teleop {
                 }
             }
         }
+
+        SmartDashboard.putNumber("Lasershark Distance", rangeFinder.getDistance());
 
         /* if (joysticks.getClimbButton()) {
             climber.toggleClimb();
