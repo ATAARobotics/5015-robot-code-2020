@@ -115,7 +115,7 @@ public class Shooter {
         shooterController.setI(kI);
         shooterController.setD(kD);
         shooterController.setIZone(kIz);
-        //shooterController.setFF(kFF);
+        shooterController.setFF(kFF);
         shooterController.setOutputRange(kMinOutput, kMaxOutput);
 
         // display PID coefficients on SmartDashboard
