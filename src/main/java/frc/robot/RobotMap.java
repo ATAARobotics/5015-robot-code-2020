@@ -37,9 +37,8 @@ public class RobotMap {
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
 
-    // Elevator
-    private VictorSPX elevatorMotor1 = new VictorSPX(5);
-    private VictorSPX elevatorMotor2 = new VictorSPX(6);
+    //Ball magazine
+    private VictorSPX magazineMotor = new VictorSPX(6);
     
     //Add shooter and conveyor belt
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
@@ -100,7 +99,7 @@ public class RobotMap {
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
         rangeFinder = new RangeFinder(laserShark);
-        shooter = new Shooter(shootMotor, elevatorMotor1, elevatorMotor2, intakeMotor, shooterEncoder, rangeFinder, shootController);
+        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, shooterEncoder, rangeFinder, shootController);
         //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
@@ -168,16 +167,8 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the first conveyor motor.
      */
-    protected VictorSPX getConveyorMotor1() {
-        return elevatorMotor1;
-    }
-
-    /**
-     * For internal use in Shooter.java.
-     * Returns the seconed conveyor motor.
-     */
-    protected VictorSPX getConveyorMotor2() {
-        return elevatorMotor2;
+    protected VictorSPX getConveyorMotor() {
+        return magazineMotor;
     }
 
     /**
@@ -186,15 +177,6 @@ public class RobotMap {
      */
     protected Ultrasonic getIntakeDetector() {
         return intakeDetector;
-    }
-
-    /**
-     * For internal use in Shooter.java.
-     * TODO: Replace this with a detector for the shooter encoder slowing down.
-     * Returns the shooting detector, which detects balls exiting the robot
-     */
-    protected Ultrasonic getShooterDetector() {
-        return shooterDetector;
     }
 
     /**

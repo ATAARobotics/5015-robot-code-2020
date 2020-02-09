@@ -50,8 +50,7 @@ public class Shooter {
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
     private CANPIDController shooterController = null;
-    private VictorSPX magazineMotor1 = null;
-    private VictorSPX magazineMotor2 = null;
+    private VictorSPX magazineMotor = null;
     private VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
     private Socket pidSocket = null;
@@ -76,11 +75,10 @@ public class Shooter {
      * @param magazineMotor2 The second motor in the elevator
      * @param intakeMotor The intake motor
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor1, VictorSPX magazineMotor2, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
+    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
         RangeFinder intakeDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
-        this.magazineMotor1 = magazineMotor1;
-        this.magazineMotor2 = magazineMotor2;
+        this.magazineMotor = magazineMotor;
         this.intakeMotor = intakeMotor;
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
@@ -158,11 +156,9 @@ public class Shooter {
 
     private void setMagazine(boolean running) {
         if (running) {
-            magazineMotor1.set(ControlMode.PercentOutput, -intakeSpeed);
-            magazineMotor2.set(ControlMode.PercentOutput,intakeSpeed);
+            magazineMotor.set(ControlMode.PercentOutput, intakeSpeed);
         } else {
-            magazineMotor1.set(ControlMode.PercentOutput,0.0);
-            magazineMotor2.set(ControlMode.PercentOutput,0.0);
+            magazineMotor.set(ControlMode.PercentOutput, 0.0);
         }
     }
 
