@@ -65,7 +65,7 @@ public class Teleop {
         //limelight distance trig
         //TODO: Test if this works (I have no idea if this does)
         angleToTarget = limeLight.getTy();
-        //distanceToWall = (targetHeight-limelightHeight) / Math.tan(limelightHeight+yAngleToTarget);
+        distanceToWall = (targetHeight-limelightHeight) / Math.tan(limelightHeight+yAngleToTarget);
     }
 
     public void TeleopPeriodic() {
