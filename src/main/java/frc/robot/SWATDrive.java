@@ -54,6 +54,10 @@ public class SWATDrive {
         return maxStraightSpeed;
     }
 
+    public double getTemperature() {
+        return robotMap.getDrivetrainTemperature();
+    }
+
     public void arcadeDrive(double speed, double rotation) {
         robotMap.getDriveTrain().arcadeDrive(-speed, rotation);
     }

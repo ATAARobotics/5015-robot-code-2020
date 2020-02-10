@@ -53,12 +53,12 @@ public class Robot extends TimedRobot {
         autoPicker.addOption("Auto 2", auto2);
         SmartDashboard.putData("Auto choices", autoPicker);
 
-        autoPicker.setDefaultOption("Default", defaultDriverScheme);
-        autoPicker.addOption("Reverse Turning", reverseTurning);
+        driveSchemePicker.setDefaultOption("Default", defaultDriverScheme);
+        driveSchemePicker.addOption("Reverse Turning", reverseTurning);
         SmartDashboard.putData("Drive Scheme choices", driveSchemePicker);
 
-        autoPicker.setDefaultOption("Default", defaultGunnerScheme);
-        autoPicker.addOption("Fun Mode", funMode);
+        gunnerSchemePicker.setDefaultOption("Default", defaultGunnerScheme);
+        gunnerSchemePicker.addOption("Fun Mode", funMode);
         SmartDashboard.putData("Gunner Scheme choices", gunnerSchemePicker);
 
         SmartDashboard.putNumber("Balls Stored", 0.0);

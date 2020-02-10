@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.lang.Math;
 import java.net.Socket;
 import java.io.PrintWriter;
-import java.io.IOException;
 
 /**
  * Ball shooter code
@@ -44,7 +43,7 @@ public class Shooter {
     private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
     private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
     private final double intakeSpeed = 1.0;
-    private final double shooterSpeed = 0.7; // TODO: Configure shooter speed
+    private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
 
     private CANSparkMax shooterMotor = null;
@@ -53,7 +52,6 @@ public class Shooter {
     private VictorSPX magazineMotor = null;
     private VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
-    private Socket pidSocket = null;
     private PrintWriter pidStream = null;
 
     private Timer magazineTimer = new Timer();
@@ -71,8 +69,7 @@ public class Shooter {
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as the lasershark for the intake.
      * @param shooterMotor The motor that shoots balls
-     * @param magazineMotor1 The first motor in the elevator
-     * @param magazineMotor2 The second motor in the elevator
+     * @param magazineMotor The magazine motor
      * @param intakeMotor The intake motor
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
@@ -83,13 +80,6 @@ public class Shooter {
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shooterController = shooterController;
-
-        try {
-            this.pidSocket = new Socket("172.22.11.1", 21);
-            this.pidStream = new PrintWriter(pidSocket.getOutputStream(), true);
-        } catch(IOException ex) {
-            DriverStation.reportError(String.format("Error initializing pidStuff: %s", ex.toString()), false);
-        }
     }
 
     /**
@@ -98,13 +88,13 @@ public class Shooter {
      */
     public void PIDInit() {
         // set PID coefficients
-        kP = 0.0015;
-        kI = 0;
-        kD = 0;
+        kP = 0.0004;
+        kI = 0.0000002;
+        kD = 0.0001;
         kIz = 0;
 
         //Max rpm
-        kFF = 0.00018;
+        kFF = 0.00021;
         
         kMaxOutput = 1;
         kMinOutput = 0;
@@ -121,6 +111,7 @@ public class Shooter {
         SmartDashboard.putNumber("D Gain", kD);
         SmartDashboard.putNumber("P Gain", kP);
         SmartDashboard.putNumber("Feed Forward", kFF);
+        SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
     }
 
     public void PIDPeriodic() {
@@ -128,7 +119,8 @@ public class Shooter {
         double p = SmartDashboard.getNumber("P Gain", 0);
         double i = SmartDashboard.getNumber("I Gain", 0);
         double d = SmartDashboard.getNumber("D Gain", 0);
-
+        double ff = SmartDashboard.getNumber("Feed Forward", 0);
+        shooterSpeed = SmartDashboard.getNumber("Shooter Speed", 0);
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller
         if ((i != kI)) {
@@ -142,6 +134,10 @@ public class Shooter {
         if ((p != kP)) {
             shooterController.setP(p);
             kP = p;
+        }
+        if ((ff != kFF)) {
+            shooterController.setFF(ff);
+            kFF = ff;
         }
 
         SmartDashboard.putNumber("SetPoint", setPoint);
@@ -311,5 +307,9 @@ public class Shooter {
 
     public void toggleOverride() {
         safetyOverride = !safetyOverride;
+    }
+
+    public double getTemperature() {
+        return shooterMotor.getMotorTemperature();
     }
 }

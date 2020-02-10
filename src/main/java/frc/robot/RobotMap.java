@@ -45,16 +45,12 @@ public class RobotMap {
     private VictorSPX intakeMotor = new VictorSPX(8);
     private CANPIDController shootController = shootMotor.getPIDController();
     private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
-    private Ultrasonic shooterDetector = new Ultrasonic(2, 3);
-
-    //Add climber
+    // Add climber
     private CANSparkMax leftClimbMotor = new CANSparkMax(10, MotorType.kBrushless);
     private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
 
+    
     // Encoders
-    // Drive
-    // private CANEncoder leftEncoder = new CANEncoder(frontLeftMotor);
-    // private CANEncoder rightEncoder = new CANEncoder(frontRightMotor);
     // Shooter
     private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
     // Climber
@@ -80,6 +76,7 @@ public class RobotMap {
     public LimeLight limeLight;
     public Shooter shooter;
     public RangeFinder rangeFinder;
+    public Encoders driveEncoders;
     //public Climber climber;
 
     public RobotMap() {
@@ -100,6 +97,7 @@ public class RobotMap {
         limeLight = new LimeLight();
         rangeFinder = new RangeFinder(laserShark);
         shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, shooterEncoder, rangeFinder, shootController);
+        driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         //climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
@@ -125,9 +123,9 @@ public class RobotMap {
      * Returns the encoders associated with the drive train.
      * TODO: make a wrapper class for this.
      */
-    // public Encoders getDriveEncoders() {
-    //     return driveEncoders;
-    // }
+     public Encoders getDriveEncoders() {
+         return driveEncoders;
+    }
 
     /**
      * For internal use in SWATDrive.java.
@@ -201,5 +199,9 @@ public class RobotMap {
 
     public CANEncoder getClimbEncoder() {
         return climbEncoder;
+    }
+
+    public double getDrivetrainTemperature() {
+        return (rearRightMotor.getTemperature() + rearLeftMotor.getTemperature() + frontRightMotor.getTemperature() + frontLeftMotor.getTemperature()) / 4;
     }
 }

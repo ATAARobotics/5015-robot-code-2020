@@ -33,7 +33,7 @@ public class Teleop {
         //Initialize Classes
         joysticks = new OI();
         this.driveTrain = robotMap.swatDrive;
-        // this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
+        this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
@@ -42,7 +42,7 @@ public class Teleop {
     }
 
     public void teleopInit() {
-        //encoders.reset();
+        encoders.reset();
 
         //Sets up PID
         visionAlignPID = new PIDController(P, I, D);
@@ -76,10 +76,13 @@ public class Teleop {
                 }
             }
 
-            //SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
-            //SmartDashboard.putNumber("EncoderRight", encoders.getRight());
-            //SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
-            //SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
+            SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
+            SmartDashboard.putNumber("EncoderRight", encoders.getRight());
+            SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
+            SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
+
+            SmartDashboard.putNumber("Drivetrain Temperature", driveTrain.getTemperature());
+            SmartDashboard.putNumber("Shooter Temperature", shooter.getTemperature());
 
             String colorGuess = colorSensor.findColor();
             SmartDashboard.putString("Color", colorGuess);

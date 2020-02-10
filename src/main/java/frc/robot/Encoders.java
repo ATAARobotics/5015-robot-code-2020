@@ -1,8 +1,7 @@
 package frc.robot;
 
-import com.revrobotics.CANEncoder;
-
-import java.lang.Math;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 /**
  * Encoder code
@@ -13,42 +12,42 @@ import java.lang.Math;
 public class Encoders {
 
     //Creates left and right encoder objects
-    private CANEncoder leftEncoder;
-    private CANEncoder rightEncoder;
+    private TalonSRX leftMotor;
+    private TalonSRX rightMotor;
 
     private double leftTicksPerInch;
     private double rightTicksPerInch;
-    private double wheelCircumference = 6 * Math.PI;
 
-    public Encoders(CANEncoder leftEncoder, CANEncoder rightEncoder) {
+    public Encoders(TalonSRX leftMotor, TalonSRX rightMotor) {
 
-        this.leftEncoder = leftEncoder;
-        this.rightEncoder = rightEncoder;
+        this.leftMotor = leftMotor;
+        this.rightMotor = rightMotor;
 
-        this.leftEncoder.setPosition(0);
-        this.rightEncoder.setPosition(0);
+        leftMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+        rightMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
-        //TODO Calculate ticks per inch
+        this.leftMotor.setSelectedSensorPosition(0);
+        this.rightMotor.setSelectedSensorPosition(0);
 
-        leftTicksPerInch = 0.0 / wheelCircumference;
-        rightTicksPerInch = 0.0 / wheelCircumference;
+        leftTicksPerInch = 1820;
+        rightTicksPerInch = 1820;
     }
     public double getRight() {
-        return rightEncoder.getPosition();
+        return rightMotor.getSelectedSensorPosition();
     }
     public double getLeft() {
-        return leftEncoder.getPosition() * -1;
+        return leftMotor.getSelectedSensorPosition() * -1;
     }
     public double getLeftDistance() {
-        return (leftEncoder.getPosition() * -1) / leftTicksPerInch;
+        return (leftMotor.getSelectedSensorPosition() * -1) / leftTicksPerInch;
     }
 
     public double getRightDistance() {
-        return rightEncoder.getPosition() / rightTicksPerInch;
+        return rightMotor.getSelectedSensorPosition() / rightTicksPerInch;
     }
 
     public void reset() {
-        leftEncoder.setPosition(0);
-        rightEncoder.setPosition(0);
+        leftMotor.setSelectedSensorPosition(0);
+        rightMotor.setSelectedSensorPosition(0);
     }
 }
