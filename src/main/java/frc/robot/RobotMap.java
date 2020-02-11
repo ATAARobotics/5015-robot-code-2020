@@ -60,9 +60,9 @@ public class RobotMap {
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     // Pneumatics
-    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
-    private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
-    private DoubleSolenoid intakeSolenoid = new DoubleSolenoid(4, 5);
+    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(6, 7);
+    private DoubleSolenoid climberSolenoid = new DoubleSolenoid(2, 3);
+    private DoubleSolenoid intakeSolenoid = new DoubleSolenoid(0, 1);
 
     // Gyro
     private Gyro NavX = new Gyro();
