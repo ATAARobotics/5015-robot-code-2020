@@ -132,6 +132,8 @@ public class Teleop {
         if (joysticks.getClimbButton()) {
             climber.toggleClimb();
         }
+
+        climber.manualClimb(joysticks.getManualClimb());
     }
 
 	public void drive(double speedA, double speedB, boolean arcade) {

@@ -12,6 +12,7 @@ class OI {
     private boolean slow;
     private boolean visionButton;
     private boolean climbToggle;
+    private boolean manualClimb;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
@@ -33,7 +34,6 @@ class OI {
         slow = driveStick.getAButtonReleased();
         visionButton = driveStick.getBackButtonReleased();
         climbToggle = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
-
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
             case "Reverse Turning":
@@ -54,7 +54,7 @@ class OI {
                 break;
 
             default:
-
+                manualClimb = gunnerStick.getBumper(Hand.kLeft);
                 shoot = gunnerStick.getBButton();
                 overrideSafeties = (gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75);
                 break;
@@ -99,5 +99,9 @@ class OI {
 
     public boolean getClimbButton() {
         return climbToggle;
+    }
+
+    public boolean getManualClimb() {
+        return manualClimb;
     }
 }
