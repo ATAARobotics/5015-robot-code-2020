@@ -1,6 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import com.cuforge.libcu.Lasershark;
 
 public class RangeFinder {

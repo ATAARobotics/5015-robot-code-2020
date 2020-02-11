@@ -31,7 +31,7 @@ public class Climber {
     public void moveClimber() {
         if (climbing) {
             climberMotors.set(0.1);
-            /*switch (climberState) {
+            switch (climberState) {
                 case 0:
 
                     climberSolenoid.set(DoubleSolenoid.Value.kReverse);
@@ -77,7 +77,7 @@ public class Climber {
 
                     DriverStation.reportError("Invalid climberState of " + climberState, false);
                     break;
-                }*/
+                }
         }
     }
 

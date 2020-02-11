@@ -60,8 +60,8 @@ public class RobotMap {
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     // Pneumatics
-    //private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
-    //private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
+    private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
+    private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
 
 
     // Gyro
@@ -77,7 +77,7 @@ public class RobotMap {
     public Shooter shooter;
     public RangeFinder rangeFinder;
     public Encoders driveEncoders;
-    //public Climber climber;
+    public Climber climber;
 
     public RobotMap() {
 
@@ -88,7 +88,6 @@ public class RobotMap {
         // camera.setResolution(160, 120);
 
         //leftClimbMotor.setInverted(true);
-        //TODO: Re-enable second climber
         rightClimbMotor.follow(leftClimbMotor, true);
 
         // Init submodules
@@ -98,7 +97,7 @@ public class RobotMap {
         rangeFinder = new RangeFinder(laserShark);
         shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, shooterEncoder, rangeFinder, shootController);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
-        //climber = new Climber(this);
+        climber = new Climber(this);
 
         // Make each side controlled with only one motor object each
         frontLeftMotor.follow(rearLeftMotor);
@@ -115,9 +114,9 @@ public class RobotMap {
      * Returns the double solenoid accessed with the gear shifting functionality
      * TODO: make a wrapper class for this.
      */
-    // public DoubleSolenoid getGearShift() {
-    //     return gearShiftSolenoid;
-    // }
+    public DoubleSolenoid getGearShift() {
+        return gearShiftSolenoid;
+    }
 
     /**
      * Returns the encoders associated with the drive train.
@@ -193,9 +192,9 @@ public class RobotMap {
         return leftClimbMotor;
     }
 
-    /*public DoubleSolenoid getClimberSolenoid() {
+    public DoubleSolenoid getClimberSolenoid() {
         return climberSolenoid;
-    }*/
+    }
 
     public CANEncoder getClimbEncoder() {
         return climbEncoder;

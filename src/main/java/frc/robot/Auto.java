@@ -45,7 +45,7 @@ public class Auto {
 
     public Auto(RobotMap robotMap) {
         this.gyro = robotMap.getGyro();
-        // this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
+        this.encoders = robotMap.getDriveEncoders();
         this.swatDrive = robotMap.swatDrive;
     }
 

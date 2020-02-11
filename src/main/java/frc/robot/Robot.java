@@ -118,10 +118,10 @@ public class Robot extends TimedRobot {
         auto.AutoDisabled();
 
         driveSchemeSelected = driveSchemePicker.getSelected();
-        //teleop.setDriveScheme(driveSchemeSelected);
+        teleop.setDriveScheme(driveSchemeSelected);
 
         gunnerSchemeSelected = gunnerSchemePicker.getSelected();
-        //teleop.setGunnerScheme(gunnerSchemeSelected);
+        teleop.setGunnerScheme(gunnerSchemeSelected);
         teleop.teleopInit();
     }
     @Override

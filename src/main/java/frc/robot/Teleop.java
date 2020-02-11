@@ -33,12 +33,12 @@ public class Teleop {
         //Initialize Classes
         joysticks = new OI();
         this.driveTrain = robotMap.swatDrive;
-        this.encoders = robotMap.getDriveEncoders(); // TODO: Re-enable this
+        this.encoders = robotMap.getDriveEncoders();
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
         this.rangeFinder = robotMap.rangeFinder;
-        //this.climber = robotMap.climber;
+        this.climber = robotMap.climber;
     }
 
     public void teleopInit() {
@@ -117,9 +117,9 @@ public class Teleop {
                         limeLight.setCameraMode(CameraMode.Drive);
                     }
                 }
-                /*if(joysticks.getGearShift()) {
+                if(joysticks.getGearShift()) {
                     driveTrain.gearShift();
-                }*/
+                }
 
                 if (joysticks.getSlow()) {
                     driveTrain.slow();
@@ -129,7 +129,7 @@ public class Teleop {
 
         SmartDashboard.putNumber("Lasershark Distance", rangeFinder.getDistance());
 
-        /* if (joysticks.getClimbButton()) {
+        if (joysticks.getClimbButton()) {
             climber.toggleClimb();
         }
     }
@@ -151,8 +151,6 @@ public class Teleop {
     }
 
     // -- End Vision --
-    */
-    }
 	public void TestPeriodic() {
         //safe mode
         //driveTrain.gearShiftSafe();
@@ -164,10 +162,10 @@ public class Teleop {
         }
         else;
     }
-    /*public void setDriveScheme(String driveScheme){
+    public void setDriveScheme(String driveScheme){
         joysticks.setDriveScheme(driveScheme);
     }
     public void setGunnerScheme(String gunnerScheme){
         joysticks.setGunnerScheme(gunnerScheme);
-    }*/
+    }
 }

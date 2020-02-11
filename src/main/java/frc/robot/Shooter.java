@@ -8,12 +8,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import java.lang.Math;
-import java.net.Socket;
-import java.io.PrintWriter;
 
 /**
  * Ball shooter code
@@ -40,8 +35,8 @@ enum ShootCase {
  */
 public class Shooter {
 
-    private final double beltCircumference = 0.0 * Math.PI; // TODO: Measure belt cercumference
-    private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; // TODO: Calculate ticks per ball
+    //private final double beltCircumference = 0.0 * Math.PI;
+    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; 
     private final double intakeSpeed = 1.0;
     private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
@@ -52,7 +47,6 @@ public class Shooter {
     private VictorSPX magazineMotor = null;
     private VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
-    private PrintWriter pidStream = null;
 
     private Timer magazineTimer = new Timer();
 
@@ -197,11 +191,6 @@ public class Shooter {
         this.ballsStored = ballsStored;
     }
 
-    public void logPID() {
-        double velocity = shooterEncoder.getVelocity()/maxRPM * 100;
-        pidStream.println(Double.toString(velocity));
-    }
-
     /**
      * Main update loop for intaking balls automatically.
      */
@@ -256,7 +245,7 @@ public class Shooter {
                 break;
 
             default:
-                DriverStation.reportError(String.format("Invalid Intake Case: %d", intakeCase), false); // TODO: Pretty print the enum value
+                DriverStation.reportError(String.format("Invalid Intake Case: %d", intakeCase), false);
         }
     }
 
@@ -266,12 +255,12 @@ public class Shooter {
      */
     public void shoot(boolean active) {
         if (active) {
-            DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
+            DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
                     shootCase = ShootCase.WARMUP;
-                    DriverStation.reportWarning("Switching to cooldown", false); // TODO: Pretty print the enum value
+                    DriverStation.reportWarning("Switching to cooldown", false);
 
                     break;
                 case WARMUP: // Shooter speeding up
@@ -293,7 +282,7 @@ public class Shooter {
 
                     break;
                 default:
-                    DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false); // TODO: Pretty print the enum value
+                    DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false);
             }
         } else if (shootCase == ShootCase.WARMUP ||
             shootCase == ShootCase.RUNNING) { // User released the button
