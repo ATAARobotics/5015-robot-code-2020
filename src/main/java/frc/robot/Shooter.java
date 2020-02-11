@@ -6,14 +6,17 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * Ball shooter code
  *
- * @author Jacob Guglielmin, Ben Heard
+ * @author Jacob Guglielmin, Ben Heard, Alexander Greco
  */
 
 enum IntakeCase {
@@ -47,6 +50,7 @@ public class Shooter {
     private VictorSPX magazineMotor = null;
     private VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
+    private DoubleSolenoid intakeControl = null;
 
     private Timer magazineTimer = new Timer();
 
@@ -66,7 +70,7 @@ public class Shooter {
      * @param magazineMotor The magazine motor
      * @param intakeMotor The intake motor
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, CANEncoder shooterEncoder, 
+    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl, CANEncoder shooterEncoder, 
         RangeFinder intakeDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor = magazineMotor;
@@ -74,6 +78,7 @@ public class Shooter {
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shooterController = shooterController;
+        this.intakeControl = intakeControl;
     }
 
     /**
@@ -148,6 +153,7 @@ public class Shooter {
         if (running) {
             magazineMotor.set(ControlMode.PercentOutput, intakeSpeed);
         } else {
+            intakeControl.set(Value.kReverse);
             magazineMotor.set(ControlMode.PercentOutput, 0.0);
         }
     }
@@ -194,15 +200,28 @@ public class Shooter {
     /**
      * Main update loop for intaking balls automatically.
      */
+
+    //Allow code to control intake motor and solenoid
+    private void setIntake(boolean running) {
+        if(running) {
+            intakeMotor.set(ControlMode.PercentOutput, -0.5);
+            intakeControl.set(Value.kForward);
+        }
+
+        else {
+            intakeMotor.set(ControlMode.PercentOutput, 0.0);
+            intakeControl.set(Value.kReverse);
+        }
+    }
     public void intake() {
         switch (intakeCase) {
             case WAITING:
                 if (ballsStored < 5 || safetyOverride) {
                     setMagazine(false);
-                    intakeMotor.set(ControlMode.PercentOutput, -0.5);
+                    setIntake(true);
                 } else {
                     setMagazine(false);
-                    intakeMotor.set(ControlMode.PercentOutput, 0.0);
+                    setIntake(false);
                 }
 
                 if (getIntakeDectector() && ballsStored != 5) {

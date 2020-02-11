@@ -10,21 +10,23 @@ public class Climber {
     private boolean climbing = false;
 
     private int climberState = 0;
-    private int step = 0;
 
-    //TODO: Actually figure out what this value should be - encoder ticks in climb
+    // TODO: Actually figure out what this value should be - encoder ticks in climb
     private final int CLIMB_DISTANCE = 0;
 
-    //Declare motors/pneumatics/encoder
+    // Declare motors/pneumatics/encoder
     private CANSparkMax climberMotors = null;
 
     private DoubleSolenoid climberSolenoid = null;
 
     private CANEncoder climbEncoder = null;
 
+    //TODO: Manual control of elevator
+    private boolean climbButton = false;
+
     public Climber(RobotMap robotMap) {
         this.climberMotors = robotMap.getClimberMotors();
-        //this.climberSolenoid = robotMap.getClimberSolenoid();
+        // this.climberSolenoid = robotMap.getClimberSolenoid();
         this.climbEncoder = robotMap.getClimbEncoder();
     }
 
@@ -32,46 +34,31 @@ public class Climber {
         if (climbing) {
             climberMotors.set(0.1);
             switch (climberState) {
+                //Release Spring
                 case 0:
 
                     climberSolenoid.set(DoubleSolenoid.Value.kReverse);
                     climberState++;
                     climbing = false;
                     break;
-
+                
+                //Pulls until target encoder distance
                 case 1:
 
-                    switch (step) {
-                        case 0:
-
-                            climberMotors.set(-1.0);
-                            step++;
-                            climbEncoder.setPosition(0);
-
-                            break;
-
-                        case 1:
-
-                            climberMotors.set(-1.0);
-                            if(climbEncoder.getPosition() <= CLIMB_DISTANCE) {
-                                climberState++;
-                            }
-
-                            break;
-
-                        default:
-
-                            DriverStation.reportError("Invalid climb step of " + step, false);
-                            break;
+                    climbEncoder.setPosition(0);
+                    climberMotors.set(-1.0);
+                    if(!climbButton/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
+                        climberState++;
                     }
 
                     break;
-
+                //
                 case 2:
 
                     climberMotors.set(0);
                     climberSolenoid.set(DoubleSolenoid.Value.kForward);
                     climbing = false;
+                    break;
 
                 default:
 
@@ -81,12 +68,17 @@ public class Climber {
         }
     }
 
+    public void manualClimb(boolean pulling) {
+        climbButton = pulling;
+    }
+
+
     public void toggleClimb() {
         if (!climbing) {
             climbing = true;
             moveClimber();
         } else {
-            //ABORTS CLIMB AT ANY STAGE OF CLIMB
+            // ABORTS CLIMB AT ANY STAGE OF CLIMB
             climbing = false;
             climberMotors.set(0);
             DriverStation.reportError("CLIMB ABORTED BY DRIVER", false);

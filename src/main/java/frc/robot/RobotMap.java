@@ -62,7 +62,7 @@ public class RobotMap {
     // Pneumatics
     private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(2, 3);
     private DoubleSolenoid climberSolenoid = new DoubleSolenoid(4, 5);
-
+    private DoubleSolenoid intakeSolenoid = new DoubleSolenoid(4, 5);
 
     // Gyro
     private Gyro NavX = new Gyro();
@@ -95,7 +95,7 @@ public class RobotMap {
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
         rangeFinder = new RangeFinder(laserShark);
-        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, shooterEncoder, rangeFinder, shootController);
+        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, rangeFinder, shootController);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
 
