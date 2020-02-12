@@ -21,6 +21,8 @@ public class Teleop {
     public boolean aligning = false;
     private boolean discoOn = false;
     private int onTargetCounter = 0;
+
+    //vision vars
     private PIDController visionAlignPID = null;
     private boolean visionActive = false;
     private boolean climbing = false;
@@ -28,6 +30,13 @@ public class Teleop {
     private double I = 0.0026;
     private double D = 0.05;
     private double tolerance = 0.2;
+
+    private double targetHeight = 81;
+    private double limelightHeight = 19;
+    private double angleToTarget;
+    private double limelightAngle = 40;
+    private double distanceToWall;
+
 
     public Teleop(RobotMap robotMap) {
         //Initialize Classes
@@ -48,13 +57,18 @@ public class Teleop {
         visionAlignPID = new PIDController(P, I, D);
         visionAlignPID.setTolerance(tolerance);
 
-        // Disable Vision Processing on Limelight
+        // Disable Vision Processing on Limeligh
         limeLight.setCameraMode(CameraMode.Drive);
         SmartDashboard.putNumber("Tolerance", tolerance);
         SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
+
     }
 
     public void TeleopPeriodic() {
+        angleToTarget = limeLight.getTy();
+        distanceToWall = (targetHeight-limelightHeight) / Math.tan(Math.toRadians(limelightAngle+angleToTarget));
+        SmartDashboard.putNumber("Distance To Wall", distanceToWall);
+        SmartDashboard.putNumber("Angle To Target", angleToTarget);
         joysticks.checkInputs();
 
         if (!climbing) {

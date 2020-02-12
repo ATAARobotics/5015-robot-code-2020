@@ -42,7 +42,7 @@ public class LimeLight {
 
     /**
      * Returns the horizontal offset from the crosshair to the target
-     * @return Target Horizontal Offset from Crosshair. (Value between -27 and 27)
+     * @return Target Horizontal Offset from Crosshair. (Value between -29.8 and 29.8)
      */
     public double getTx(){
         return tx.getDouble(0);
@@ -50,7 +50,7 @@ public class LimeLight {
 
     /**
      * Returns the vertical offset from crosshair to target
-     * @return Target Vertical Offset from Crosshair. (Value between -20.5 and 20.5)
+     * @return Target Vertical Offset from Crosshair. (Value between -24.85 and 24.85)
      */
     public double getTy(){
         return ty.getDouble(0);
