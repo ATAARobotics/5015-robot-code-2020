@@ -21,7 +21,7 @@ public class LimeLight {
     NetworkTableEntry camMode;
 
     public LimeLight(){
-        table = NetworkTableInstance.getDefault().getTable("limelight-swat");
+        table = NetworkTableInstance.getDefault().getTable("limelight-swatbot");
         tv = table.getEntry("tv");
         tx = table.getEntry("tx");
         ty = table.getEntry("ty");

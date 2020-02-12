@@ -31,10 +31,10 @@ public class Teleop {
     private double D = 0.05;
     private double tolerance = 0.2;
 
-    private double targetHeight = 81;
+    private double targetHeight = 89;
     private double limelightHeight = 19;
     private double angleToTarget;
-    private double limelightAngle = 40;
+    private double limelightAngle = 50;
     private double distanceToWall;
 
 
@@ -57,7 +57,7 @@ public class Teleop {
         visionAlignPID = new PIDController(P, I, D);
         visionAlignPID.setTolerance(tolerance);
 
-        // Disable Vision Processing on Limeligh
+        // Disable Vision Processing on Limelight
         limeLight.setCameraMode(CameraMode.Drive);
         SmartDashboard.putNumber("Tolerance", tolerance);
         SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
