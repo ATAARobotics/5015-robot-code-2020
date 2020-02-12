@@ -31,10 +31,10 @@ public class Teleop {
     private double D = 0.05;
     private double tolerance = 0.2;
 
-    private double targetHeight;
-    private double limelightHeight;
+    private double targetHeight = 81;
+    private double limelightHeight = 19;
     private double angleToTarget;
-    private double limelightAngle;
+    private double limelightAngle = 40;
     private double distanceToWall;
 
 
@@ -57,18 +57,18 @@ public class Teleop {
         visionAlignPID = new PIDController(P, I, D);
         visionAlignPID.setTolerance(tolerance);
 
-        // Disable Vision Processing on Limelight
+        // Disable Vision Processing on Limeligh
         limeLight.setCameraMode(CameraMode.Drive);
         SmartDashboard.putNumber("Tolerance", tolerance);
         SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
 
-        //limelight distance trig
-        //TODO: Test if this works (I have no idea if this does)
-        angleToTarget = limeLight.getTy();
-        distanceToWall = (targetHeight-limelightHeight) / Math.tan(limelightHeight+yAngleToTarget);
     }
 
     public void TeleopPeriodic() {
+        angleToTarget = limeLight.getTy();
+        distanceToWall = (targetHeight-limelightHeight) / Math.tan(Math.toRadians(limelightAngle+angleToTarget));
+        SmartDashboard.putNumber("Distance To Wall", distanceToWall);
+        SmartDashboard.putNumber("Angle To Target", angleToTarget);
         joysticks.checkInputs();
 
         if (!climbing) {
