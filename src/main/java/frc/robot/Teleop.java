@@ -17,25 +17,27 @@ public class Teleop {
     private ColorSensor colorSensor = null;
     private RangeFinder rangeFinder = null;
 
-    public boolean PIDEnabled = false;
-    public boolean aligning = false;
+    private boolean climbing = false;
+
+    //Vision Control Variables
     private boolean discoOn = false;
     private int onTargetCounter = 0;
 
-    //vision vars
+    //Vision PID and PID values
     private PIDController visionAlignPID = null;
     private boolean visionActive = false;
-    private boolean climbing = false;
-    private double P = 0.05;
-    private double I = 0.0026;
-    private double D = 0.05;
+    //TODO: Tune vision PID values
+    private double P = 0.0;
+    private double I = 0.0;
+    private double D = 0.0;
     private double tolerance = 0.2;
 
+    //Variables for limelight distance tracking
     private double targetHeight = 89;
     private double limelightHeight = 19;
-    private double angleToTarget;
     private double limelightAngle = 50;
     private double distanceToWall;
+    private double angleToTarget;
 
 
     public Teleop(RobotMap robotMap) {
@@ -65,10 +67,13 @@ public class Teleop {
     }
 
     public void TeleopPeriodic() {
+
+        //Calculate distance to wall using limelight.
         angleToTarget = limeLight.getTy();
         distanceToWall = (targetHeight-limelightHeight) / Math.tan(Math.toRadians(limelightAngle+angleToTarget));
         SmartDashboard.putNumber("Distance To Wall", distanceToWall);
         SmartDashboard.putNumber("Angle To Target", angleToTarget);
+
         joysticks.checkInputs();
 
         if (!climbing) {
@@ -80,6 +85,7 @@ public class Teleop {
             shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
+            //When vision button is pressed, toggle vision and CameraMode
             if(joysticks.getVisionButton()) {
                 visionActive = !visionActive;
                 if (visionActive) {
