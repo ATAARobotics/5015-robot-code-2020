@@ -42,7 +42,7 @@ public class RobotMap {
     
     //Add shooter and conveyor belt
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
-    private VictorSPX intakeMotor = new VictorSPX(8);
+    private VictorSPX intakeMotor = new VictorSPX(5);
     private CANPIDController shootController = shootMotor.getPIDController();
     private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
     // Add climber

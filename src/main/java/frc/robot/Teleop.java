@@ -1,10 +1,15 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
+import javafx.scene.paint.Color;
 
 public class Teleop {
     // Variables for robot classes
@@ -19,29 +24,28 @@ public class Teleop {
 
     private boolean climbing = false;
 
-    //Vision Control Variables
+    // Vision Control Variables
     private boolean discoOn = false;
     private int onTargetCounter = 0;
 
-    //Vision PID and PID values
+    // Vision PID and PID values
     private PIDController visionAlignPID = null;
     private boolean visionActive = false;
-    //TODO: Tune vision PID values
+    // TODO: Tune vision PID values
     private double P = 0.0;
     private double I = 0.0;
     private double D = 0.0;
     private double tolerance = 0.2;
 
-    //Variables for limelight distance tracking
+    // Variables for limelight distance tracking
     private double targetHeight = 89;
     private double limelightHeight = 19;
     private double limelightAngle = 50;
     private double distanceToWall;
     private double angleToTarget;
 
-
     public Teleop(RobotMap robotMap) {
-        //Initialize Classes
+        // Initialize Classes
         joysticks = new OI();
         this.driveTrain = robotMap.swatDrive;
         this.encoders = robotMap.getDriveEncoders();
@@ -55,7 +59,7 @@ public class Teleop {
     public void teleopInit() {
         encoders.reset();
 
-        //Sets up PID
+        // Sets up PID
         visionAlignPID = new PIDController(P, I, D);
         visionAlignPID.setTolerance(tolerance);
 
@@ -68,9 +72,9 @@ public class Teleop {
 
     public void TeleopPeriodic() {
 
-        //Calculate distance to wall using limelight.
+        // Calculate distance to wall using limelight.
         angleToTarget = limeLight.getTy();
-        distanceToWall = (targetHeight-limelightHeight) / Math.tan(Math.toRadians(limelightAngle+angleToTarget));
+        distanceToWall = (targetHeight - limelightHeight) / Math.tan(Math.toRadians(limelightAngle + angleToTarget));
         SmartDashboard.putNumber("Distance To Wall", distanceToWall);
         SmartDashboard.putNumber("Angle To Target", angleToTarget);
 
@@ -85,13 +89,13 @@ public class Teleop {
             shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
-            //When vision button is pressed, toggle vision and CameraMode
-            if(joysticks.getVisionButton()) {
+            // When vision button is pressed, toggle vision and CameraMode
+            if (joysticks.getVisionButton()) {
                 visionActive = !visionActive;
                 if (visionActive) {
                     onTargetCounter = 0;
                     limeLight.setCameraMode(CameraMode.Vision);
-                }else{
+                } else {
                     limeLight.setCameraMode(CameraMode.Drive);
                 }
             }
@@ -102,8 +106,26 @@ public class Teleop {
             SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
 
             SmartDashboard.putNumber("Drivetrain Temperature", driveTrain.getTemperature());
+            Map<String, Object> properties = new HashMap<String, Object>();
+            Color thresholdColor = Color.rgb(204, 0, 0);
+            Color barColor = Color.rgb(0, 190, 0);
+            properties.put("Min Value", 0);
+            properties.put("Max Value", 70);
+            properties.put("Threshold", 50);
+            properties.put("Angle Range", 180);
+            properties.put("Threshold Color", thresholdColor);
+            properties.put("Color", barColor);
+            properties.put("Title", "Drive Train Temperature");
+            Shuffleboard.getTab("New Dashboard").add("Drive Train Temperature", driveTrain.getTemperature())
+            .withWidget("Temperature Gauge") // specify the widget here
+            .withProperties(properties)
+            .getEntry();
+            properties.replace("Title", "Shooter Temperature");
             SmartDashboard.putNumber("Shooter Temperature", shooter.getTemperature());
-
+            Shuffleboard.getTab("New Dashboard").add("Shooter Temperature", shooter.getTemperature())
+            .withWidget("Temperature Gauge") // specify the widget here
+            .withProperties(properties)
+            .getEntry();
             String colorGuess = colorSensor.findColor();
             SmartDashboard.putString("Color", colorGuess);
 
