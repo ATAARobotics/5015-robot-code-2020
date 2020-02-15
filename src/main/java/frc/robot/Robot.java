@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
             else {
                 autoCommands = Files.readAllLines(path, StandardCharsets.UTF_8);
                 for (String command : autoCommands) {
-                    if(command.endsWith(":")) {
+                    if(command.endsWith(":") && command.length() > 1) {
                         command.substring(0, command.length()-2);
                         autoPicker.addOption(command, command);
                     }
