@@ -7,13 +7,22 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.LimeLight;
 
 public class Robot extends TimedRobot {
-    //Create objects to run auto and teleop code
+    // Create objects to run auto and teleop code
     public Teleop teleop = null;
     Auto auto = null;
     Encoders encoders = null;
@@ -21,13 +30,15 @@ public class Robot extends TimedRobot {
     LimeLight limeLight = null;
     RobotMap robotMap = null;
     Shooter shooter = null;
-    //Climber climber = null;
+    // Climber climber = null;
     SWATDrive driveTrain = null;
     Gyro gyro = null;
+    List<String> autoCommands;
 
-    //Add variables for the auto selector
-    private final String defaultAuto = "Default";
-    private final String auto2 = "Auto 2";
+    // Add variables for the auto selector
+    final String rev = "5015-2020-rev1";
+    String fileName = "./auto/swatbots.auto";
+    Path path = Paths.get(fileName);
     private String autoSelected;
     private final SendableChooser<String> autoPicker = new SendableChooser<>();
 
@@ -49,9 +60,26 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
-        autoPicker.setDefaultOption("Default Auto", defaultAuto);
-        autoPicker.addOption("Auto 2", auto2);
-        SmartDashboard.putData("Auto choices", autoPicker);
+        try {
+            autoCommands = Files.readAllLines(path, StandardCharsets.UTF_8);
+            if(autoCommands.get(0) != rev) {
+                DriverStation.reportError("Error: Auto File revision did not match. \nExpected: " + rev + ", Actual: " + autoCommands.get(0), true);
+            }
+            else {
+                autoCommands = Files.readAllLines(path, StandardCharsets.UTF_8);
+                for (String command : autoCommands) {
+                    if(command.endsWith(":")) {
+                        command.substring(0, command.length()-2);
+                        autoPicker.addOption(command, command);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        autoPicker.setDefaultOption("Default Auto", "Default");
+        SmartDashboard.putData("Auto Choices", autoPicker);
 
         driveSchemePicker.setDefaultOption("Default", defaultDriverScheme);
         driveSchemePicker.addOption("Reverse Turning", reverseTurning);
@@ -96,9 +124,8 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        autoSelected = autoPicker.getSelected();
+        autoSelected = SmartDashboard.getString("Auto Selector", "Default");
         auto.setAutoMode(autoSelected);
-        // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
         auto.AutoInit();
     }
 

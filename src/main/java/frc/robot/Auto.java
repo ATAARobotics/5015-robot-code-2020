@@ -1,8 +1,17 @@
 package frc.robot;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.PIDController;
 //import frc.robot.pathweaver.PathFinder;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * A file dedicated to all auto related code
@@ -13,7 +22,7 @@ public class Auto {
 
     String autoSelected;
 
-    //TODO Tune PIDs
+    // TODO Tune PIDs
 
     // Drive values
     double Dp = 0;
@@ -42,6 +51,12 @@ public class Auto {
     Encoders encoders = null;
     SWATDrive swatDrive = null;
     Gyro gyro = null;
+    List<String> autoCommands;
+    final String root = "./autos";
+    final String rev = "5015-2020-rev1";
+    String fileName = "./auto/swatbots.auto";
+
+    Path path = Paths.get(fileName);
 
     public Auto(RobotMap robotMap) {
         this.gyro = robotMap.getGyro();
@@ -54,7 +69,7 @@ public class Auto {
      */
     public void AutoInit() {
 
-        //encoders.reset();
+        encoders.reset();
         gyro.reset();
 
         // Speed PID
