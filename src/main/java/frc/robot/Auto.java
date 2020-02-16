@@ -50,7 +50,7 @@ public class Auto {
 
     private int commandNumber = 0;
     private boolean nextCommand = false;
-    private boolean noTargetLock = false;
+    private boolean targetLock = false;
 
     private Shooter shooter;
     private LimeLight limeLight;
@@ -128,17 +128,19 @@ public class Auto {
         }
         
         else if(commandType.equals("s")) {
-            if(noTargetLock) {
+            if(!targetLock) {
                 //TODO: run vision alignment function
                 //noTargetLock !vision.align()
-                noTargetLock = false;
-            }
-            if(shooter.getBallsStored() != 0) {
-                shooter.shoot(true);
+                targetLock = true;
             }
             else {
-                shooter.shoot(false);
-                nextCommand = true;
+                if(shooter.getBallsStored() != 0) {
+                    shooter.shoot(true);
+                }
+                else {
+                    shooter.shoot(false);
+                    nextCommand = true;
+                }
             }
         }
         //increment commandNumber after a completed command
