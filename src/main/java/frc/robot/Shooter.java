@@ -320,4 +320,8 @@ public class Shooter {
     public double getTemperature() {
         return shooterMotor.getMotorTemperature();
     }
+
+	public double getBallsStored() {
+		return ballsStored;
+	}
 }

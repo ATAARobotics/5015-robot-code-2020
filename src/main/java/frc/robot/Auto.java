@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import frc.robot.vision.LimeLight;
+
 //import frc.robot.pathweaver.PathFinder;
 
 /**
@@ -18,14 +20,7 @@ public class Auto {
 
     String autoSelected;
 
-    // TODO Tune PIDs
-
-    // Drive values
-    double Dp = 0;
-    double Di = 0;
-    double Dd = 0;
-
-    double speed = 0;
+    // TODO Tune PID
 
     // Turn values
     double Tp = 0;
@@ -33,8 +28,6 @@ public class Auto {
     double Td = 0;
 
     double turn = 0;
-
-    PIDController drivePID;
     PIDController turnPID;
 
     boolean driveIsEnabled;
@@ -48,7 +41,7 @@ public class Auto {
     SWATDrive swatDrive = null;
     Gyro gyro = null;
     List<String> autoCommands;
-    List<List<String>> splitAutoCommands =  new ArrayList<List<String>>(); 
+    List<List<String>> splitAutoCommands = new ArrayList<List<String>>();
     final String root = "./autos";
     final String rev = "5015-2020-rev1";
     String fileName = "./auto/swatbots.auto";
@@ -56,28 +49,29 @@ public class Auto {
     Path path = Paths.get(fileName);
 
     private int commandNumber = 0;
-
     private boolean nextCommand = false;
+    private boolean noTargetLock = false;
+
+    private Shooter shooter;
+    private LimeLight limeLight;
 
     public Auto(RobotMap robotMap) {
         this.gyro = robotMap.getGyro();
         this.encoders = robotMap.getDriveEncoders();
         this.swatDrive = robotMap.swatDrive;
+        this.shooter = robotMap.shooter;
+        this.limeLight = robotMap.limeLight;
     }
 
     /**
      * Function that contains tasks designed to be ran at initalization
      */
     public void AutoInit() {
-
         encoders.reset();
         gyro.reset();
 
         // Speed PID
-        drivePID = new PIDController(Dp, Di, Dd);
-
-        drivePID.setTolerance(1.0);
-        drivePID.setIntegratorRange(-1.0, 1.0);
+        /* Config the peak and nominal outputs, 12V means full */
 
         // Turn PID
         turnPID = new PIDController(Tp, Ti, Td);
@@ -125,18 +119,33 @@ public class Auto {
         if(commandType.equals("m")) {
             //TODO: PID for distance
             commandValue = commandValue/12;
-            drivePID.calculate(encoders.getLeftDistance(), commandValue);
-            nextCommand = drivePID.atSetpoint();
+            nextCommand = encoders.PID(commandValue);
         }
         else if(commandType.equals("r")) {
             //TODO: PID for rotation
             turnPID.calculate(gyro.getAngle(), commandValue);
             nextCommand = turnPID.atSetpoint();
         }
+        
+        else if(commandType.equals("s")) {
+            if(noTargetLock) {
+                //TODO: run vision alignment function
+                //noTargetLock !vision.align()
+                noTargetLock = false;
+            }
+            if(shooter.getBallsStored() != 0) {
+                shooter.shoot(true);
+            }
+            else {
+                shooter.shoot(false);
+                nextCommand = true;
+            }
+        }
         //increment commandNumber after a completed command
         if(nextCommand) {
             commandNumber++;
             encoders.reset();
+            encoders.PID(0);
             gyro.reset();
             nextCommand = false;
         }
