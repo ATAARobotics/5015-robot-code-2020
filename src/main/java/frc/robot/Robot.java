@@ -80,7 +80,6 @@ public class Robot extends TimedRobot {
         properties.put("Min Value", 0);
         properties.put("Max Value", 100);
         properties.put("Threshold", 10);
-        properties.put("Angle Range", 180);
         properties.put("Color", "red");
         properties.put("Threshold Color", "green");
 
