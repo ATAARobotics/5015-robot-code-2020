@@ -39,7 +39,7 @@ public class Robot extends TimedRobot {
 
     // Add variables for the auto selector
     final String rev = "5015-2020-rev1";
-    String fileName = "./auto/swatbots.auto";
+    String fileName = "./autos/swatbots.auto";
     Path path = Paths.get(fileName);
     private String autoSelected;
     private final SendableChooser<String> autoPicker = new SendableChooser<>();
@@ -88,15 +88,17 @@ public class Robot extends TimedRobot {
 
         try {
             autoCommands = Files.readAllLines(path, StandardCharsets.UTF_8);
-            if(autoCommands.get(0) != rev) {
+            if(!autoCommands.get(0).equals(rev)) {
                 DriverStation.reportError("Error: Auto File revision did not match. \nExpected: " + rev + ", Actual: " + autoCommands.get(0), true);
             }
             else {
                 autoCommands = Files.readAllLines(path, StandardCharsets.UTF_8);
+                auto.setAutoCommands(autoCommands);
                 for (String command : autoCommands) {
                     if(command.endsWith(":") && command.length() > 1) {
-                        command.substring(0, command.length()-2);
-                        autoPicker.addOption(command, command);
+                        String commandString = command.substring(0, command.length()-1);
+                        autoPicker.addOption(commandString, commandString);
+                        System.out.println(commandString);
                     }
                 }
             }
@@ -119,7 +121,6 @@ public class Robot extends TimedRobot {
         robotMap.shooter.PIDInit();
 
         teleop.teleopInit();
-        auto.AutoInit();
         robotMap.limeLight.ledOff();
     }
 

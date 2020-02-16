@@ -51,7 +51,7 @@ public class Climber {
                     }
 
                     break;
-                //
+                //locks spring
                 case 2:
 
                     climberMotors.set(0);

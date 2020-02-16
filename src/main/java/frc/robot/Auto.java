@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
@@ -46,11 +48,16 @@ public class Auto {
     SWATDrive swatDrive = null;
     Gyro gyro = null;
     List<String> autoCommands;
+    List<List<String>> splitAutoCommands =  new ArrayList<List<String>>(); 
     final String root = "./autos";
     final String rev = "5015-2020-rev1";
     String fileName = "./auto/swatbots.auto";
 
     Path path = Paths.get(fileName);
+
+    private int commandNumber = 0;
+
+    private boolean nextCommand = false;
 
     public Auto(RobotMap robotMap) {
         this.gyro = robotMap.getGyro();
@@ -78,7 +85,33 @@ public class Auto {
         turnPID.setTolerance(2.0);
         turnPID.setIntegratorRange(-1.0, 1.0);
         turnPID.setSetpoint(0.0);
-
+        //Remove rev#
+        autoCommands.remove(0);
+        //auto start
+        int start = 1;
+        int end = autoCommands.size()-1;
+        int i=0;
+        //Get the index of the line which defines the selected auto and get the first command based on its location
+        outer: for (;i<autoCommands.size();i++) {
+            String command = autoCommands.get(i);
+            if(command.equals(autoSelected)) {
+               start=i+1;
+               break outer;
+            }
+        }
+        //Get the index of the line which defines the next auto  and get the last command based on its location
+        outer: for (;i<autoCommands.size();i++) {
+            String command = autoCommands.get(i);
+            if(command.equals(autoSelected)) {
+               end=i-1;
+               break outer;
+            }
+        }
+        autoCommands = autoCommands.subList(start, end);
+        for (String command : autoCommands) {
+            List<String> item = Arrays.asList(command.split(" "));
+            splitAutoCommands.add(item);
+        }
     }
 
     /**
@@ -86,20 +119,26 @@ public class Auto {
      * periodically.
      */
     public void AutoPeriodic() {
-        switch (autoSelected) {
-            case "Default":
-
-                //Default Auto Code
-                //TODO add auto code
-
-                break;
-
-            case "Auto 2":
-
-                //Other auto code
-
-            default:
-                break;
+        List<String> command = splitAutoCommands.get(commandNumber);
+        String commandType = command.get(0);
+        double commandValue = Double.parseDouble(command.get(1));
+        if(commandType.equals("m")) {
+            //TODO: PID for distance
+            commandValue = commandValue/12;
+            drivePID.calculate(encoders.getLeftDistance(), commandValue);
+            nextCommand = drivePID.atSetpoint();
+        }
+        else if(commandType.equals("r")) {
+            //TODO: PID for rotation
+            turnPID.calculate(gyro.getAngle(), commandValue);
+            nextCommand = turnPID.atSetpoint();
+        }
+        //increment commandNumber after a completed command
+        if(nextCommand) {
+            commandNumber++;
+            encoders.reset();
+            gyro.reset();
+            nextCommand = false;
         }
     }
 
@@ -113,4 +152,8 @@ public class Auto {
     public void setAutoMode(String autoMode) {
         autoSelected = autoMode;
     }
+
+	public void setAutoCommands(List<String> autoCommands2) {
+        autoCommands = autoCommands2;
+	}
 }
