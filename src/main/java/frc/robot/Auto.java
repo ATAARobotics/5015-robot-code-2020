@@ -21,7 +21,6 @@ public class Auto {
     String autoSelected;
 
     // TODO Tune PID
-
     // Turn values
     double Tp = 0;
     double Ti = 0;

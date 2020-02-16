@@ -28,6 +28,7 @@ public class Teleop {
     private PIDController visionAlignPID = null;
     private boolean visionActive = false;
     // TODO: Tune vision PID values
+    // TODO: Move vision PID into limelight file(more accessable)
     private double P = 0.0;
     private double I = 0.0;
     private double D = 0.0;
