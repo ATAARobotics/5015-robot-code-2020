@@ -248,7 +248,7 @@ public class Shooter {
 
             case RUNNING:
                 if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.5) {
+                    if(magazineTimer.get() < 0.3) {
                         setMagazine(true);
                     } else {
                         ballsStored++;
