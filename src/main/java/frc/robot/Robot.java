@@ -153,7 +153,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         driveTemp.setDouble(driveTrain.getTemperature());
         shooterTemp.setDouble(shooter.getTemperature());
-        double volt = Math.floor(RobotController.getBatteryVoltage() - 11) / 2) * 100);
+        double volt = Math.floor(((RobotController.getBatteryVoltage() - 11) / 2) * 100);
         if (volt < 0) {
             volt = 0;
         } else if (volt > 100) {
