@@ -31,7 +31,7 @@ public class Climber {
     }
 
     public void moveClimber() {
-        if (true) {
+        if (climbing) {
             System.out.println(climberState);
             switch (climberState) {
                 //Release Spring
@@ -46,7 +46,7 @@ public class Climber {
 
                     climbEncoder.setPosition(0);
                     climberMotors.set(-1.0);
-                    if(false/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
+                    if(!climbButton/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
                         climberState++;
                     }
 
@@ -75,7 +75,6 @@ public class Climber {
     public void toggleClimb() {
         if (!climbing) {
             climbing = true;
-            moveClimber();
         } else {
             // ABORTS CLIMB AT ANY STAGE OF CLIMB
             climbing = false;
