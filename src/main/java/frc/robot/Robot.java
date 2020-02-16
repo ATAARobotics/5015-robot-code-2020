@@ -84,7 +84,7 @@ public class Robot extends TimedRobot {
         properties.put("Color", "red");
         properties.put("Threshold Color", "green");
 
-        driveTemp = Shuffleboard.getTab("Temperature Refresh")
+        driveTemp = Shuffleboard.getTab("Dashboard Refresh")
         .add("Drive Train Temperature", driveTrain.getTemperature())
         .withWidget("Temperature Gauge") // specify the widget here
         .withProperties(properties)
@@ -96,10 +96,11 @@ public class Robot extends TimedRobot {
             .withProperties(properties)
             .getEntry();
 
+        double volt = (RobotController.getBatteryVoltage() - 11) / 2;
         batteryVolt = Shuffleboard.getTab("Dashboard Refresh")
-            .add("Battery Gauge", RobotController.getBatteryVoltage())
+            .add("Battery Gauge", volt)
             .withWidget("Battery Gauge") // specify the widget here
-            .withProperties(properties)
+            .withProperties(propertiesBattery)
             .getEntry();
 
         try {
@@ -153,7 +154,8 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         driveTemp.setDouble(driveTrain.getTemperature());
         shooterTemp.setDouble(shooter.getTemperature());
-        batteryVolt.setDouble(RobotController.getBatteryVoltage());
+        double volt = (RobotController.getBatteryVoltage() - 11) / 2;
+        batteryVolt.setDouble(volt);
     }
 
     @Override
