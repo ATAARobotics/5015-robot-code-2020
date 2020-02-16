@@ -39,7 +39,7 @@ public class RobotMap {
 
     //Ball magazine
     private VictorSPX magazineMotor = new VictorSPX(6);
-    
+
     //Add shooter and conveyor belt
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
     private VictorSPX intakeMotor = new VictorSPX(5);
@@ -49,7 +49,7 @@ public class RobotMap {
     private CANSparkMax leftClimbMotor = new CANSparkMax(10, MotorType.kBrushless);
     private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
 
-    
+
     // Encoders
     // Shooter
     private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
@@ -78,6 +78,7 @@ public class RobotMap {
     public RangeFinder rangeFinder;
     public Encoders driveEncoders;
     public Climber climber;
+    public Align align;
 
     public RobotMap() {
 
@@ -98,6 +99,7 @@ public class RobotMap {
         shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, rangeFinder, shootController);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
+        align = new Align(this);
 
         // Make each side controlled with only one motor object each
         frontLeftMotor.follow(rearLeftMotor);

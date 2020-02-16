@@ -139,10 +139,10 @@ public class Auto {
             else {
                 //Check ballsStored to see if magazine has been emptied
                 if(shooter.getBallsStored() != 0) {
-                    shooter.shoot(true);
+                    shooter.shoot(true, 0.73);
                 }
                 else {
-                    shooter.shoot(false);
+                    shooter.shoot(false, 0.73);
                     nextCommand = true;
                 }
             }
@@ -161,7 +161,7 @@ public class Auto {
      * Function that contains tasks designed to be ran when the robot is disabled.
      */
     public void AutoDisabled() {
-        
+
     }
 
     //Get auto selected from dashboard

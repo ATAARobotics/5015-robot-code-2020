@@ -39,11 +39,10 @@ enum ShootCase {
 public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
-    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; 
+    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
     private final double intakeSpeed = 1.0;
-    private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
-
+    private double shooterSpeed = 0.73;
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
     private CANPIDController shooterController = null;
@@ -70,7 +69,7 @@ public class Shooter {
      * @param magazineMotor The magazine motor
      * @param intakeMotor The intake motor
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl, CANEncoder shooterEncoder, 
+    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl, CANEncoder shooterEncoder,
         RangeFinder intakeDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor = magazineMotor;
@@ -94,7 +93,7 @@ public class Shooter {
 
         //Max rpm
         kFF = 0.00021;
-        
+
         kMaxOutput = 1;
         kMinOutput = 0;
         maxRPM = 5600;
@@ -160,11 +159,11 @@ public class Shooter {
 
     /**
      * Sets the shooter on or off, uses shootSpeed for the power if on.
-     * 
+     *
      * @param running Whether the magazine should be moving
      */
     private boolean getIntakeDectector() {
-          
+
         if(intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0){
 
             return true;
@@ -177,8 +176,8 @@ public class Shooter {
         }else{
             return false;
         }
-      
-        
+
+
     }
 
     private void setShooter(boolean running) {
@@ -272,7 +271,8 @@ public class Shooter {
      * Main update loop for the shooter, when not active, just shuts off the shooter.
      * @param active Whether the shooter should be shooting.
      */
-    public void shoot(boolean active) {
+    public void shoot(boolean active, double speed) {
+        shooterSpeed = speed;
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
             switch (shootCase) {
@@ -289,7 +289,7 @@ public class Shooter {
                     break;
 
                 case RUNNING: // Shooter running
-                
+
                     setMagazine(true);
 
                     if (shooterEncoder.getVelocity() < (setPoint - 25)) {
