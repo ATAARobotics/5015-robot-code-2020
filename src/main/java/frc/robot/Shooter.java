@@ -40,7 +40,8 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; 
-    private final double intakeSpeed = 1.0;
+    private final double magazineSpeed = 0.75;
+    private final double intakeSpeed = -1.0;
     private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
 
@@ -151,7 +152,7 @@ public class Shooter {
 
     private void setMagazine(boolean running) {
         if (running) {
-            magazineMotor.set(ControlMode.PercentOutput, intakeSpeed);
+            magazineMotor.set(ControlMode.PercentOutput, magazineSpeed);
         } else {
             intakeControl.set(Value.kReverse);
             magazineMotor.set(ControlMode.PercentOutput, 0.0);
@@ -204,7 +205,7 @@ public class Shooter {
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
         if(running) {
-            intakeMotor.set(ControlMode.PercentOutput, -0.5);
+            intakeMotor.set(ControlMode.PercentOutput, -1);
             intakeControl.set(Value.kForward);
         }
 
