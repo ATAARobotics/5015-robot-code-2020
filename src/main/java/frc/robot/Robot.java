@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.LimeLight;
+import edu.wpi.first.wpilibj.RobotController;
 
 public class Robot extends TimedRobot {
     // Create objects to run auto and teleop code
@@ -55,6 +56,7 @@ public class Robot extends TimedRobot {
     private final SendableChooser<String> gunnerSchemePicker = new SendableChooser<>();
     private NetworkTableEntry driveTemp;
     private NetworkTableEntry shooterTemp;
+    private NetworkTableEntry batteryVolt;
 
     public Robot() {
         robotMap = new RobotMap();
@@ -74,15 +76,29 @@ public class Robot extends TimedRobot {
         properties.put("Color", "green");
         properties.put("Threshold Color", "red");
         
-        driveTemp = Shuffleboard.getTab("Temperature Dashboard")
+        Map<String, Object> propertiesBattery = new HashMap<String, Object>();
+        properties.put("Min Value", 0);
+        properties.put("Max Value", 100);
+        properties.put("Threshold", 10);
+        properties.put("Angle Range", 180);
+        properties.put("Color", "red");
+        properties.put("Threshold Color", "green");
+
+        driveTemp = Shuffleboard.getTab("Temperature Refresh")
         .add("Drive Train Temperature", driveTrain.getTemperature())
         .withWidget("Temperature Gauge") // specify the widget here
         .withProperties(properties)
         .getEntry();
                 
-        shooterTemp = Shuffleboard.getTab("Temperature Dashboard")
+        shooterTemp = Shuffleboard.getTab("Dashboard Refresh")
             .add("Shooter Temperature", shooter.getTemperature())
             .withWidget("Temperature Gauge") // specify the widget here
+            .withProperties(properties)
+            .getEntry();
+
+        batteryVolt = Shuffleboard.getTab("Dashboard Refresh")
+            .add("Battery Gauge", RobotController.getBatteryVoltage())
+            .withWidget("Battery Gauge") // specify the widget here
             .withProperties(properties)
             .getEntry();
 
@@ -137,6 +153,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         driveTemp.setDouble(driveTrain.getTemperature());
         shooterTemp.setDouble(shooter.getTemperature());
+        batteryVolt.setDouble(RobotController.getBatteryVoltage());
     }
 
     @Override
