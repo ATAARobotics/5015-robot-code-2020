@@ -14,11 +14,13 @@ public class Align {
     private double D = 0.0;
     private double tolerance = 0.2;
 
+    //TODO: Tune PID for alignment
     private PIDController visionAlignPID = new PIDController(P, I, D);
 
+    //Variables to get distance to wall. THESE MUST BE ACCURATE.
     private double targetHeight = 89;
     private double limelightHeight = 44;
-    private double limelightAngle = 39.3;
+    private double limelightAngle = 40.8;
     private double distanceToWall = 0;
     private double angleToTarget = 0;
 
@@ -38,8 +40,7 @@ public class Align {
         // Calculate distance to wall using limelight.
         angleToTarget = limeLight.getTy();
         distanceToWall = (targetHeight - limelightHeight) / Math.tan(Math.toRadians(limelightAngle + angleToTarget));
-        SmartDashboard.putNumber("Distance To Wall", distanceToWall);
-        SmartDashboard.putNumber("Angle To Target", angleToTarget);
+
         return distanceToWall;
     }
 }

@@ -51,6 +51,7 @@ public class Teleop {
 
         // Sets up PID
 
+
         // Disable Vision Processing on Limelight
         limeLight.setCameraMode(CameraMode.Vision);
 
@@ -59,6 +60,8 @@ public class Teleop {
     public void TeleopPeriodic() {
         climber.moveClimber();
 
+        SmartDashboard.putNumber("Distance To Wall", alignment.getDistance());
+        SmartDashboard.putNumber("Angle To Target", limeLight.getTy());
 
         joysticks.checkInputs();
 
