@@ -2,7 +2,6 @@ package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
@@ -17,6 +16,7 @@ public class Teleop {
     private Climber climber = null;
     private ColorSensor colorSensor = null;
     private RangeFinder rangeFinder = null;
+    private Align alignment = null;
 
     private boolean climbing = false;
 
@@ -25,21 +25,7 @@ public class Teleop {
     private int onTargetCounter = 0;
 
     // Vision PID and PID values
-    private PIDController visionAlignPID = null;
     private boolean visionActive = false;
-    // TODO: Tune vision PID values
-    // TODO: Move vision PID into limelight file(more accessable)
-    private double P = 0.0;
-    private double I = 0.0;
-    private double D = 0.0;
-    private double tolerance = 0.2;
-
-    // Variables for limelight distance tracking
-    private double targetHeight = 89;
-    private double limelightHeight = 44;
-    private double limelightAngle = 39.3;
-    private double distanceToWall;
-    private double angleToTarget;
 
     NetworkTableEntry driveTemp;
     NetworkTableEntry shootTemp;
@@ -54,6 +40,7 @@ public class Teleop {
         this.colorSensor = robotMap.colorSensor;
         this.rangeFinder = robotMap.rangeFinder;
         this.climber = robotMap.climber;
+        this.alignment = robotMap.align;
     }
 
     public void teleopInit() {
@@ -63,24 +50,15 @@ public class Teleop {
         encoders.reset();
 
         // Sets up PID
-        visionAlignPID = new PIDController(P, I, D);
-        visionAlignPID.setTolerance(tolerance);
 
         // Disable Vision Processing on Limelight
         limeLight.setCameraMode(CameraMode.Vision);
-        SmartDashboard.putNumber("Tolerance", tolerance);
-        SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
 
     }
 
     public void TeleopPeriodic() {
         climber.moveClimber();
-        // Calculate distance to wall using limelight.
-        angleToTarget = limeLight.getTy();
-        //TODO: Move into Limelight file(more Accessable)
-        distanceToWall = (targetHeight - limelightHeight) / Math.tan(Math.toRadians(limelightAngle + angleToTarget));
-        SmartDashboard.putNumber("Distance To Wall", distanceToWall);
-        SmartDashboard.putNumber("Angle To Target", angleToTarget);
+
 
         joysticks.checkInputs();
 
@@ -90,7 +68,7 @@ public class Teleop {
             }
             shooter.intake();
             boolean shootButton = joysticks.getShoot();
-            shooter.shoot(shootButton);
+            shooter.shoot(shootButton, 0.73);
             shooter.shooterPeriodic();
 
             // When vision button is pressed, toggle vision and CameraMode
@@ -112,17 +90,30 @@ public class Teleop {
             // Vision Alignment
             if(visionActive) {
                 // Disable Vision if Aligned
-                if(visionAlignPID.atSetpoint()){
+                if(alignment.atSetpoint()){
                     DriverStation.reportWarning("On target", false);
                     onTargetCounter++;
                     // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
                     if (onTargetCounter > 10) {
+                        //Shoot at different speeds based on distance from wall
+                        //TODO: Determine necessary values.
+                        if(alignment.getDistance() > 0 && alignment.getDistance() < 10){
+                            shooter.shoot(true, 0.0);
+                        }else if(alignment.getDistance() > 10 && alignment.getDistance() < 20){
+                            shooter.shoot(true, 0.0);
+                        }else if(alignment.getDistance() > 20 && alignment.getDistance() < 30){
+                            shooter.shoot(true, 0.0);
+                        }else if(alignment.getDistance() > 30 && alignment.getDistance() < 40){
+                            shooter.shoot(true, 0.0);
+                        }else if(alignment.getDistance() > 40 && alignment.getDistance() < 50){
+                            shooter.shoot(true, 0.0);
+                        }
                         visionActive = false;
                     }
                 } else {
                     DriverStation.reportWarning("Not on target", false);
                     //Rotate using values from the limelight
-                    driveTrain.arcadeDrive(0.0, visionAlignPID.calculate(limeLight.getTx(), 0.0));
+                    driveTrain.arcadeDrive(0.0, alignment.visionAlign());
 
                 }
             // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
@@ -168,13 +159,6 @@ public class Teleop {
         }
 	}
 
-    // -- Vision: --
-    // Update tolerance for Vision PID from shuffleboard
-    public void updateFromShuffleData(){
-        tolerance = SmartDashboard.getNumber("Tolerance", tolerance);
-    }
-
-    // -- End Vision --
 	public void TestPeriodic() {
         //safe mode
         driveTrain.gearShiftSafe();
