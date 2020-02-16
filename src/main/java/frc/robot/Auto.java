@@ -101,6 +101,7 @@ public class Auto {
                break outer;
             }
         }
+        //Split commands into command type and value ex.["m","10"]
         autoCommands = autoCommands.subList(start, end);
         for (String command : autoCommands) {
             List<String> item = Arrays.asList(command.split(" "));
@@ -116,17 +117,19 @@ public class Auto {
         List<String> command = splitAutoCommands.get(commandNumber);
         String commandType = command.get(0);
         double commandValue = Double.parseDouble(command.get(1));
+        //Move with encoder value PID
         if(commandType.equals("m")) {
             //TODO: PID for distance
             commandValue = commandValue/12;
             nextCommand = encoders.PID(commandValue);
         }
+        //Rotate with gyro value PID
         else if(commandType.equals("r")) {
             //TODO: PID for rotation
             turnPID.calculate(gyro.getAngle(), commandValue);
             nextCommand = turnPID.atSetpoint();
         }
-        
+        //Shoot until empty
         else if(commandType.equals("s")) {
             if(!targetLock) {
                 //TODO: run vision alignment function
@@ -134,6 +137,7 @@ public class Auto {
                 targetLock = true;
             }
             else {
+                //Check ballsStored to see if magazine has been emptied
                 if(shooter.getBallsStored() != 0) {
                     shooter.shoot(true);
                 }
@@ -143,7 +147,7 @@ public class Auto {
                 }
             }
         }
-        //increment commandNumber after a completed command
+        //increment commandNumber after a completed command and run resets
         if(nextCommand) {
             commandNumber++;
             encoders.reset();
@@ -160,10 +164,12 @@ public class Auto {
         
     }
 
+    //Get auto selected from dashboard
     public void setAutoMode(String autoMode) {
         autoSelected = autoMode;
     }
 
+    //Get commands from auto file
 	public void setAutoCommands(List<String> autoCommands2) {
         autoCommands = autoCommands2;
 	}
