@@ -26,20 +26,19 @@ public class Climber {
 
     public Climber(RobotMap robotMap) {
         this.climberMotors = robotMap.getClimberMotors();
-        // this.climberSolenoid = robotMap.getClimberSolenoid();
+        //this.climberSolenoid = robotMap.getClimberSolenoid();
         this.climbEncoder = robotMap.getClimbEncoder();
     }
 
     public void moveClimber() {
-        if (climbing) {
-            climberMotors.set(0.1);
+        if (true) {
+            System.out.println(climberState);
             switch (climberState) {
                 //Release Spring
                 case 0:
 
-                    climberSolenoid.set(DoubleSolenoid.Value.kReverse);
+                    //climberSolenoid.set(DoubleSolenoid.Value.kReverse);
                     climberState++;
-                    climbing = false;
                     break;
                 
                 //Pulls until target encoder distance
@@ -47,7 +46,7 @@ public class Climber {
 
                     climbEncoder.setPosition(0);
                     climberMotors.set(-1.0);
-                    if(!climbButton/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
+                    if(false/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
                         climberState++;
                     }
 
@@ -56,7 +55,7 @@ public class Climber {
                 case 2:
 
                     climberMotors.set(0);
-                    climberSolenoid.set(DoubleSolenoid.Value.kForward);
+                    //climberSolenoid.set(DoubleSolenoid.Value.kForward);
                     climbing = false;
                     break;
 

@@ -7,18 +7,21 @@
 
 package frc.robot;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import frc.robot.vision.LimeLight;
 
 public class Robot extends TimedRobot {
@@ -51,15 +54,39 @@ public class Robot extends TimedRobot {
     private final String funMode = "Fun Mode";
     private String gunnerSchemeSelected;
     private final SendableChooser<String> gunnerSchemePicker = new SendableChooser<>();
+    private NetworkTableEntry driveTemp;
+    private NetworkTableEntry shooterTemp;
 
     public Robot() {
         robotMap = new RobotMap();
         teleop = new Teleop(robotMap);
+        driveTrain = robotMap.swatDrive;
+        shooter = robotMap.shooter;
         auto = new Auto(robotMap);
     }
 
     @Override
     public void robotInit() {
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("Min Value", 0);
+        properties.put("Max Value", 70);
+        properties.put("Threshold", 50);
+        properties.put("Angle Range", 180);
+        properties.put("Color", "green");
+        properties.put("Threshold Color", "red");
+        
+        driveTemp = Shuffleboard.getTab("Temperature Dashboard")
+        .add("Drive Train Temperature", driveTrain.getTemperature())
+        .withWidget("Temperature Gauge") // specify the widget here
+        .withProperties(properties)
+        .getEntry();
+                
+        shooterTemp = Shuffleboard.getTab("Temperature Dashboard")
+            .add("Shooter Temperature", shooter.getTemperature())
+            .withWidget("Temperature Gauge") // specify the widget here
+            .withProperties(properties)
+            .getEntry();
+
         try {
             autoCommands = Files.readAllLines(path, StandardCharsets.UTF_8);
             if(autoCommands.get(0) != rev) {
@@ -75,7 +102,6 @@ public class Robot extends TimedRobot {
                 }
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         autoPicker.setDefaultOption("Default Auto", "Default");
@@ -109,7 +135,8 @@ public class Robot extends TimedRobot {
     */
     @Override
     public void robotPeriodic() {
-
+        driveTemp.setDouble(driveTrain.getTemperature());
+        shooterTemp.setDouble(shooter.getTemperature());
     }
 
     @Override

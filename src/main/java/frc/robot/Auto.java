@@ -1,17 +1,11 @@
 package frc.robot;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.PIDController;
 //import frc.robot.pathweaver.PathFinder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * A file dedicated to all auto related code

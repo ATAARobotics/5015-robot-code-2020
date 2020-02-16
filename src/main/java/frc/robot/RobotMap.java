@@ -87,7 +87,7 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
-        //leftClimbMotor.setInverted(true);
+        leftClimbMotor.setInverted(true);
         rightClimbMotor.follow(leftClimbMotor, true);
 
         // Init submodules
@@ -189,7 +189,7 @@ public class RobotMap {
     }
 
      public CANSparkMax getClimberMotors() {
-        return leftClimbMotor;
+        return rightClimbMotor;
     }
 
     public DoubleSolenoid getClimberSolenoid() {
