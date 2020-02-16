@@ -36,8 +36,8 @@ public class Teleop {
 
     // Variables for limelight distance tracking
     private double targetHeight = 89;
-    private double limelightHeight = 19;
-    private double limelightAngle = 50;
+    private double limelightHeight = 44;
+    private double limelightAngle = 39.3;
     private double distanceToWall;
     private double angleToTarget;
 
@@ -67,7 +67,7 @@ public class Teleop {
         visionAlignPID.setTolerance(tolerance);
 
         // Disable Vision Processing on Limelight
-        limeLight.setCameraMode(CameraMode.Drive);
+        limeLight.setCameraMode(CameraMode.Vision);
         SmartDashboard.putNumber("Tolerance", tolerance);
         SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
 
