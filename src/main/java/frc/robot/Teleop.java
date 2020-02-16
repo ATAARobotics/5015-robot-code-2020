@@ -177,7 +177,7 @@ public class Teleop {
     // -- End Vision --
 	public void TestPeriodic() {
         //safe mode
-        //driveTrain.gearShiftSafe();
+        driveTrain.gearShiftSafe();
         joysticks.checkInputs();
 
         driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());

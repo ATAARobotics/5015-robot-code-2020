@@ -17,6 +17,7 @@ public class Climber {
     // Declare motors/pneumatics/encoder
     private CANSparkMax climberMotors = null;
 
+    //TODO: Add Solenoid when added to hardware
     private DoubleSolenoid climberSolenoid = null;
 
     private CANEncoder climbEncoder = null;

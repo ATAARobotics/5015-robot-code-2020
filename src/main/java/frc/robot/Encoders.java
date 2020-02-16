@@ -92,6 +92,9 @@ public class Encoders {
         rightMotor.setSelectedSensorPosition(0);
     }
 
+    //Send ticks required to go a specified distance(For use in PIDs)
+    //Returns if it completes within 100 ticks
+    //TODO: Adjust tolerance
     public boolean PID(double target) {
         leftMotor.set(ControlMode.Position, target*leftTicksPerInch);
         rightMotor.set(ControlMode.Position, target*rightTicksPerInch);
