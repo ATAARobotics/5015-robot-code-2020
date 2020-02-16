@@ -77,6 +77,7 @@ public class Teleop {
         climber.moveClimber();
         // Calculate distance to wall using limelight.
         angleToTarget = limeLight.getTy();
+        //TODO: Move into Limelight file(more Accessable)
         distanceToWall = (targetHeight - limelightHeight) / Math.tan(Math.toRadians(limelightAngle + angleToTarget));
         SmartDashboard.putNumber("Distance To Wall", distanceToWall);
         SmartDashboard.putNumber("Angle To Target", angleToTarget);

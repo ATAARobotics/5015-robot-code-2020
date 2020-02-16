@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.wpi.first.wpilibj.controller.PIDController;
+import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
 
 //import frc.robot.pathweaver.PathFinder;
@@ -68,7 +69,7 @@ public class Auto {
     public void AutoInit() {
         encoders.reset();
         gyro.reset();
-
+        limeLight.setCameraMode(CameraMode.Vision);
         // Speed PID
         /* Config the peak and nominal outputs, 12V means full */
 
