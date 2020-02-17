@@ -153,7 +153,6 @@ public class Shooter {
         if (running) {
             magazineMotor.set(ControlMode.PercentOutput, magazineSpeed);
         } else {
-            intakeControl.set(Value.kReverse);
             magazineMotor.set(ControlMode.PercentOutput, 0.0);
         }
     }
