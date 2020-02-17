@@ -46,8 +46,8 @@ public class Climber {
                 case 1:
 
                     climbEncoder.setPosition(0);
-                    climberMotors.set(-1.0);
-                    if(!climbButton/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
+                    climberMotors.set(1.0);
+                    if(false/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
                         climberState++;
                     }
 

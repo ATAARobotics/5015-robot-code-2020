@@ -88,8 +88,8 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
-        leftClimbMotor.setInverted(true);
-        rightClimbMotor.follow(leftClimbMotor, true);
+        rightClimbMotor.setInverted(true);
+        leftClimbMotor.follow(rightClimbMotor, true);
 
         // Init submodules
         swatDrive = new SWATDrive(this);

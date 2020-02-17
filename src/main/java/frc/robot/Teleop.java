@@ -29,6 +29,7 @@ public class Teleop {
 
     NetworkTableEntry driveTemp;
     NetworkTableEntry shootTemp;
+    private RobotMap robotMap;
 
     public Teleop(RobotMap robotMap) {
         // Initialize Classes
@@ -41,6 +42,7 @@ public class Teleop {
         this.rangeFinder = robotMap.rangeFinder;
         this.climber = robotMap.climber;
         this.alignment = robotMap.align;
+        this.robotMap = robotMap;
     }
 
     public void teleopInit() {
@@ -59,7 +61,6 @@ public class Teleop {
 
     public void TeleopPeriodic() {
         climber.moveClimber();
-
         SmartDashboard.putNumber("Distance To Wall", alignment.getDistance());
         SmartDashboard.putNumber("Angle To Target", limeLight.getTy());
 

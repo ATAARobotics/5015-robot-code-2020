@@ -21,10 +21,6 @@ class OI {
     private boolean overrideSafeties;
     private boolean discoToggle;
 
-    //Special Function variables
-    boolean leftTriggerPressed = false;
-    boolean rightTriggerPressed = false;
-
     public OI() {
 
     }
@@ -33,7 +29,8 @@ class OI {
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
         visionButton = driveStick.getBackButtonReleased();
-        climbToggle = driveStick.getBumper(Hand.kLeft);
+        climbToggle = driveStick.getBumperReleased(Hand.kLeft);
+        manualClimb = gunnerStick.getBumperReleased(Hand.kRight);
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
             case "Reverse Turning":
@@ -54,7 +51,6 @@ class OI {
                 break;
 
             default:
-                manualClimb = gunnerStick.getBumper(Hand.kLeft);
                 shoot = gunnerStick.getBButton();
                 overrideSafeties = (gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75);
                 break;
