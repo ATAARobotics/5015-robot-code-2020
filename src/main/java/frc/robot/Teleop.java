@@ -29,7 +29,6 @@ public class Teleop {
 
     NetworkTableEntry driveTemp;
     NetworkTableEntry shootTemp;
-    private RobotMap robotMap;
 
     public Teleop(RobotMap robotMap) {
         // Initialize Classes
@@ -42,7 +41,6 @@ public class Teleop {
         this.rangeFinder = robotMap.rangeFinder;
         this.climber = robotMap.climber;
         this.alignment = robotMap.align;
-        this.robotMap = robotMap;
     }
 
     public void teleopInit() {
@@ -50,9 +48,6 @@ public class Teleop {
         String colorGuess = colorSensor.findColor();
         SmartDashboard.putString("Color", colorGuess);
         encoders.reset();
-
-        // Sets up PID
-
 
         // Disable Vision Processing on Limelight
         limeLight.setCameraMode(CameraMode.Vision);
@@ -164,15 +159,9 @@ public class Teleop {
 	}
 
 	public void TestPeriodic() {
-        //safe mode
-        driveTrain.gearShiftSafe();
         joysticks.checkInputs();
 
-        driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
-        if (joysticks.getSlow()) {
-            driveTrain.slow();
-        }
-        else;
+        climber.release(joysticks.getClimbRelease());
     }
     public void setDriveScheme(String driveScheme){
         joysticks.setDriveScheme(driveScheme);

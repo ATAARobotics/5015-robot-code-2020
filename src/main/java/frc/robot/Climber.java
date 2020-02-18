@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -11,52 +13,67 @@ public class Climber {
 
     private int climberState = 0;
 
+    private int climbTickCounter = 0;
+
     // TODO: Actually figure out what this value should be - encoder ticks in climb
     private final int CLIMB_DISTANCE = 0;
 
     // Declare motors/pneumatics/encoder
     private CANSparkMax climberMotors = null;
 
-    //TODO: Add Solenoid when added to hardware
-    private DoubleSolenoid climberSolenoid = null;
-
     private CANEncoder climbEncoder = null;
+
+    private DigitalInput climbLimit = null;
 
     //TODO: Manual control of elevator
     private boolean climbButton = false;
 
     public Climber(RobotMap robotMap) {
         this.climberMotors = robotMap.getClimberMotors();
-        //this.climberSolenoid = robotMap.getClimberSolenoid();
         this.climbEncoder = robotMap.getClimbEncoder();
+        this.climbLimit = robotMap.getClimbLimit();
     }
 
     public void moveClimber() {
         if (climbing) {
             System.out.println(climberState);
             switch (climberState) {
-                //Release Spring
+                //Release climber
                 case 0:
 
-                    //climberSolenoid.set(DoubleSolenoid.Value.kReverse);
-                    climberState++;
+                    climberMotors.set(-1.0);
+
+                    if (!climbLimit.get()) {
+                        climbTickCounter++;
+                    } else {
+                        climbTickCounter = 0;
+                    }
+
+                    if (climbTickCounter >= 50) {
+                        climberState++;
+                        climbTickCounter = 0;
+                    }
                     break;
                 
-                //Pulls until target encoder distance
+                //Pulls until limit switch is contacted
                 case 1:
 
-                    climbEncoder.setPosition(0);
-                    climberMotors.set(1.0);
-                    if(false/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
+                    if (climbLimit.get()) {
+                        climbTickCounter++;
+                    } else {
+                        climbTickCounter = 0;
+                    }
+
+                    if (climbTickCounter >= 2) {
                         climberState++;
                     }
 
                     break;
-                //locks spring
+
+                //Stops climber
                 case 2:
 
                     climberMotors.set(0);
-                    //climberSolenoid.set(DoubleSolenoid.Value.kForward);
                     climbing = false;
                     break;
 
@@ -86,5 +103,33 @@ public class Climber {
 
     public boolean getClimbing() {
         return climbing;
+    }
+
+    public void release(boolean active) {
+        if (active) {
+            switch (climberState) {
+                case 0:
+
+                    climberMotors.set(0.2);
+                    if (!climbLimit.get()) {
+                        climberState++;
+                    }
+
+                    break;
+
+                case 1:
+
+                    if (climbLimit.get()) {
+                        climberMotors.set(0.0);
+                    }
+
+                default:
+
+                    break;
+            }
+        } else {
+            climberMotors.set(0.0);
+            climberState = 0;
+        }
     }
 }

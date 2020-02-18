@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -53,21 +54,23 @@ public class RobotMap {
     // Encoders
     // Shooter
     private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
-    // Climber
-    private CANEncoder climbEncoder = getClimberMotors().getEncoder();
+
+    //Climber
+    private CANEncoder climbEncoder = new CANEncoder(rightClimbMotor);
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
 
     // Pneumatics
     private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(0, 1);
-    private DoubleSolenoid climberSolenoid = new DoubleSolenoid(2, 3);
     private DoubleSolenoid intakeSolenoid = new DoubleSolenoid(6, 7);
 
     // Gyro
     private Gyro NavX = new Gyro();
 
     private Lasershark laserShark = new Lasershark(5);
+
+    private DigitalInput climbLimit = new DigitalInput(6);
 
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
@@ -88,7 +91,6 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
-        rightClimbMotor.setInverted(true);
         leftClimbMotor.follow(rightClimbMotor, true);
 
         // Init submodules
@@ -194,12 +196,12 @@ public class RobotMap {
         return rightClimbMotor;
     }
 
-    public DoubleSolenoid getClimberSolenoid() {
-        return climberSolenoid;
-    }
-
     public CANEncoder getClimbEncoder() {
         return climbEncoder;
+    }
+
+    public DigitalInput getClimbLimit() {
+        return climbLimit;
     }
 
     public double getDrivetrainTemperature() {
