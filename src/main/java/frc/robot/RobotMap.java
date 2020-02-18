@@ -10,6 +10,7 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
@@ -36,7 +37,7 @@ public class RobotMap {
     private WPI_TalonSRX rearRightMotor = new WPI_TalonSRX(3);
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
-
+    private DigitalInput climbLimit = new DigitalInput(6);
     //Ball magazine
     private VictorSPX magazineMotor = new VictorSPX(6);
 
@@ -88,7 +89,6 @@ public class RobotMap {
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
 
-        rightClimbMotor.setInverted(true);
         leftClimbMotor.follow(rightClimbMotor, true);
 
         // Init submodules
@@ -161,7 +161,10 @@ public class RobotMap {
     protected CANSparkMax getShooterMotor() {
         return shootMotor;
     }
-
+    
+    protected DigitalInput getClimbLimit() {
+        return climbLimit;
+    }
     /**
      * For internal use in Shooter.java.
      * Returns the first conveyor motor.

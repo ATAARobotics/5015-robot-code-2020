@@ -2,6 +2,8 @@ package frc.robot;
 
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
+
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -25,46 +27,21 @@ public class Climber {
     //TODO: Manual control of elevator
     private boolean climbButton = false;
 
+    private DigitalInput limitSwitch;
+
     public Climber(RobotMap robotMap) {
         this.climberMotors = robotMap.getClimberMotors();
         //this.climberSolenoid = robotMap.getClimberSolenoid();
         this.climbEncoder = robotMap.getClimbEncoder();
+        this.limitSwitch = robotMap.getClimbLimit();
     }
 
     public void moveClimber() {
         if (climbing) {
-            System.out.println(climberState);
-            switch (climberState) {
-                //Release Spring
-                case 0:
-
-                    //climberSolenoid.set(DoubleSolenoid.Value.kReverse);
-                    climberState++;
-                    break;
-                
-                //Pulls until target encoder distance
-                case 1:
-
-                    climbEncoder.setPosition(0);
-                    climberMotors.set(1.0);
-                    if(false/*climbEncoder.getPosition() <= CLIMB_DISTANCE*/) {
-                        climberState++;
-                    }
-
-                    break;
-                //locks spring
-                case 2:
-
-                    climberMotors.set(0);
-                    //climberSolenoid.set(DoubleSolenoid.Value.kForward);
-                    climbing = false;
-                    break;
-
-                default:
-
-                    DriverStation.reportError("Invalid climberState of " + climberState, false);
-                    break;
-                }
+            climberMotors.set(-1.0);
+            if(!limitSwitch.get()) {
+                climberMotors.set(0);
+            }
         }
     }
 
@@ -86,5 +63,9 @@ public class Climber {
 
     public boolean getClimbing() {
         return climbing;
+    }
+
+    public void release() {
+        climberMotors.set(0.5);
     }
 }

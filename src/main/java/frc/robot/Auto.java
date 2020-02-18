@@ -139,10 +139,10 @@ public class Auto {
             else {
                 //Check ballsStored to see if magazine has been emptied
                 if(shooter.getBallsStored() != 0) {
-                    shooter.shoot(true, 0.73);
+                    shooter.shoot(true);
                 }
                 else {
-                    shooter.shoot(false, 0.73);
+                    shooter.shoot(false);
                     nextCommand = true;
                 }
             }

@@ -87,9 +87,9 @@ public class Shooter {
      */
     public void PIDInit() {
         // set PID coefficients
-        kP = 0.0004;
+        kP = 0.0007;
         kI = 0.0000002;
-        kD = 0.0001;
+        kD = 0.1;
         kIz = 0;
 
         //Max rpm
@@ -246,7 +246,7 @@ public class Shooter {
 
             case RUNNING:
                 if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.2) {
+                    if(magazineTimer.get() < 0.1) {
                         setMagazine(true);
                     } else {
                         ballsStored++;
@@ -271,8 +271,7 @@ public class Shooter {
      * Main update loop for the shooter, when not active, just shuts off the shooter.
      * @param active Whether the shooter should be shooting.
      */
-    public void shoot(boolean active, double speed) {
-        shooterSpeed = speed;
+    public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
             switch (shootCase) {
