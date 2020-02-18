@@ -77,11 +77,12 @@ public class Robot extends TimedRobot {
         properties.put("Threshold Color", "red");
         
         Map<String, Object> propertiesBattery = new HashMap<String, Object>();
-        properties.put("Min Value", 0);
-        properties.put("Max Value", 100);
-        properties.put("Threshold", 10);
-        properties.put("Color", "red");
-        properties.put("Threshold Color", "green");
+        propertiesBattery.put("Min Value", 0);
+        propertiesBattery.put("Max Value", 100);
+        propertiesBattery.put("Threshold", 10);
+        propertiesBattery.put("Angle Range", 180);
+        propertiesBattery.put("Color", "red");
+        propertiesBattery.put("Threshold Color", "green");
 
         driveTemp = Shuffleboard.getTab("Dashboard Refresh")
         .add("Drive Train Temperature", driveTrain.getTemperature())
@@ -98,7 +99,7 @@ public class Robot extends TimedRobot {
         double volt = (RobotController.getBatteryVoltage() - 11) / 2;
         batteryVolt = Shuffleboard.getTab("Dashboard Refresh")
             .add("Battery Gauge", volt)
-            .withWidget("Battery Gauge") // specify the widget here
+            .withWidget("Temperature Gauge") // specify the widget here
             .withProperties(propertiesBattery)
             .getEntry();
 

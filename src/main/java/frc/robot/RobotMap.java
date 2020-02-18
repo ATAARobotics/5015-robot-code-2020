@@ -37,7 +37,7 @@ public class RobotMap {
     private WPI_TalonSRX rearRightMotor = new WPI_TalonSRX(3);
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
-
+    private DigitalInput climbLimit = new DigitalInput(6);
     //Ball magazine
     private VictorSPX magazineMotor = new VictorSPX(6);
 
@@ -163,7 +163,10 @@ public class RobotMap {
     protected CANSparkMax getShooterMotor() {
         return shootMotor;
     }
-
+    
+    protected DigitalInput getClimbLimit() {
+        return climbLimit;
+    }
     /**
      * For internal use in Shooter.java.
      * Returns the first conveyor motor.

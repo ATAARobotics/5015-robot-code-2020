@@ -67,7 +67,7 @@ public class Teleop {
             }
             shooter.intake();
             boolean shootButton = joysticks.getShoot();
-            shooter.shoot(shootButton, 0.73);
+            shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
             // When vision button is pressed, toggle vision and CameraMode
@@ -97,15 +97,15 @@ public class Teleop {
                         //Shoot at different speeds based on distance from wall
                         //TODO: Determine necessary values.
                         if(alignment.getDistance() > 0 && alignment.getDistance() < 10){
-                            shooter.shoot(true, 0.0);
+                            //shooter.shoot(true, 0.0);
                         }else if(alignment.getDistance() > 10 && alignment.getDistance() < 20){
-                            shooter.shoot(true, 0.0);
+                            //shooter.shoot(true, 0.0);
                         }else if(alignment.getDistance() > 20 && alignment.getDistance() < 30){
-                            shooter.shoot(true, 0.0);
+                            //shooter.shoot(true, 0.0);
                         }else if(alignment.getDistance() > 30 && alignment.getDistance() < 40){
-                            shooter.shoot(true, 0.0);
+                            //shooter.shoot(true, 0.0);
                         }else if(alignment.getDistance() > 40 && alignment.getDistance() < 50){
-                            shooter.shoot(true, 0.0);
+                            //shooter.shoot(true, 0.0);
                         }
                         visionActive = false;
                     }

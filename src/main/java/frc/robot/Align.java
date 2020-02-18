@@ -33,6 +33,7 @@ public class Align {
         return visionAlignPID.calculate(limeLight.getTx(), 0.0);
     }
     public boolean atSetpoint(){
+        visionAlignPID.calculate(limeLight.getTx(),0.0);
         return visionAlignPID.atSetpoint();
     }
 
