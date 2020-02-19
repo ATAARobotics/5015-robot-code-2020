@@ -106,6 +106,7 @@ public class Teleop {
                             //shooter.shoot(true, 0.0);
                         }
                         visionActive = false;
+                        limeLight.setCameraMode(CameraMode.Drive);
                     }
                 } else {
                     DriverStation.reportWarning("Not on target", false);

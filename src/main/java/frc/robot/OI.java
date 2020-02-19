@@ -36,7 +36,7 @@ class OI {
         climbToggle = driveStick.getBumperReleased(Hand.kLeft);
         climbRelease = driveStick.getStartButton();
         manualClimb = gunnerStick.getBumperReleased(Hand.kRight);
-        intakeToggle = driveStick.getYButtonReleased();
+        intakeToggle = gunnerStick.getYButtonReleased();
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {

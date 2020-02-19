@@ -41,7 +41,7 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
-    private final double magazineSpeed = 0.75;
+    private final double magazineSpeed = -0.75;
     private final double intakeSpeed = -1.0;
     private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
@@ -152,8 +152,12 @@ public class Shooter {
     }
 
     private void setMagazine(boolean running) {
+        setMagazine(running, magazineSpeed);
+    }
+
+    private void setMagazine(boolean running, double speed) {
         if (running) {
-            magazineMotor.set(ControlMode.PercentOutput, magazineSpeed);
+            magazineMotor.set(ControlMode.PercentOutput, speed);
         } else {
             magazineMotor.set(ControlMode.PercentOutput, 0.0);
         }
@@ -184,9 +188,11 @@ public class Shooter {
 
     private void setShooter(boolean running) {
         if (running) {
+            shooterController.setOutputRange(kMinOutput, kMaxOutput);
             setPoint = shooterSpeed * maxRPM;
         } else {
             setPoint = 0 * maxRPM;
+            shooterController.setOutputRange(0, 0);
         }
         shooterController.setReference(setPoint, ControlType.kVelocity);
     }
@@ -205,7 +211,7 @@ public class Shooter {
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
         if(running) {
-            intakeMotor.set(ControlMode.PercentOutput, -1);
+            intakeMotor.set(ControlMode.PercentOutput, intakeSpeed);
             intakeControl.set(Value.kForward);
         }
 
@@ -248,7 +254,7 @@ public class Shooter {
 
             case RUNNING:
                 if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.1) {
+                    if(magazineTimer.get() < 0.15) {
                         setMagazine(true);
                     } else {
                         ballsStored++;
@@ -293,7 +299,7 @@ public class Shooter {
 
                 case RUNNING: // Shooter running
 
-                    setMagazine(true);
+                    setMagazine(true, -1.0);
 
                     if (shooterEncoder.getVelocity() < (setPoint - 25)) {
                         if (ballsStored != 0) {
