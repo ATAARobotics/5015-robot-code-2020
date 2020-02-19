@@ -41,7 +41,7 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
-    private final double magazineSpeed = -0.75;
+    private final double magazineSpeed = 0.75;
     private final double intakeSpeed = -1.0;
     private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
@@ -148,6 +148,7 @@ public class Shooter {
         SmartDashboard.putNumber("Balls Stored", ballsStored);
         setShooter(shooterActive);
         PIDPeriodic();
+        SmartDashboard.putBoolean("Override", safetyOverride);
     }
 
     private void setMagazine(boolean running) {
@@ -315,8 +316,8 @@ public class Shooter {
         }
     }
 
-    public void toggleOverride() {
-        safetyOverride = !safetyOverride;
+    public void setOverride(boolean newOverride) {
+        safetyOverride = newOverride;
         if (intakeCase == IntakeCase.OFF && safetyOverride == false) {
             intakeCase = IntakeCase.WAITING;
         }

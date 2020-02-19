@@ -62,9 +62,7 @@ public class Teleop {
         joysticks.checkInputs();
 
         if (!climbing) {
-            if (joysticks.getOverride()) {
-                shooter.toggleOverride();
-            }
+            shooter.setOverride(joysticks.getOverride());
             shooter.intake();
             boolean shootButton = joysticks.getShoot();
             shooter.shoot(shootButton);

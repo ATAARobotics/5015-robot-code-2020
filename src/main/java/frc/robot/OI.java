@@ -1,5 +1,6 @@
 package frc.robot;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.XboxController;
 class OI {
 
@@ -20,7 +21,8 @@ class OI {
     private XboxController gunnerStick = new XboxController(1);
     private String gunnerScheme = "Default";
     private boolean shoot;
-    private boolean overrideSafeties;
+    private boolean overrideSafeties = false;
+    private boolean overriding = false;
     private boolean discoToggle;
 
     public OI() {
@@ -57,7 +59,14 @@ class OI {
 
             default:
                 shoot = gunnerStick.getBButton();
-                overrideSafeties = (gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75);
+
+                if ((gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75) && !overriding) {
+                    overrideSafeties = !overrideSafeties;
+                    overriding = true;
+                } else if ((gunnerStick.getTriggerAxis(Hand.kRight) <= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) <= 0.75)) {
+                    overriding = false;
+                }
+
                 break;
         }
     }
