@@ -23,6 +23,7 @@ enum IntakeCase {
     WAITING,
     STARTING,
     RUNNING,
+    OFF
 }
 
 enum ShootCase {
@@ -39,8 +40,8 @@ enum ShootCase {
 public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
-    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5; 
-    private final double magazineSpeed = 0.75;
+    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
+    private final double magazineSpeed = -0.75;
     private final double intakeSpeed = -1.0;
     private double shooterSpeed = 0.73; // TODO: Configure shooter speed
     private boolean shooterActive = false;
@@ -261,7 +262,9 @@ public class Shooter {
                     }
                 }
                 break;
-
+            case OFF:
+                setIntake(false);
+                break;
             default:
                 DriverStation.reportError(String.format("Invalid Intake Case: %d", intakeCase), false);
         }
@@ -314,6 +317,9 @@ public class Shooter {
 
     public void toggleOverride() {
         safetyOverride = !safetyOverride;
+        if (intakeCase == IntakeCase.OFF && safetyOverride == false) {
+            intakeCase = IntakeCase.WAITING;
+        }
     }
 
     public double getTemperature() {
@@ -322,5 +328,14 @@ public class Shooter {
 
 	public double getBallsStored() {
 		return ballsStored;
-	}
+    }
+    public void toggleIntake(){
+        if(safetyOverride){
+            if(intakeCase != IntakeCase.OFF){
+                intakeCase = IntakeCase.OFF;
+            }else{
+                intakeCase = IntakeCase.WAITING;
+            }
+        }
+    }
 }

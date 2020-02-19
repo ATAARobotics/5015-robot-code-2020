@@ -129,6 +129,9 @@ public class Teleop {
                         limeLight.setCameraMode(CameraMode.Drive);
                     }
                 }
+                if(joysticks.getIntakeToggle()){
+                    shooter.toggleIntake();
+                }
                 if(joysticks.getGearShift()) {
                     driveTrain.gearShift();
                 }
