@@ -345,4 +345,16 @@ public class Shooter {
             }
         }
     }
+    //Shoot at different speeds based on distance from wall
+    //TODO: Please check that this is the correct way to input the formulas
+    public void setShooterSpeed(double distance) {
+        double speed = 0.0;
+        if(distance < 52) {
+            speed = -1.32 + 0.112*distance + -1.44*(Math.exp(-03))*distance*distance;
+        }
+        else{
+            speed = 0.658 + -2.44*(Math.exp(-03))*(distance) + 1.61*(Math.exp(-05))*(distance)*(distance);
+        }
+            shooterSpeed = speed;
+        }
 }

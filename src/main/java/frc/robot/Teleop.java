@@ -98,19 +98,9 @@ public class Teleop {
                     onTargetCounter++;
                     // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
                     if (onTargetCounter > 10) {
-                        //Shoot at different speeds based on distance from wall
-                        //TODO: Determine necessary values.
-                        if(alignment.getDistance() > 0 && alignment.getDistance() < 10){
-                            //shooter.shoot(true, 0.0);
-                        }else if(alignment.getDistance() > 10 && alignment.getDistance() < 20){
-                            //shooter.shoot(true, 0.0);
-                        }else if(alignment.getDistance() > 20 && alignment.getDistance() < 30){
-                            //shooter.shoot(true, 0.0);
-                        }else if(alignment.getDistance() > 30 && alignment.getDistance() < 40){
-                            //shooter.shoot(true, 0.0);
-                        }else if(alignment.getDistance() > 40 && alignment.getDistance() < 50){
-                            //shooter.shoot(true, 0.0);
-                        }
+                        //Pass target distance to shooter
+                        shooter.setShooterSpeed(alignment.getDistance());
+                        shooter.shoot(true);
                         visionActive = false;
                         limeLight.setCameraMode(CameraMode.Drive);
                     }
@@ -177,4 +167,5 @@ public class Teleop {
     public void setGunnerScheme(String gunnerScheme){
         joysticks.setGunnerScheme(gunnerScheme);
     }
+
 }
