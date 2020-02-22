@@ -18,8 +18,8 @@ public class Align {
 
     //Variables to get distance to wall. THESE MUST BE ACCURATE.
     private double targetHeight = 89;
-    private double limelightHeight = 44;
-    private double limelightAngle = 40.8;
+    private double limelightHeight = 44.75;
+    private double limelightAngle = 30.65;
     private double distanceToWall = 0;
     private double angleToTarget = 0;
 
