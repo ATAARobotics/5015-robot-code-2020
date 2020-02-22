@@ -68,6 +68,12 @@ public class Teleop {
             shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
+            if(joysticks.getReverse()){
+                joysticks.setDriveScheme("Reverse");
+            }else{
+                joysticks.setDriveScheme("Default");
+            }
+
             // When vision button is pressed, toggle vision and CameraMode
             if (joysticks.getVisionButton()) {
                 visionActive = !visionActive;

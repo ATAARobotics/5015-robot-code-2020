@@ -16,6 +16,7 @@ class OI {
     private boolean manualClimb;
     private boolean climbRelease;
     private boolean intakeToggle;
+    private boolean reverse;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
@@ -37,6 +38,9 @@ class OI {
         climbRelease = driveStick.getStartButton();
         manualClimb = gunnerStick.getBumperReleased(Hand.kRight);
         intakeToggle = gunnerStick.getYButtonReleased();
+        if(driveStick.getYButtonReleased()){
+            reverse = !reverse;
+        }
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
@@ -109,6 +113,10 @@ class OI {
 
     public boolean getClimbButton() {
         return climbToggle;
+    }
+
+    public boolean getReverse() {
+        return reverse;
     }
 
     public boolean getManualClimb() {
