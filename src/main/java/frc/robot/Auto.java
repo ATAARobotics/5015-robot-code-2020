@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
@@ -55,12 +56,16 @@ public class Auto {
     private Shooter shooter;
     private LimeLight limeLight;
 
+    private Align alignment;
+
+    private int onTargetCounter = 0;
+
     public Auto(RobotMap robotMap) {
         this.gyro = robotMap.getGyro();
         this.encoders = robotMap.getDriveEncoders();
         this.swatDrive = robotMap.swatDrive;
         this.shooter = robotMap.shooter;
-        this.limeLight = robotMap.limeLight;
+        this.alignment = robotMap.align;
     }
 
     /**
@@ -133,12 +138,21 @@ public class Auto {
         else if(commandType.equals("s")) {
             if(!targetLock) {
                 //TODO: run vision alignment function
-                //noTargetLock !vision.align()
-                targetLock = true;
+                if(alignment.atSetpoint()){
+                    DriverStation.reportWarning("On target", false);
+                    onTargetCounter++;
+                    // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
+                    if (onTargetCounter > 10) {
+                        //Pass target distance to shooter
+                        targetLock = true;
+                    }
+                }
             }
             else {
+                targetLock = false;
                 //Check ballsStored to see if magazine has been emptied
                 if(shooter.getBallsStored() != 0) {
+                    shooter.setShooterSpeed(alignment.getDistance());
                     shooter.shoot(true);
                 }
                 else {

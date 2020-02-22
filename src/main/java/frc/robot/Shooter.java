@@ -43,7 +43,7 @@ public class Shooter {
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
     private final double magazineSpeed = -0.75;
     private final double intakeSpeed = -1.0;
-    private double shooterSpeed = 0.73; // TODO: Configure shooter speed
+    private double shooterSpeed = 0.85;
     private boolean shooterActive = false;
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;

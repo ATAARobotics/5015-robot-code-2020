@@ -1,10 +1,8 @@
 package frc.robot;
 
-import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 
 public class Climber {
@@ -15,22 +13,13 @@ public class Climber {
 
     private int climbTickCounter = 0;
 
-    // TODO: Actually figure out what this value should be - encoder ticks in climb
-    private final int CLIMB_DISTANCE = 0;
-
     // Declare motors/pneumatics/encoder
     private CANSparkMax climberMotors = null;
 
-    private CANEncoder climbEncoder = null;
-
     private DigitalInput climbLimit = null;
-
-    //TODO: Manual control of elevator
-    private boolean climbButton = false;
 
     public Climber(RobotMap robotMap) {
         this.climberMotors = robotMap.getClimberMotors();
-        this.climbEncoder = robotMap.getClimbEncoder();
         this.climbLimit = robotMap.getClimbLimit();
     }
 
@@ -84,11 +73,6 @@ public class Climber {
                 }
         }
     }
-
-    public void manualClimb(boolean pulling) {
-        climbButton = pulling;
-    }
-
 
     public void toggleClimb() {
         if (!climbing) {
