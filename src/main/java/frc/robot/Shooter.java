@@ -300,7 +300,7 @@ public class Shooter {
                 case RUNNING: // Shooter running
 
                     setMagazine(true, -1.0);
-
+                    //TODO: Better detection of ball shooting
                     if (shooterEncoder.getVelocity() < (setPoint - 25)) {
                         if (ballsStored != 0) {
                             ballsStored--;
