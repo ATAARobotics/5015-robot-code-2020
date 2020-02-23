@@ -350,10 +350,10 @@ public class Shooter {
     public void setShooterSpeed(double distance) {
         double speed = 0.0;
         if(distance < 52) {
-            speed = -1.32 + 0.112*distance + -1.44*(Math.exp(-03))*distance*distance;
+            speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
         }
         else{
-            speed = 0.658 + -2.44*(Math.exp(-03))*(distance) + 1.61*(Math.exp(-05))*(distance)*(distance);
+            speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
         }
             shooterSpeed = speed;
         }
