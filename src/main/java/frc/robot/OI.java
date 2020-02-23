@@ -10,17 +10,16 @@ class OI {
     private double ZRotation;
     private boolean gearShift;
     private boolean slow;
-    private boolean visionButton;
+    private boolean visionShoot;
     private boolean climbToggle;
     private boolean manualClimb;
     private boolean climbRelease;
     private boolean intakeToggle;
-    private boolean reverse;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
     private String gunnerScheme = "Default";
-    private boolean shoot;
+    private boolean manualShoot;
     private boolean overrideSafeties = false;
     private boolean overriding = false;
     private boolean discoToggle;
@@ -30,16 +29,16 @@ class OI {
     }
     //periodic function to update controller input
     public void checkInputs() {
+
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
-        visionButton = driveStick.getBackButtonReleased();
+
         climbToggle = driveStick.getBumperReleased(Hand.kLeft);
         climbRelease = driveStick.getStartButton();
+
         manualClimb = gunnerStick.getBumperReleased(Hand.kRight);
-        intakeToggle = gunnerStick.getYButtonReleased();
-        if(driveStick.getYButtonReleased()){
-            reverse = !reverse;
-        }
+        visionShoot = gunnerStick.getBButtonReleased();
+        intakeToggle = gunnerStick.getAButtonReleased();
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
@@ -61,7 +60,7 @@ class OI {
                 break;
 
             default:
-                shoot = gunnerStick.getBButton();
+                manualShoot = gunnerStick.getYButton();
 
                 if ((gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75) && !overriding) {
                     overrideSafeties = !overrideSafeties;
@@ -90,8 +89,8 @@ class OI {
         return slow;
     }
 
-    public boolean getVisionButton() {
-        return visionButton;
+    public boolean getVisionShoot() {
+        return visionShoot;
     }
     public boolean getDiscoButton(){
         return discoToggle;
@@ -102,8 +101,8 @@ class OI {
     public void setGunnerScheme(String gunnerScheme){
         this.gunnerScheme = gunnerScheme;
     }
-	public boolean getShoot() {
-		return shoot;
+	public boolean getManualShoot() {
+		return manualShoot;
     }
 
     public boolean getOverride() {
@@ -112,10 +111,6 @@ class OI {
 
     public boolean getClimbButton() {
         return climbToggle;
-    }
-
-    public boolean getReverse() {
-        return reverse;
     }
 
     public boolean getManualClimb() {

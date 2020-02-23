@@ -337,24 +337,28 @@ public class Shooter {
 		return ballsStored;
     }
     public void toggleIntake(){
-        if(safetyOverride){
-            if(intakeCase != IntakeCase.OFF){
-                intakeCase = IntakeCase.OFF;
-            }else{
-                intakeCase = IntakeCase.WAITING;
-            }
+        if(intakeCase != IntakeCase.OFF){
+            intakeCase = IntakeCase.OFF;
+        }else{
+            intakeCase = IntakeCase.WAITING;
         }
+
     }
     //Shoot at different speeds based on distance from wall
     //TODO: Please check that this is the correct way to input the formulas
     public void setShooterSpeed(double distance) {
         double speed = 0.0;
-        if(distance < 52) {
-            speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
+        if(distance != 0.0){
+            if(distance < 52) {
+                speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
+            }
+            else{
+                speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
+            }
+        }else{
+            speed = 0.85;
         }
-        else{
-            speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
-        }
+
             shooterSpeed = speed;
         }
 }

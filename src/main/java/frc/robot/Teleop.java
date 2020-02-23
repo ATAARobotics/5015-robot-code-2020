@@ -50,7 +50,7 @@ public class Teleop {
         encoders.reset();
 
         // Disable Vision Processing on Limelight
-        limeLight.setCameraMode(CameraMode.Vision);
+        limeLight.setCameraMode(CameraMode.Drive);
 
     }
 
@@ -64,18 +64,15 @@ public class Teleop {
         if (!climbing) {
             shooter.setOverride(joysticks.getOverride());
             shooter.intake();
-            boolean shootButton = joysticks.getShoot();
+            boolean shootButton = joysticks.getManualShoot();
+            if(shootButton){
+                shooter.setShooterSpeed(0.0);
+            }
             shooter.shoot(shootButton);
             shooter.shooterPeriodic();
 
-            if(joysticks.getReverse()){
-                joysticks.setDriveScheme("Reverse");
-            }else{
-                joysticks.setDriveScheme("Default");
-            }
-
             // When vision button is pressed, toggle vision and CameraMode
-            if (joysticks.getVisionButton()) {
+            if (joysticks.getVisionShoot()) {
                 visionActive = !visionActive;
                 if (visionActive) {
                     onTargetCounter = 0;
