@@ -348,7 +348,10 @@ public class Shooter {
     //TODO: Please check that this is the correct way to input the formulas
     public void setShooterSpeed(double distance) {
         double speed = 0.0;
+
+        //If distance is 0.0 (manual entry), sets speed to 0.85
         if(distance != 0.0){
+            //Sets speed based on distance from wall
             if(distance < 52) {
                 speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
             }

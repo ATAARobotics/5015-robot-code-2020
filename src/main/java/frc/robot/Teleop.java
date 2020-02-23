@@ -65,6 +65,7 @@ public class Teleop {
             shooter.setOverride(joysticks.getOverride());
             shooter.intake();
             boolean shootButton = joysticks.getManualShoot();
+            //sets shooter speed to 0.85 if manual shoot is pressed
             if(shootButton){
                 shooter.setShooterSpeed(0.0);
             }
