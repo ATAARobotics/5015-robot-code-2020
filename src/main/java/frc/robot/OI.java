@@ -36,7 +36,7 @@ class OI {
         climbToggle = driveStick.getBumperReleased(Hand.kLeft);
         climbRelease = driveStick.getStartButton();
 
-        manualClimb = gunnerStick.getBumperReleased(Hand.kRight);
+        manualClimb = gunnerStick.getBumper(Hand.kRight);
         visionShoot = gunnerStick.getBButtonReleased();
         intakeToggle = gunnerStick.getAButtonReleased();
 

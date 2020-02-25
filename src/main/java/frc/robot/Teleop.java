@@ -18,8 +18,6 @@ public class Teleop {
     private RangeFinder rangeFinder = null;
     private Align alignment = null;
 
-    private boolean climbing = false;
-
     // Vision Control Variables
     private boolean discoOn = false;
     private int onTargetCounter = 0;
@@ -61,7 +59,7 @@ public class Teleop {
 
         joysticks.checkInputs();
 
-        if (!climbing) {
+        if (!climber.getClimbing()) {
             shooter.setOverride(joysticks.getOverride());
             shooter.intake();
             boolean shootButton = joysticks.getManualShoot();
@@ -133,9 +131,14 @@ public class Teleop {
                     driveTrain.slow();
                 }
             }
+        } else {
+            shooter.setOverride(true);
+            shooter.toggleIntake();
         }
 
         SmartDashboard.putNumber("Lasershark Distance", rangeFinder.getDistance());
+
+        climber.manualClimb(joysticks.getManualClimb());
 
         if (joysticks.getClimbButton()) {
             climber.toggleClimb();

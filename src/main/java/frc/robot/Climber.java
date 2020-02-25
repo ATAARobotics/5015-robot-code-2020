@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 public class Climber {
 
     private boolean climbing = false;
+    private boolean manualClimbing = false;
 
     private int climberState = 0;
 
@@ -25,7 +26,6 @@ public class Climber {
 
     public void moveClimber() {
         if (climbing) {
-            System.out.println(climberState);
             switch (climberState) {
                 //Release climber
                 case 0:
@@ -62,7 +62,7 @@ public class Climber {
                 //Stops climber
                 case 2:
 
-                    climberMotors.set(0);
+                    climberMotors.set(0.0);
                     climbing = false;
                     break;
 
@@ -70,7 +70,7 @@ public class Climber {
 
                     DriverStation.reportError("Invalid climberState of " + climberState, false);
                     break;
-                }
+            }
         }
     }
 
@@ -80,13 +80,13 @@ public class Climber {
         } else {
             // ABORTS CLIMB AT ANY STAGE OF CLIMB
             climbing = false;
-            climberMotors.set(0);
+            climberMotors.set(0.0);
             DriverStation.reportError("CLIMB ABORTED BY DRIVER", false);
         }
     }
 
     public boolean getClimbing() {
-        return climbing;
+        return climbing || manualClimbing;
     }
 
     public void release(boolean active) {
@@ -114,6 +114,16 @@ public class Climber {
         } else {
             climberMotors.set(0.0);
             climberState = 0;
+        }
+    }
+
+    public void manualClimb(boolean climb) {
+        if (!climbing && climb) {
+            climberMotors.set(-0.5);
+            manualClimbing = true;
+        } else if (!climbing && !climb && manualClimbing) {
+            climberMotors.set(0.0);
+            manualClimbing = false;
         }
     }
 }
