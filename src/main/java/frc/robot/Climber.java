@@ -19,7 +19,7 @@ public class Climber {
     private DigitalInput climbLimit = null;
 
     public Climber(RobotMap robotMap) {
-        this.climberMotors = robotMap.getClimberMotors();
+        this.climberMotors = robotMap.getClimberMotor();
         this.climbLimit = robotMap.getClimbLimit();
     }
 

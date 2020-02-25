@@ -45,9 +45,9 @@ public class RobotMap {
     private VictorSPX intakeMotor = new VictorSPX(5);
     private CANPIDController shootController = shootMotor.getPIDController();
     private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
+    
     // Add climber
-    private CANSparkMax leftClimbMotor = new CANSparkMax(10, MotorType.kBrushless);
-    private CANSparkMax rightClimbMotor = new CANSparkMax(9, MotorType.kBrushless);
+    private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
 
 
     // Encoders
@@ -55,7 +55,7 @@ public class RobotMap {
     private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
 
     //Climber
-    private CANEncoder climbEncoder = new CANEncoder(rightClimbMotor);
+    private CANEncoder climbEncoder = new CANEncoder(climbMotor);
 
     // Drivetrain
     private DifferentialDrive driveTrain = new DifferentialDrive(leftMotors, rightMotors);
@@ -89,8 +89,6 @@ public class RobotMap {
         // Shuffleboard.getTab("Camera").add(camera);
         // camera.setFPS(30);
         // camera.setResolution(160, 120);
-
-        leftClimbMotor.follow(rightClimbMotor, true);
 
         // Init submodules
         swatDrive = new SWATDrive(this);
@@ -191,8 +189,8 @@ public class RobotMap {
         return shootController;
     }
 
-     public CANSparkMax getClimberMotors() {
-        return rightClimbMotor;
+     public CANSparkMax getClimberMotor() {
+        return climbMotor;
     }
 
     public CANEncoder getClimbEncoder() {
