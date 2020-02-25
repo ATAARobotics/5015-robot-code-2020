@@ -122,4 +122,20 @@ public class LimeLight {
         }
     }
 
+    public String getCamMode() {
+        switch ((int)camMode.getDouble(-1)) {
+            case 0:
+
+                return "Vision";
+                
+            case 1:
+
+                return "Driving";
+        
+            default:
+
+                return "Error";
+        }
+    }
+
 }

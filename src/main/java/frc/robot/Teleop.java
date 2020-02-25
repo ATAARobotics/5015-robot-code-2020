@@ -56,6 +56,7 @@ public class Teleop {
         climber.moveClimber();
         SmartDashboard.putNumber("Distance To Wall", alignment.getDistance());
         SmartDashboard.putNumber("Angle To Target", limeLight.getTy());
+        SmartDashboard.putString("Limelight Mode", limeLight.getCamMode());
 
         joysticks.checkInputs();
 
