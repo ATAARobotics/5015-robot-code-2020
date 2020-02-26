@@ -20,6 +20,7 @@ public class Encoders {
     private double rightTicksPerInch;
 
     // Drive values
+    //TODO: Tune straight driving values
     double Dp = 0;
     double Di = 0;
     double Dd = 0;

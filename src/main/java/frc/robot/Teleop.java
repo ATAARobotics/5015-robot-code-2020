@@ -15,6 +15,7 @@ public class Teleop {
     private Shooter shooter = null;
     private Climber climber = null;
     private ColorSensor colorSensor = null;
+    private Gyro gyro = null;
     private RangeFinder rangeFinder = null;
     private Align alignment = null;
 
@@ -36,6 +37,7 @@ public class Teleop {
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
+        this.gyro = robotMap.getGyro();
         this.rangeFinder = robotMap.rangeFinder;
         this.climber = robotMap.climber;
         this.alignment = robotMap.align;
@@ -48,7 +50,7 @@ public class Teleop {
         encoders.reset();
 
         // Disable Vision Processing on Limelight
-        limeLight.setCameraMode(CameraMode.Drive);
+        limeLight.setCameraMode(CameraMode.Vision);
 
     }
 
@@ -57,6 +59,7 @@ public class Teleop {
         SmartDashboard.putNumber("Distance To Wall", alignment.getDistance());
         SmartDashboard.putNumber("Angle To Target", limeLight.getTy());
         SmartDashboard.putString("Limelight Mode", limeLight.getCamMode());
+        SmartDashboard.putNumber("Gyro Value", gyro.getAngle());
 
         joysticks.checkInputs();
 
@@ -97,7 +100,9 @@ public class Teleop {
                     if (onTargetCounter > 10) {
                         //Pass target distance to shooter
                         shooter.setShooterSpeed(alignment.getDistance());
-                        shooter.shoot(true);
+                        while (shooter.getBallsStored() > 0) {
+                            shooter.shoot(true);
+                        }
                         visionActive = false;
                         limeLight.setCameraMode(CameraMode.Drive);
                     }

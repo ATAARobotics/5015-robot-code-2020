@@ -59,6 +59,7 @@ public class Shooter {
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
     private double setPoint = 0;
+    private boolean shooting = false;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
     private boolean safetyOverride = false;
@@ -300,12 +301,15 @@ public class Shooter {
                 case RUNNING: // Shooter running
 
                     setMagazine(true, -1.0);
-                    //TODO: Better detection of ball shooting
-                    if (shooterEncoder.getVelocity() < (setPoint - 25)) {
+                    if (shooterEncoder.getVelocity() < (setPoint - 25) && !shooting) {
                         if (ballsStored != 0) {
+                            shooting = true;
                             ballsStored--;
                         }
+
                         //shootCase = ShootCase.WARMUP;
+                    } else if (shooterEncoder.getVelocity() > (setPoint - 20)) {
+                        shooting = false;
                     }
 
                     break;

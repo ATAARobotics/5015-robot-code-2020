@@ -84,12 +84,6 @@ public class RobotMap {
 
     public RobotMap() {
 
-        // TODO: Reenable camera code
-        // UsbCamera camera = CameraServer.getInstance().startAutomaticCapture(0);
-        // Shuffleboard.getTab("Camera").add(camera);
-        // camera.setFPS(30);
-        // camera.setResolution(160, 120);
-
         // Init submodules
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);

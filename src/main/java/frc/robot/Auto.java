@@ -119,12 +119,11 @@ public class Auto {
      * periodically.
      */
     public void AutoPeriodic() {
-        List<String> command = splitAutoCommands.get(commandNumber);
+        /*List<String> command = splitAutoCommands.get(commandNumber);
         String commandType = command.get(0);
         double commandValue = Double.parseDouble(command.get(1));
         //Move with encoder value PID
         if(commandType.equals("m")) {
-            //TODO: PID for distance
             commandValue = commandValue/12;
             nextCommand = encoders.PID(commandValue);
         }
@@ -137,7 +136,6 @@ public class Auto {
         //Shoot until empty
         else if(commandType.equals("s")) {
             if(!targetLock) {
-                //TODO: run vision alignment function
                 if(alignment.atSetpoint()){
                     DriverStation.reportWarning("On target", false);
                     onTargetCounter++;
@@ -146,9 +144,12 @@ public class Auto {
                         //Pass target distance to shooter
                         targetLock = true;
                     }
+                } else {
+                    DriverStation.reportWarning("Not on target", false);
+                    //Rotate using values from the limelight
+                    swatDrive.arcadeDrive(0.0, alignment.visionAlign());
                 }
-            }
-            else {
+            } else {
                 targetLock = false;
                 //Check ballsStored to see if magazine has been emptied
                 if(shooter.getBallsStored() != 0) {
@@ -168,7 +169,8 @@ public class Auto {
             encoders.PID(0);
             gyro.reset();
             nextCommand = false;
-        }
+        }*/
+        encoders.PID(100);
     }
 
     /**
