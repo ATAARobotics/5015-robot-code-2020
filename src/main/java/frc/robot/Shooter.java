@@ -51,6 +51,7 @@ public class Shooter {
     private VictorSPX magazineMotor = null;
     private VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
+    private RangeFinder shootDetector = null;
     private DoubleSolenoid intakeControl = null;
 
     private Timer magazineTimer = new Timer();
@@ -73,12 +74,13 @@ public class Shooter {
      * @param intakeMotor The intake motor
      */
     public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl, CANEncoder shooterEncoder,
-        RangeFinder intakeDetector, CANPIDController shooterController) {
+        RangeFinder intakeDetector, RangeFinder shootDetector, CANPIDController shooterController) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor = magazineMotor;
         this.intakeMotor = intakeMotor;
         this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
+        this.shootDetector = shootDetector;
         this.shooterController = shooterController;
         this.intakeControl = intakeControl;
     }
@@ -171,20 +173,34 @@ public class Shooter {
      */
     private boolean getIntakeDectector() {
 
-        if(intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0){
+        if (intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0) {
 
             return true;
 
-        }else if(intakeDetector.getDistance() == 0.0){
+        } else if(intakeDetector.getDistance() == 0.0) {
 
             DriverStation.reportError("Lasershark Disconnected", false);
             return false;
 
-        }else{
+        } else {
             return false;
         }
+    }
 
+    private boolean getShootDetector() {
 
+        if (shootDetector.getDistance() < 5.0 && shootDetector.getDistance() != 0.0) {
+
+            return true;
+
+        } else if(shootDetector.getDistance() == 0.0) {
+
+            DriverStation.reportError("Lasershark Disconnected", false);
+            return false;
+
+        } else {
+            return false;
+        }
     }
 
     private void setShooter(boolean running) {
@@ -301,7 +317,7 @@ public class Shooter {
                 case RUNNING: // Shooter running
 
                     setMagazine(true, -1.0);
-                    if (shooterEncoder.getVelocity() < (setPoint - 500) && !shooting) {
+                    if (getShootDetector() && !shooting) {
                         if (ballsStored != 0) {
                             shooting = true;
                         }

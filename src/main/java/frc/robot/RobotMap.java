@@ -44,7 +44,6 @@ public class RobotMap {
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
     private VictorSPX intakeMotor = new VictorSPX(5);
     private CANPIDController shootController = shootMotor.getPIDController();
-    private Ultrasonic intakeDetector = new Ultrasonic(0, 1);
     
     // Add climber
     private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
@@ -67,9 +66,10 @@ public class RobotMap {
     // Gyro
     private Gyro NavX = new Gyro();
 
-    private Lasershark laserShark = new Lasershark(5);
+    private Lasershark intakeLaserShark = new Lasershark(5);
+    private Lasershark shootLaserShark = new Lasershark(6);
 
-    private DigitalInput climbLimit = new DigitalInput(6);
+    private DigitalInput climbLimit = new DigitalInput(7);
 
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
@@ -77,7 +77,8 @@ public class RobotMap {
     public ColorSensor colorSensor;
     public LimeLight limeLight;
     public Shooter shooter;
-    public RangeFinder rangeFinder;
+    public RangeFinder intakeDetector;
+    public RangeFinder shootDetector;
     public Encoders driveEncoders;
     public Climber climber;
     public Align align;
@@ -88,8 +89,9 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        rangeFinder = new RangeFinder(laserShark);
-        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, rangeFinder, shootController);
+        intakeDetector = new RangeFinder(intakeLaserShark);
+        shootDetector = new RangeFinder(shootLaserShark);
+        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, intakeDetector, shootDetector, shootController);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
         align = new Align(this);
@@ -162,15 +164,7 @@ public class RobotMap {
     protected VictorSPX getConveyorMotor() {
         return magazineMotor;
     }
-
-    /**
-     * For internal use in Shooter.java.
-     * Returns the detector for balls waiting at the intake
-     */
-    protected Ultrasonic getIntakeDetector() {
-        return intakeDetector;
-    }
-
+    
     /**
      * For internal use in Shooter.java.
      * Returns the hardware color sensor for the control panel.
