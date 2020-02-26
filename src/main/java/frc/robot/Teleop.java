@@ -22,6 +22,7 @@ public class Teleop {
     // Vision Control Variables
     private boolean discoOn = false;
     private int onTargetCounter = 0;
+    private boolean visionShoot = false;
 
     // Vision PID and PID values
     private boolean visionActive = false;
@@ -64,14 +65,7 @@ public class Teleop {
         joysticks.checkInputs();
 
         if (!climber.getClimbing()) {
-            shooter.setOverride(joysticks.getOverride());
-            shooter.intake();
-            boolean shootButton = joysticks.getManualShoot();
-            //sets shooter speed to 0.85 if manual shoot is pressed
-            if(shootButton){
-                shooter.setShooterSpeed(0.0);
-            }
-            shooter.shoot(shootButton);
+
             shooter.shooterPeriodic();
 
             // When vision button is pressed, toggle vision and CameraMode
@@ -92,6 +86,8 @@ public class Teleop {
 
             // Vision Alignment
             if(visionActive) {
+                shooter.shoot(false);
+                shooter.setShooterSpeed(alignment.getDistance());
                 // Disable Vision if Aligned
                 if(alignment.atSetpoint()){
                     DriverStation.reportWarning("On target", false);
@@ -99,12 +95,13 @@ public class Teleop {
                     // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
                     if (onTargetCounter > 10) {
                         //Pass target distance to shooter
-                        shooter.setShooterSpeed(alignment.getDistance());
-                        while (shooter.getBallsStored() > 0) {
+                        if (shooter.getBallsStored() > 0) {
                             shooter.shoot(true);
+                        } else {
+                            visionActive = false;
+                            limeLight.setCameraMode(CameraMode.Drive);
                         }
-                        visionActive = false;
-                        limeLight.setCameraMode(CameraMode.Drive);
+
                     }
                 } else {
                     DriverStation.reportWarning("Not on target", false);
@@ -114,7 +111,14 @@ public class Teleop {
                 }
             // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
             }else{
-
+                shooter.setOverride(joysticks.getOverride());
+                shooter.intake();
+                boolean shootButton = joysticks.getManualShoot();
+                //sets shooter speed to 0.85 if manual shoot is pressed
+                if(shootButton){
+                    shooter.setShooterSpeed(0.0);
+                }
+                shooter.shoot(shootButton);
                 //This is where the robot is driven (disabled during vision)
 				driveTrain.arcadeDrive(joysticks.getXSpeed(), joysticks.getZRotation());
 

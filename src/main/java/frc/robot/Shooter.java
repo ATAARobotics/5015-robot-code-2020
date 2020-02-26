@@ -293,7 +293,7 @@ public class Shooter {
 
                     break;
                 case WARMUP: // Shooter speeding up
-                    if (!(shooterEncoder.getVelocity() < setPoint)) {
+                    if (shooterEncoder.getVelocity() >= setPoint) {
                         shootCase = ShootCase.RUNNING;
                     }
                     break;
@@ -301,15 +301,16 @@ public class Shooter {
                 case RUNNING: // Shooter running
 
                     setMagazine(true, -1.0);
-                    if (shooterEncoder.getVelocity() < (setPoint - 25) && !shooting) {
+                    if (shooterEncoder.getVelocity() < (setPoint - 500) && !shooting) {
                         if (ballsStored != 0) {
                             shooting = true;
-                            ballsStored--;
                         }
 
                         //shootCase = ShootCase.WARMUP;
-                    } else if (shooterEncoder.getVelocity() > (setPoint - 20)) {
+                    } else if (shooterEncoder.getVelocity() < (setPoint - 400)) {
                         shooting = false;
+                        shootCase = ShootCase.WARMUP;
+                        ballsStored--;
                     }
 
                     break;
@@ -352,11 +353,11 @@ public class Shooter {
     //TODO: Please check that this is the correct way to input the formulas
     public void setShooterSpeed(double distance) {
         double speed = 0.0;
-
+        distance += 17;
         //If distance is 0.0 (manual entry), sets speed to 0.85
         if(distance != 0.0){
             //Sets speed based on distance from wall
-            if(distance < 52) {
+            if(distance < 52){
                 speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
             }
             else{
