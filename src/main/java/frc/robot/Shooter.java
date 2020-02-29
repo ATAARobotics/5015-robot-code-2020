@@ -301,6 +301,7 @@ public class Shooter {
             case REVERSE:
                 setIntakeSpeed(1.0);
                 setIntake(true);
+                setMagazine(false);
                 break;
             case OFF:
                 setIntake(false);
