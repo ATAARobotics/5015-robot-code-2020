@@ -53,7 +53,7 @@ public class Teleop {
         encoders.reset();
 
         // Disable Vision Processing on Limelight
-        limeLight.setCameraMode(CameraMode.Drive);
+        limeLight.setCameraMode(CameraMode.Vision);
 
     }
 
@@ -101,7 +101,7 @@ public class Teleop {
                             shooter.shoot(true);
                         } else {
                             visionActive = false;
-                            limeLight.setCameraMode(CameraMode.Drive);
+                            limeLight.setCameraMode(CameraMode.Vision);
                         }
 
                     }
@@ -136,6 +136,9 @@ public class Teleop {
                 }
                 if(joysticks.getIntakeReverse()){
                     shooter.reverseIntake();
+                }
+                if(joysticks.getMagazineReverse()){
+                    shooter.reverseMagazine();
                 }
                 if(joysticks.getGearShift()) {
                     driveTrain.gearShift();

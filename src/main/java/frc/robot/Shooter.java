@@ -24,6 +24,7 @@ enum IntakeCase {
     STARTING,
     RUNNING,
     REVERSE,
+    MAGREVERSE,
     OFF
 }
 
@@ -46,6 +47,7 @@ public class Shooter {
     private final double magazineSpeed = -0.60;
     private double intakeSpeed = -1.0;
     private double shooterSpeed = 0.85;
+    private double manualShooterSpeed = 0.85;
     private boolean shooterActive = false;
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
@@ -116,7 +118,7 @@ public class Shooter {
         SmartDashboard.putNumber("D Gain", kD);
         SmartDashboard.putNumber("P Gain", kP);
         SmartDashboard.putNumber("Feed Forward", kFF);
-        SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
+        SmartDashboard.putNumber("Manual Shooter Speed", manualShooterSpeed);
     }
 
     public void PIDPeriodic() {
@@ -125,7 +127,7 @@ public class Shooter {
         double i = SmartDashboard.getNumber("I Gain", 0);
         double d = SmartDashboard.getNumber("D Gain", 0);
         double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        shooterSpeed = SmartDashboard.getNumber("Shooter Speed", 0);
+        manualShooterSpeed = SmartDashboard.getNumber("Manual Shooter Speed", 0.85);
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller
         if ((i != kI)) {
@@ -180,22 +182,6 @@ public class Shooter {
             return true;
 
         } else if(intakeDetector.getDistance() == 0.0) {
-
-            DriverStation.reportError("Lasershark Disconnected", false);
-            return false;
-
-        } else {
-            return false;
-        }
-    }
-
-    private boolean getShootDetector() {
-
-        if (shootDetector.getDistance() < 5.0 && shootDetector.getDistance() != 0.0) {
-
-            return true;
-
-        } else if(shootDetector.getDistance() == 0.0) {
 
             DriverStation.reportError("Lasershark Disconnected", false);
             return false;
@@ -303,6 +289,9 @@ public class Shooter {
                 setIntake(true);
                 setMagazine(false);
                 break;
+            case MAGREVERSE:
+                setMagazine(true, 0.3);
+                break;
             case OFF:
                 setIntake(false);
                 break;
@@ -344,7 +333,9 @@ public class Shooter {
                 case BALL_SHOOTING:
                     if(shootDetector.getDistance() > 7.0){
                         shootCase = ShootCase.WARMUP;
-                        ballsStored--;
+                        if (ballsStored >= 1) {
+                            ballsStored--;
+                        }
                         if (ballsStored < 0) {
                             ballsStored = 0;
                         }
@@ -407,11 +398,11 @@ public class Shooter {
             if(distance < 52) {
                 speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
             } else {
-                speed = 0.658 + -0.00264*distance + 0.0000161*distance*distance;
+                speed = 0.658 + -0.00264*distance + 0.000019*distance*distance;
             }
         }else{
 
-            speed = 0.85;
+            speed = manualShooterSpeed;
         }
 
             shooterSpeed = speed;
@@ -423,6 +414,16 @@ public class Shooter {
         if(intakeCase != IntakeCase.OFF){
             if(intakeCase != IntakeCase.REVERSE){
                 intakeCase = IntakeCase.REVERSE;
+            }else{
+                intakeCase = IntakeCase.WAITING;
+            }
+        }
+        System.out.println("INTAKE CASE: " + intakeCase);
+    }
+    public void reverseMagazine(){
+        if(intakeCase != IntakeCase.OFF){
+            if(intakeCase != IntakeCase.MAGREVERSE){
+                intakeCase = IntakeCase.MAGREVERSE;
             }else{
                 intakeCase = IntakeCase.WAITING;
             }

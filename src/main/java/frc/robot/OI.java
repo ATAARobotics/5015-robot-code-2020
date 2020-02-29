@@ -16,6 +16,7 @@ class OI {
     private boolean climbRelease;
     private boolean intakeToggle;
     private boolean intakeReverse;
+    private boolean magazineReverse;
     private boolean resetBalls;
 
     //Gunner variables
@@ -45,6 +46,7 @@ class OI {
         visionShoot = gunnerStick.getBButtonReleased();
         intakeToggle = gunnerStick.getAButtonReleased();
         intakeReverse = gunnerStick.getXButtonReleased();
+        magazineReverse = gunnerStick.getBackButtonReleased();
         toggleIntakeMotors = gunnerStick.getBumperReleased(Hand.kRight);
 
         //Switch statement to determine controls for the driver
@@ -132,6 +134,9 @@ class OI {
     }
     public boolean getIntakeReverse(){
         return intakeReverse;
+    }
+    public boolean getMagazineReverse(){
+        return magazineReverse;
     }
     public boolean getBallReset(){
         return resetBalls;
