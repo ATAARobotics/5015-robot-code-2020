@@ -8,10 +8,10 @@ public class Align {
     private LimeLight limeLight = null;
 
     // Variables for limelight distance tracking
-    private double P = 0.08;
-    private double I = 0.05;
-    private double D = 0.07;
-    private double tolerance = 0.2;
+    private double P = 0.04;
+    private double I = 0.03;
+    private double D = 0.007;
+    private double tolerance = 0.5;
 
     //TODO: Tune PID for alignment
     private PIDController visionAlignPID = new PIDController(P, I, D);

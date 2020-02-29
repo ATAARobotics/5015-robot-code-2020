@@ -44,7 +44,7 @@ public class RobotMap {
     private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
     private VictorSPX intakeMotor = new VictorSPX(5);
     private CANPIDController shootController = shootMotor.getPIDController();
-    
+
     // Add climber
     private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
 
@@ -156,7 +156,7 @@ public class RobotMap {
     protected CANSparkMax getShooterMotor() {
         return shootMotor;
     }
-    
+
     /**
      * For internal use in Shooter.java.
      * Returns the first conveyor motor.
@@ -164,7 +164,7 @@ public class RobotMap {
     protected VictorSPX getConveyorMotor() {
         return magazineMotor;
     }
-    
+
     /**
      * For internal use in Shooter.java.
      * Returns the hardware color sensor for the control panel.

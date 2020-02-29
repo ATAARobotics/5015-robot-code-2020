@@ -23,6 +23,7 @@ enum IntakeCase {
     WAITING,
     STARTING,
     RUNNING,
+    REVERSE,
     OFF
 }
 
@@ -30,6 +31,7 @@ enum ShootCase {
     INITIAL,
     WARMUP,
     RUNNING,
+    BALL_SHOOTING
 }
 
 
@@ -41,8 +43,8 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
-    private final double magazineSpeed = -0.75;
-    private final double intakeSpeed = -1.0;
+    private final double magazineSpeed = -0.60;
+    private double intakeSpeed = -1.0;
     private double shooterSpeed = 0.85;
     private boolean shooterActive = false;
     private CANSparkMax shooterMotor = null;
@@ -237,15 +239,24 @@ public class Shooter {
             intakeControl.set(Value.kReverse);
         }
     }
+    private void setIntakeMotors(boolean running){
+        if(running){
+            intakeMotor.set(ControlMode.PercentOutput, intakeSpeed);
+        }else{
+            intakeMotor.set(ControlMode.PercentOutput, 0.0);
+        }
+    }
     public void intake() {
         switch (intakeCase) {
             case WAITING:
+                setIntakeSpeed(-1.0);
                 if (ballsStored < 5 || safetyOverride) {
                     setMagazine(false);
                     setIntake(true);
                 } else {
                     setMagazine(false);
-                    setIntake(false);
+                    setIntakeMotors(false);
+                    //intakeCase = IntakeCase.OFF;
                 }
 
                 if (getIntakeDectector() && ballsStored != 5) {
@@ -255,6 +266,7 @@ public class Shooter {
                 break;
 
             case STARTING:
+                setIntakeSpeed(-1.0);
                 if (ballsStored < 4) {
                     if (getIntakeDectector()) {
                         setMagazine(true);
@@ -264,12 +276,15 @@ public class Shooter {
                         intakeCase = IntakeCase.RUNNING;
                     }
                 } else {
+                    magazineTimer.reset();
+                    magazineTimer.start();
                     intakeCase = IntakeCase.RUNNING;
                 }
 
                 break;
 
             case RUNNING:
+                setIntakeSpeed(-1.0);
                 if(ballsStored < 4) {
                     if(magazineTimer.get() < 0.15) {
                         setMagazine(true);
@@ -278,13 +293,17 @@ public class Shooter {
                         intakeCase = IntakeCase.WAITING;
                     }
                 } else {
-                    if(magazineTimer.get() < 0.2) {
+                    if(magazineTimer.get() < 0.1) {
                         setMagazine(true);
                     } else {
                         ballsStored++;
                         intakeCase = IntakeCase.WAITING;
                     }
                 }
+                break;
+            case REVERSE:
+                setIntakeSpeed(1.0);
+                setIntake(true);
                 break;
             case OFF:
                 setIntake(false);
@@ -301,11 +320,12 @@ public class Shooter {
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
+            //DriverStation.reportWarning("Shooter LSRSHRK Distance: " + shootDetector.getDistance(), false);
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
                     shootCase = ShootCase.WARMUP;
-                    DriverStation.reportWarning("Switching to cooldown", false);
+                    //DriverStation.reportWarning("Switching to cooldown", false);
 
                     break;
                 case WARMUP: // Shooter speeding up
@@ -315,7 +335,7 @@ public class Shooter {
                     break;
 
                 case RUNNING: // Shooter running
-
+                    setIntakeMotors(true);
                     setMagazine(true, -1.0);
                     if (getShootDetector() && !shooting) {
                         if (ballsStored != 0) {
@@ -323,19 +343,24 @@ public class Shooter {
                         }
 
                         //shootCase = ShootCase.WARMUP;
-                    } else if (shooterEncoder.getVelocity() < (setPoint - 400)) {
+                    } else if (shootDetector.getDistance() < 7.0) {
+                        shootCase = ShootCase.BALL_SHOOTING;
+                    }
+
+                    break;
+                case BALL_SHOOTING:
+                    if(shootDetector.getDistance() > 7.0){
                         shooting = false;
                         shootCase = ShootCase.WARMUP;
                         ballsStored--;
-                    }
 
+                    }
                     break;
                 default:
                     DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false);
             }
         } else if (shootCase == ShootCase.WARMUP ||
             shootCase == ShootCase.RUNNING) { // User released the button
-
             setMagazine(false);
             shooterActive = false;
 
@@ -365,13 +390,24 @@ public class Shooter {
         }
 
     }
+    public void toggleIntake(boolean climbing){
+        if(climbing){
+            intakeCase = IntakeCase.OFF;
+        }else{
+            if(intakeCase != IntakeCase.OFF){
+                intakeCase = IntakeCase.OFF;
+            }else{
+                intakeCase = IntakeCase.WAITING;
+            }
+        }
+    }
     //Shoot at different speeds based on distance from wall
     //TODO: Please check that this is the correct way to input the formulas
     public void setShooterSpeed(double distance) {
         double speed = 0.0;
-        distance += 17;
         //If distance is 0.0 (manual entry), sets speed to 0.85
         if(distance != 0.0){
+            distance += 17;
             //Sets speed based on distance from wall
             if(distance < 52){
                 speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
@@ -380,9 +416,23 @@ public class Shooter {
                 speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
             }
         }else{
+
             speed = 0.85;
         }
 
             shooterSpeed = speed;
+    }
+    public void setIntakeSpeed(double speed){
+        intakeSpeed = speed;
+    }
+    public void reverseIntake(){
+        if(intakeCase != IntakeCase.OFF){
+            if(intakeCase != IntakeCase.REVERSE){
+                intakeCase = IntakeCase.REVERSE;
+            }else{
+                intakeCase = IntakeCase.WAITING;
+            }
         }
+        System.out.println("INTAKE CASE: " + intakeCase);
+    }
 }

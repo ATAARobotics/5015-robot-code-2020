@@ -53,7 +53,7 @@ public class Teleop {
         encoders.reset();
 
         // Disable Vision Processing on Limelight
-        limeLight.setCameraMode(CameraMode.Vision);
+        limeLight.setCameraMode(CameraMode.Drive);
 
     }
 
@@ -88,7 +88,7 @@ public class Teleop {
 
             // Vision Alignment
             if(visionActive) {
-                shooter.shoot(false);
+                //shooter.shoot(false);
                 shooter.setShooterSpeed(alignment.getDistance());
                 // Disable Vision if Aligned
                 if(alignment.atSetpoint()){
@@ -113,7 +113,6 @@ public class Teleop {
                 }
             // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
             }else{
-                shooter.setOverride(joysticks.getOverride());
                 shooter.intake();
                 boolean shootButton = joysticks.getManualShoot();
                 //sets shooter speed to 0.85 if manual shoot is pressed
@@ -135,6 +134,9 @@ public class Teleop {
                 if(joysticks.getIntakeToggle()){
                     shooter.toggleIntake();
                 }
+                if(joysticks.getIntakeReverse()){
+                    shooter.reverseIntake();
+                }
                 if(joysticks.getGearShift()) {
                     driveTrain.gearShift();
                 }
@@ -144,12 +146,11 @@ public class Teleop {
                 }
             }
         } else {
-            shooter.setOverride(true);
-            shooter.toggleIntake();
+            shooter.toggleIntake(true);
         }
 
         SmartDashboard.putNumber("Lasershark Intake Distance", intakeDetector.getDistance());
-        
+
         SmartDashboard.putNumber("Lasershark Shooter Distance", shootDetector.getDistance());
 
         climber.manualClimb(joysticks.getManualClimb());

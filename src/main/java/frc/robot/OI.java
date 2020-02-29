@@ -15,6 +15,7 @@ class OI {
     private boolean manualClimb;
     private boolean climbRelease;
     private boolean intakeToggle;
+    private boolean intakeReverse;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
@@ -33,12 +34,14 @@ class OI {
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
 
-        climbToggle = driveStick.getBumperReleased(Hand.kLeft);
+        //climbToggle = driveStick.getBumperReleased(Hand.kLeft);
+        climbToggle = false;
         climbRelease = driveStick.getStartButton();
 
-        manualClimb = gunnerStick.getBumper(Hand.kRight);
+        manualClimb = driveStick.getBumper(Hand.kLeft);
         visionShoot = gunnerStick.getBButtonReleased();
         intakeToggle = gunnerStick.getAButtonReleased();
+        intakeReverse = gunnerStick.getXButtonReleased();
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
@@ -62,12 +65,12 @@ class OI {
             default:
                 manualShoot = gunnerStick.getYButton();
 
-                if ((gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75) && !overriding) {
-                    overrideSafeties = !overrideSafeties;
-                    overriding = true;
-                } else if ((gunnerStick.getTriggerAxis(Hand.kRight) <= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) <= 0.75)) {
-                    overriding = false;
-                }
+                // if ((gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75) && !overriding) {
+                //     overrideSafeties = !overrideSafeties;
+                //     overriding = true;
+                // } else if ((gunnerStick.getTriggerAxis(Hand.kRight) <= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) <= 0.75)) {
+                //     overriding = false;
+                // }
 
                 break;
         }
@@ -122,5 +125,8 @@ class OI {
     }
     public boolean getIntakeToggle(){
         return intakeToggle;
+    }
+    public boolean getIntakeReverse(){
+        return intakeReverse;
     }
 }
