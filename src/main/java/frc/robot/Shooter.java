@@ -320,7 +320,7 @@ public class Shooter {
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
-            //DriverStation.reportWarning("Shooter LSRSHRK Distance: " + shootDetector.getDistance(), false);
+            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
@@ -434,5 +434,8 @@ public class Shooter {
             }
         }
         System.out.println("INTAKE CASE: " + intakeCase);
+    }
+    public void resetBalls(){
+        ballsStored = 0;
     }
 }

@@ -45,7 +45,7 @@ public class Auto {
     List<List<String>> splitAutoCommands = new ArrayList<List<String>>();
     final String root = "./autos";
     final String rev = "5015-2020-rev1";
-    String fileName = "./auto/swatbots.auto";
+    String fileName = "./auto/AAAAAA.auto";
 
     Path path = Paths.get(fileName);
 
@@ -119,7 +119,7 @@ public class Auto {
      * periodically.
      */
     public void AutoPeriodic() {
-        /*List<String> command = splitAutoCommands.get(commandNumber);
+        List<String> command = splitAutoCommands.get(commandNumber);
         String commandType = command.get(0);
         double commandValue = Double.parseDouble(command.get(1));
         //Move with encoder value PID
@@ -169,7 +169,7 @@ public class Auto {
             encoders.PID(0);
             gyro.reset();
             nextCommand = false;
-        }*/
+        }
         encoders.PID(100);
     }
 

@@ -16,6 +16,7 @@ class OI {
     private boolean climbRelease;
     private boolean intakeToggle;
     private boolean intakeReverse;
+    private boolean resetBalls;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
@@ -38,6 +39,7 @@ class OI {
         climbToggle = false;
         climbRelease = driveStick.getStartButton();
 
+        resetBalls = driveStick.getStartButtonReleased();
         manualClimb = driveStick.getBumper(Hand.kLeft);
         visionShoot = gunnerStick.getBButtonReleased();
         intakeToggle = gunnerStick.getAButtonReleased();
@@ -128,5 +130,8 @@ class OI {
     }
     public boolean getIntakeReverse(){
         return intakeReverse;
+    }
+    public boolean getBallReset(){
+        return resetBalls;
     }
 }

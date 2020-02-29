@@ -140,6 +140,9 @@ public class Teleop {
                 if(joysticks.getGearShift()) {
                     driveTrain.gearShift();
                 }
+                if(joysticks.getBallReset()){
+                    shooter.resetBalls();
+                }
 
                 if (joysticks.getSlow()) {
                     driveTrain.slow();
