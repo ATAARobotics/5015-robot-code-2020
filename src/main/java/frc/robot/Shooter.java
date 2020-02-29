@@ -62,10 +62,10 @@ public class Shooter {
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
     private double setPoint = 0;
-    private boolean shooting = false;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
     private boolean safetyOverride = false;
+    private boolean intakeToggle = false;
 
 
     /**
@@ -229,20 +229,17 @@ public class Shooter {
 
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
+        setIntakeMotors(running);
         if(running) {
-            intakeMotor.set(ControlMode.PercentOutput, intakeSpeed);
             intakeControl.set(Value.kForward);
-        }
-
-        else {
-            intakeMotor.set(ControlMode.PercentOutput, 0.0);
+        } else {
             intakeControl.set(Value.kReverse);
         }
     }
     private void setIntakeMotors(boolean running){
-        if(running){
-            intakeMotor.set(ControlMode.PercentOutput, intakeSpeed);
-        }else{
+        if(running) {
+            intakeMotor.set(ControlMode.PercentOutput, intakeToggle ? intakeSpeed : 0.0);
+        } else {
             intakeMotor.set(ControlMode.PercentOutput, 0.0);
         }
     }
@@ -337,22 +334,19 @@ public class Shooter {
                 case RUNNING: // Shooter running
                     setIntakeMotors(true);
                     setMagazine(true, -1.0);
-                    if (getShootDetector() && !shooting) {
-                        if (ballsStored != 0) {
-                            shooting = true;
-                        }
-
-                        //shootCase = ShootCase.WARMUP;
-                    } else if (shootDetector.getDistance() < 7.0) {
+                    setIntake(true);
+                    if (shootDetector.getDistance() < 7.0) {
                         shootCase = ShootCase.BALL_SHOOTING;
                     }
 
                     break;
                 case BALL_SHOOTING:
                     if(shootDetector.getDistance() > 7.0){
-                        shooting = false;
                         shootCase = ShootCase.WARMUP;
                         ballsStored--;
+                        if (ballsStored < 0) {
+                            ballsStored = 0;
+                        }
 
                     }
                     break;
@@ -435,7 +429,7 @@ public class Shooter {
         }
         System.out.println("INTAKE CASE: " + intakeCase);
     }
-    public void resetBalls(){
-        ballsStored = 0;
+    public void toggleIntakeMotors() {
+        intakeToggle = !intakeToggle;
     }
 }

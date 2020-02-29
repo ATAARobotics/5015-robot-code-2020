@@ -141,7 +141,10 @@ public class Teleop {
                     driveTrain.gearShift();
                 }
                 if(joysticks.getBallReset()){
-                    shooter.resetBalls();
+                    shooter.setBallsStored(0);
+                }
+                if (joysticks.getToggleIntakeMotors()) {
+                    shooter.toggleIntakeMotors();
                 }
 
                 if (joysticks.getSlow()) {
