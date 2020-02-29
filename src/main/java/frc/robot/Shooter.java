@@ -3,14 +3,10 @@ package frc.robot;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
@@ -43,18 +39,12 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
+    private RobotMap robotMap = null;
+
     private final double magazineSpeed = -0.60;
     private double intakeSpeed = -1.0;
     private double shooterSpeed = 0.85;
     private boolean shooterActive = false;
-    private CANSparkMax shooterMotor = null;
-    private CANEncoder shooterEncoder = null;
-    private CANPIDController shooterController = null;
-    private VictorSPX magazineMotor = null;
-    private VictorSPX intakeMotor = null;
-    private RangeFinder intakeDetector = null;
-    private RangeFinder shootDetector = null;
-    private DoubleSolenoid intakeControl = null;
 
     private Timer magazineTimer = new Timer();
 
@@ -65,7 +55,7 @@ public class Shooter {
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
     private boolean safetyOverride = false;
-    private boolean intakeToggle = false;
+    private boolean intakeToggle = true;
 
 
     /**
@@ -74,14 +64,7 @@ public class Shooter {
      * @param robotMap The robotMap instance for this robot.
      */
     public Shooter(RobotMap robotMap) {
-        shooterMotor = robotMap.getShooterMotor();
-        magazineMotor = robotMap.getMagazineMotor();
-        intakeMotor = robotMap.getIntakeMotor();
-        shooterEncoder = robotMap.getShooterEncoder();
-        intakeDetector = robotMap.getIntakeDetector();
-        shootDetector = robotMap.getShootDetector();
-        shooterController = robotMap.getShooterController();
-        intakeControl = robotMap.getIntakeSolenoid();
+        this.robotMap = robotMap;
     }
 
     /**
@@ -101,49 +84,22 @@ public class Shooter {
         kMaxOutput = 1;
         kMinOutput = 0;
         maxRPM = 5600;
-        shooterController.setP(kP);
-        shooterController.setI(kI);
-        shooterController.setD(kD);
-        shooterController.setIZone(kIz);
-        shooterController.setFF(kFF);
-        shooterController.setOutputRange(kMinOutput, kMaxOutput);
-
-        // display PID coefficients on SmartDashboard
-        SmartDashboard.putNumber("I Gain", kI);
-        SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("P Gain", kP);
-        SmartDashboard.putNumber("Feed Forward", kFF);
-        SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
+        robotMap.setShooterPID(kP, kI, kD, kIz, kFF);
+        robotMap.setShooterOutputRange(kMinOutput, kMaxOutput);
     }
 
     public void PIDPeriodic() {
         // read PID coefficients from SmartDashboard
-        double p = SmartDashboard.getNumber("P Gain", 0);
-        double i = SmartDashboard.getNumber("I Gain", 0);
-        double d = SmartDashboard.getNumber("D Gain", 0);
-        double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        shooterSpeed = SmartDashboard.getNumber("Shooter Speed", 0);
-        // if PID coefficients on SmartDashboard have changed, write new values to
-        // controller
-        if ((i != kI)) {
-            shooterController.setI(i);
-            kI = i;
-        }
-        if ((d != kD)) {
-            shooterController.setD(d);
-            kD = d;
-        }
-        if ((p != kP)) {
-            shooterController.setP(p);
-            kP = p;
-        }
-        if ((ff != kFF)) {
-            shooterController.setFF(ff);
-            kFF = ff;
-        }
+        double p = SmartDashboard.getNumber("P Gain", kP);
+        double i = SmartDashboard.getNumber("I Gain", kI);
+        double d = SmartDashboard.getNumber("D Gain", kD);
+        double ff = SmartDashboard.getNumber("Feed Forward", kFF);
+        shooterSpeed = SmartDashboard.getNumber("Shooter Speed", shooterSpeed);
+        robotMap.setShooterPID(p, i, d, kIz, ff);
+        robotMap.setShooterOutputRange(kMinOutput, kMaxOutput);
 
         SmartDashboard.putNumber("SetPoint", setPoint);
-        SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
+        SmartDashboard.putNumber("ProcessVariable", robotMap.checkShooterVelocity());
 
     }
     public void shooterPeriodic() {
@@ -159,44 +115,32 @@ public class Shooter {
 
     private void setMagazine(boolean running, double speed) {
         if (running) {
-            magazineMotor.set(ControlMode.PercentOutput, speed);
+            robotMap.setMagazineMotor(speed);
         } else {
-            magazineMotor.set(ControlMode.PercentOutput, 0.0);
+            robotMap.setMagazineMotor(0.0);
         }
     }
 
     /**
-     * Sets the shooter on or off, uses shootSpeed for the power if on.
-     *
-     * @param running Whether the magazine should be moving
+     * Gets wheather there is a ball in the intake
      */
     private boolean getIntakeDectector() {
-
-        if (intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0) {
-
+        if (robotMap.checkIntakeDetector() < 5.0 && robotMap.checkIntakeDetector() != 0.0) {
             return true;
-
-        } else if(intakeDetector.getDistance() == 0.0) {
-
-            DriverStation.reportError("Lasershark Disconnected", false);
+        } else if(robotMap.checkIntakeDetector() == 0.0) {
+            DriverStation.reportError("Intake Lasershark Disconnected", false);
             return false;
-
         } else {
             return false;
         }
     }
 
     private boolean getShootDetector() {
-
-        if (shootDetector.getDistance() < 5.0 && shootDetector.getDistance() != 0.0) {
-
+        if (robotMap.checkShooterDetector() < 5.0 && robotMap.checkShooterDetector() != 0.0) {
             return true;
-
-        } else if(shootDetector.getDistance() == 0.0) {
-
-            DriverStation.reportError("Lasershark Disconnected", false);
+        } else if(robotMap.checkShooterDetector() == 0.0) {
+            DriverStation.reportError("Shooting Lasershark Disconnected", false);
             return false;
-
         } else {
             return false;
         }
@@ -204,13 +148,13 @@ public class Shooter {
 
     private void setShooter(boolean running) {
         if (running) {
-            shooterController.setOutputRange(kMinOutput, kMaxOutput);
+            robotMap.setShooterOutputRange(kMinOutput, kMaxOutput);
             setPoint = shooterSpeed * maxRPM;
         } else {
             setPoint = 0 * maxRPM;
-            shooterController.setOutputRange(0, 0);
+            robotMap.setShooterOutputRange(0.0, 0.0);
         }
-        shooterController.setReference(setPoint, ControlType.kVelocity);
+        robotMap.setShooterSetPoint(setPoint);
     }
 
     /**
@@ -228,16 +172,16 @@ public class Shooter {
     private void setIntake(boolean running) {
         setIntakeMotors(running);
         if(running) {
-            intakeControl.set(Value.kForward);
+            robotMap.setIntakeExtended(true);
         } else {
-            intakeControl.set(Value.kReverse);
+            robotMap.setIntakeExtended(false);
         }
     }
     private void setIntakeMotors(boolean running){
         if(running) {
-            intakeMotor.set(ControlMode.PercentOutput, intakeToggle ? intakeSpeed : 0.0);
+            robotMap.setIntakeMotor(intakeToggle ? intakeSpeed : 0.0);
         } else {
-            intakeMotor.set(ControlMode.PercentOutput, 0.0);
+            robotMap.setIntakeMotor(0.0);
         }
     }
     public void intake() {
@@ -314,7 +258,7 @@ public class Shooter {
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
-            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
+            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + robotMap.checkShooterDetector(), false);
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
@@ -323,7 +267,7 @@ public class Shooter {
 
                     break;
                 case WARMUP: // Shooter speeding up
-                    if (shooterEncoder.getVelocity() >= setPoint) {
+                    if (robotMap.checkShooterVelocity() >= setPoint) {
                         shootCase = ShootCase.RUNNING;
                     }
                     break;
@@ -332,13 +276,13 @@ public class Shooter {
                     setIntakeMotors(true);
                     setMagazine(true, -1.0);
                     setIntake(true);
-                    if (shootDetector.getDistance() < 7.0) {
+                    if (robotMap.checkShooterDetector() < 7.0) {
                         shootCase = ShootCase.BALL_SHOOTING;
                     }
 
                     break;
                 case BALL_SHOOTING:
-                    if(shootDetector.getDistance() > 7.0){
+                    if(robotMap.checkShooterDetector() > 7.0){
                         shootCase = ShootCase.WARMUP;
                         ballsStored--;
                         if (ballsStored < 0) {
@@ -366,12 +310,8 @@ public class Shooter {
         }
     }
 
-    public double getTemperature() {
-        return shooterMotor.getMotorTemperature();
-    }
-
-	public double getBallsStored() {
-		return ballsStored;
+    public double getBallsStored() {
+        return ballsStored;
     }
     public void toggleIntake(){
         if(intakeCase != IntakeCase.OFF){
@@ -392,26 +332,21 @@ public class Shooter {
             }
         }
     }
-    //Shoot at different speeds based on distance from wall
-    //TODO: Please check that this is the correct way to input the formulas
+    // Shoot at different speeds based on distance from wall
+    // TODO: Please check that this is the correct way to input the formulas
     public void setShooterSpeed(double distance) {
-        double speed = 0.0;
-        //If distance is 0.0 (manual entry), sets speed to 0.85
+        // If distance is 0.0 (manual entry), set speed to 0.85
         if(distance != 0.0){
             distance += 17;
-            //Sets speed based on distance from wall
-            if(distance < 52){
-                speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
+            // Sets speed based on distance from wall
+            if(distance < 52) {
+                shooterSpeed = -1.32 + 0.112*distance + -0.00144*distance*distance;
+            } else {
+                shooterSpeed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
             }
-            else{
-                speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
-            }
-        }else{
-
-            speed = 0.85;
+        } else {
+            shooterSpeed = SmartDashboard.getNumber("Shooter Speed", 0.85);
         }
-
-            shooterSpeed = speed;
     }
     public void setIntakeSpeed(double speed){
         intakeSpeed = speed;

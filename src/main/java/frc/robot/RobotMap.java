@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -9,9 +10,11 @@ import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ColorSensorV3;
+import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Ultrasonic;
@@ -41,9 +44,9 @@ public class RobotMap {
     private VictorSPX magazineMotor = new VictorSPX(6);
 
     //Add shooter and conveyor belt
-    private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
+    private CANSparkMax shooterMotor = new CANSparkMax(7, MotorType.kBrushless);
     private VictorSPX intakeMotor = new VictorSPX(5);
-    private CANPIDController shootController = shootMotor.getPIDController();
+    private CANPIDController shooterController = shooterMotor.getPIDController();
 
     // Add climber
     private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
@@ -51,7 +54,7 @@ public class RobotMap {
 
     // Encoders
     // Shooter
-    private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
+    private CANEncoder shooterEncoder = new CANEncoder(shooterMotor);
 
     //Climber
     private CANEncoder climbEncoder = new CANEncoder(climbMotor);
@@ -66,13 +69,10 @@ public class RobotMap {
     // Gyro
     private Gyro gyro = new Gyro();
 
-    private Lasershark intakeLaserShark = new Lasershark(5);
-    private Lasershark shootLaserShark = new Lasershark(6);
+    private Lasershark intakeDetector = new Lasershark(5);
+    private Lasershark shooterDetector = new Lasershark(6);
 
     private DigitalInput climbLimit = new DigitalInput(7);
-
-    private RangeFinder intakeDetector = new RangeFinder(intakeLaserShark);;
-    private RangeFinder shootDetector = new RangeFinder(shootLaserShark);
 
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
@@ -138,65 +138,82 @@ public class RobotMap {
 
     /**
      * For internal use in Shooter.java.
-     * Returns the hardware encoder on the shooter motor.
+     * Returns the current speed of the shooter.
      */
-    protected CANEncoder getShooterEncoder() {
-        return shooterEncoder;
+    protected double checkShooterVelocity() {
+        return shooterEncoder.getVelocity();
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the hardware shooter motor.
+     * Sets the speed of the magazine motor.
      */
-    protected CANSparkMax getShooterMotor() {
-        return shootMotor;
+    protected void setMagazineMotor(double speed) {
+        magazineMotor.set(ControlMode.PercentOutput, speed);
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the hardware magazine motor.
+     * Sets the speed of the intake motor.
      */
-    protected VictorSPX getMagazineMotor() {
-        return magazineMotor;
+    protected void setIntakeMotor(double speed) {
+        intakeMotor.set(ControlMode.PercentOutput, speed);
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the hardware intake motor.
+     * Sets the shooter's PID, izone and ff values.
      */
-    protected VictorSPX getIntakeMotor() {
-        return intakeMotor;
+    protected void setShooterPID(double p, double i, double d, double iz, double ff) {
+        shooterController.setP(p);
+        shooterController.setI(i);
+        shooterController.setD(d);
+        shooterController.setIZone(iz);
+        shooterController.setFF(ff);
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the shooter motor's PID controller.
+     * Sets the shooter's output range.
      */
-    protected CANPIDController getShooterController() {
-        return shootController;
+    protected void setShooterOutputRange(double min, double max) {
+        shooterController.setOutputRange(min, max);
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the shooter's .
+     * Sets the shooter's PID setpoint.
      */
-    protected RangeFinder getShootDetector() {
-        return shootDetector;
+    protected void setShooterSetPoint(double setPoint) {
+        shooterController.setReference(setPoint, ControlType.kVelocity);
     }
 
     /**
      * For internal use in Shooter.java.
-     * Returns the shooter motor's PID controller.
+     * Returns the distance in inches of the shooter lasershark.
      */
-    protected RangeFinder getIntakeDetector() {
-        return intakeDetector;
+    protected double checkShooterDetector() {
+        return shooterDetector.getDistanceInches();
     }
 
     /**
-     *
+     * For internal use in Shooter.java.
+     * Returns the distance in inches of the intake lasershark.
      */
-    protected DoubleSolenoid getIntakeSolenoid() {
-        return intakeSolenoid;
+    protected double checkIntakeDetector() {
+        return intakeDetector.getDistanceInches();
+    }
+
+    /**
+     * For internal use in Shooter.java
+     * Returns the intake up/down solenoid (down = true).
+     */
+    protected void setIntakeExtended(boolean enabled) {
+        if (enabled) {
+            intakeSolenoid.set(Value.kForward);
+        } else {
+            intakeSolenoid.set(Value.kReverse);
+        }
     }
     //// Colour Wheel ////
 
@@ -239,7 +256,19 @@ public class RobotMap {
     /**
      * Return the temperature of the drivetrain in degrees celcius
      */
-    public double getDrivetrainTemperature() {
-        return (rearRightMotor.getTemperature() + rearLeftMotor.getTemperature() + frontRightMotor.getTemperature() + frontLeftMotor.getTemperature()) / 4;
+    public double getDriveTrainTemperature() {
+        return Math.max(
+            Math.max(
+                rearRightMotor.getTemperature(),
+                rearLeftMotor.getTemperature()),
+            Math.max(
+                frontRightMotor.getTemperature(),
+                frontLeftMotor.getTemperature()));
     }
+    /**
+     *
+     */
+     public double getShooterTemperature() {
+         return shooterMotor.getMotorTemperature();
+     }
 }
