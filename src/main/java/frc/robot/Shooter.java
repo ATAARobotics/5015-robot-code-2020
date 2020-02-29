@@ -404,11 +404,10 @@ public class Shooter {
         if(distance != 0.0){
             distance += 17;
             //Sets speed based on distance from wall
-            if(distance < 52){
+            if(distance < 52) {
                 speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
-            }
-            else{
-                speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
+            } else {
+                speed = 0.658 + -0.00264*distance + 0.0000161*distance*distance;
             }
         }else{
 
