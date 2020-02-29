@@ -15,7 +15,6 @@ public class Teleop {
     private Shooter shooter = null;
     private Climber climber = null;
     private ColorSensor colorSensor = null;
-    private Gyro gyro = null;
     private RangeFinder intakeDetector = null;
     private RangeFinder shootDetector = null;
     private Align alignment = null;
@@ -39,7 +38,6 @@ public class Teleop {
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
         this.colorSensor = robotMap.colorSensor;
-        this.gyro = robotMap.getGyro();
         this.intakeDetector = robotMap.intakeDetector;
         this.shootDetector = robotMap.shootDetector;
         this.climber = robotMap.climber;
@@ -62,7 +60,6 @@ public class Teleop {
         SmartDashboard.putNumber("Distance To Wall", alignment.getDistance());
         SmartDashboard.putNumber("Angle To Target", limeLight.getTy());
         SmartDashboard.putString("Limelight Mode", limeLight.getCamMode());
-        SmartDashboard.putNumber("Gyro Value", gyro.getAngle());
 
         joysticks.checkInputs();
 

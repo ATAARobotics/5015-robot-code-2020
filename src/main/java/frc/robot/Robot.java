@@ -35,7 +35,6 @@ public class Robot extends TimedRobot {
     Shooter shooter = null;
     // Climber climber = null;
     SWATDrive driveTrain = null;
-    Gyro gyro = null;
     List<String> autoCommands;
 
     // Add variables for the auto selector
@@ -75,7 +74,7 @@ public class Robot extends TimedRobot {
         properties.put("Angle Range", 180);
         properties.put("Color", "green");
         properties.put("Threshold Color", "red");
-        
+
         Map<String, Object> propertiesBattery = new HashMap<String, Object>();
         propertiesBattery.put("Min Value", 0);
         propertiesBattery.put("Max Value", 100);
@@ -89,7 +88,7 @@ public class Robot extends TimedRobot {
         .withWidget("Temperature Gauge") // specify the widget here
         .withProperties(properties)
         .getEntry();
-                
+
         shooterTemp = Shuffleboard.getTab("Dashboard Refresh")
             .add("Shooter Temperature", shooter.getTemperature())
             .withWidget("Temperature Gauge") // specify the widget here

@@ -64,7 +64,7 @@ public class RobotMap {
     private DoubleSolenoid intakeSolenoid = new DoubleSolenoid(6, 7);
 
     // Gyro
-    private Gyro NavX = new Gyro();
+    private Gyro gyro = new Gyro();
 
     private Lasershark intakeLaserShark = new Lasershark(5);
     private Lasershark shootLaserShark = new Lasershark(6);
@@ -100,9 +100,6 @@ public class RobotMap {
         frontLeftMotor.follow(rearLeftMotor);
         frontRightMotor.follow(rearRightMotor);
         // PID coefficients
-
-
-        NavX.initializeNavX();
     }
 
     // Drive train
@@ -119,8 +116,8 @@ public class RobotMap {
      * Returns the encoders associated with the drive train.
      * TODO: make a wrapper class for this.
      */
-     public Encoders getDriveEncoders() {
-         return driveEncoders;
+    public Encoders getDriveEncoders() {
+        return driveEncoders;
     }
 
     /**
@@ -132,11 +129,11 @@ public class RobotMap {
     }
 
     /**
-     * Returns the navx attached to the robot.
-     * TODO: make a wrapper class for this.
+     * For internal use in Auto.java.
+     * Returns the Gyro object associated with the NavX.
      */
-    public Gyro getGyro() {
-        return NavX;
+    protected Gyro getGyro() {
+        return gyro;
     }
 
     // Shooter / Elevator
