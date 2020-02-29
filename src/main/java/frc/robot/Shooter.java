@@ -71,20 +71,17 @@ public class Shooter {
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as the lasershark for the intake.
-     * @param shooterMotor The motor that shoots balls
-     * @param magazineMotor The magazine motor
-     * @param intakeMotor The intake motor
+     * @param robotMap The robotMap instance for this robot.
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl, CANEncoder shooterEncoder,
-        RangeFinder intakeDetector, RangeFinder shootDetector, CANPIDController shooterController) {
-        this.shooterMotor = shooterMotor;
-        this.magazineMotor = magazineMotor;
-        this.intakeMotor = intakeMotor;
-        this.shooterEncoder = shooterEncoder;
-        this.intakeDetector = intakeDetector;
-        this.shootDetector = shootDetector;
-        this.shooterController = shooterController;
-        this.intakeControl = intakeControl;
+    public Shooter(RobotMap robotMap) {
+        shooterMotor = robotMap.getShooterMotor();
+        magazineMotor = robotMap.getMagazineMotor();
+        intakeMotor = robotMap.getIntakeMotor();
+        shooterEncoder = robotMap.getShooterEncoder();
+        intakeDetector = robotMap.getIntakeDetector();
+        shootDetector = robotMap.getShootDetector();
+        shooterController = robotMap.getShooterController();
+        intakeControl = robotMap.getIntakeSolenoid();
     }
 
     /**

@@ -71,14 +71,15 @@ public class RobotMap {
 
     private DigitalInput climbLimit = new DigitalInput(7);
 
+    private RangeFinder intakeDetector = new RangeFinder(intakeLaserShark);;
+    private RangeFinder shootDetector = new RangeFinder(shootLaserShark);
+
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
     public SWATDrive swatDrive;
     public ColorSensor colorSensor;
     public LimeLight limeLight;
     public Shooter shooter;
-    public RangeFinder intakeDetector;
-    public RangeFinder shootDetector;
     public Encoders driveEncoders;
     public Climber climber;
     public Align align;
@@ -89,9 +90,7 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        intakeDetector = new RangeFinder(intakeLaserShark);
-        shootDetector = new RangeFinder(shootLaserShark);
-        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, intakeDetector, shootDetector, shootController);
+        shooter = new Shooter(this);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
         align = new Align(this);
@@ -99,10 +98,9 @@ public class RobotMap {
         // Make each side controlled with only one motor object each
         frontLeftMotor.follow(rearLeftMotor);
         frontRightMotor.follow(rearRightMotor);
-        // PID coefficients
     }
 
-    // Drive train
+    //// Drive train ////
 
     /**
      * Returns the double solenoid accessed with the gear shifting functionality
@@ -136,7 +134,7 @@ public class RobotMap {
         return gyro;
     }
 
-    // Shooter / Elevator
+    //// Shooter / Elevator ////
 
     /**
      * For internal use in Shooter.java.
@@ -156,36 +154,91 @@ public class RobotMap {
 
     /**
      * For internal use in Shooter.java.
-     * Returns the first conveyor motor.
+     * Returns the hardware magazine motor.
      */
-    protected VictorSPX getConveyorMotor() {
+    protected VictorSPX getMagazineMotor() {
         return magazineMotor;
     }
 
     /**
      * For internal use in Shooter.java.
+     * Returns the hardware intake motor.
+     */
+    protected VictorSPX getIntakeMotor() {
+        return intakeMotor;
+    }
+
+    /**
+     * For internal use in Shooter.java.
+     * Returns the shooter motor's PID controller.
+     */
+    protected CANPIDController getShooterController() {
+        return shootController;
+    }
+
+    /**
+     * For internal use in Shooter.java.
+     * Returns the shooter's .
+     */
+    protected RangeFinder getShootDetector() {
+        return shootDetector;
+    }
+
+    /**
+     * For internal use in Shooter.java.
+     * Returns the shooter motor's PID controller.
+     */
+    protected RangeFinder getIntakeDetector() {
+        return intakeDetector;
+    }
+
+    /**
+     *
+     */
+    protected DoubleSolenoid getIntakeSolenoid() {
+        return intakeSolenoid;
+    }
+    //// Colour Wheel ////
+
+    /**
+     * For internal use in ColourWheel.java.
      * Returns the hardware color sensor for the control panel.
      */
     protected ColorSensorV3 getColorSensor() {
         return colorSensorHardware;
     }
 
-    public CANPIDController getShooterController() {
-        return shootController;
-    }
+    //// Climber ////
 
-     public CANSparkMax getClimberMotor() {
+    /**
+     * For internal use in Climber.java
+     * Returns the motor used for climbing.
+     */
+    protected CANSparkMax getClimberMotor() {
         return climbMotor;
     }
 
-    public CANEncoder getClimbEncoder() {
+    /**
+     * For internal use in Climber.java
+     * Returns the encoder used for climbing.
+     */
+    protected CANEncoder getClimbEncoder() {
         return climbEncoder;
     }
 
-    public DigitalInput getClimbLimit() {
+    /**
+     * For internal use in Climber.java
+     * Returns the switch that limits the climb.
+     */
+    protected DigitalInput getClimbLimit() {
         return climbLimit;
     }
 
+    //// Miscellaneous ////
+
+    /**
+     * Return the temperature of the drivetrain in degrees celcius
+     */
     public double getDrivetrainTemperature() {
         return (rearRightMotor.getTemperature() + rearLeftMotor.getTemperature() + frontRightMotor.getTemperature() + frontLeftMotor.getTemperature()) / 4;
     }
