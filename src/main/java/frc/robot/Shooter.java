@@ -44,7 +44,7 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
-    private final double magazineSpeed = -0.60;
+    private final double magazineSpeed = -0.65;
     private double intakeSpeed = -1.0;
     private double shooterSpeed = 0.85;
     private double manualShooterSpeed = 0.85;
@@ -398,7 +398,7 @@ public class Shooter {
             if(distance < 52) {
                 speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
             } else {
-                speed = 0.658 + -0.00264*distance + 0.000019*distance*distance;
+                speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
             }
         }else{
 

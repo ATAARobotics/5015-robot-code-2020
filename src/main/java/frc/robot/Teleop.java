@@ -53,7 +53,7 @@ public class Teleop {
         encoders.reset();
 
         // Disable Vision Processing on Limelight
-        limeLight.setCameraMode(CameraMode.Vision);
+        limeLight.setCameraMode(CameraMode.Drive);
 
     }
 
@@ -101,7 +101,7 @@ public class Teleop {
                             shooter.shoot(true);
                         } else {
                             visionActive = false;
-                            limeLight.setCameraMode(CameraMode.Vision);
+                            limeLight.setCameraMode(CameraMode.Drive);
                         }
 
                     }
