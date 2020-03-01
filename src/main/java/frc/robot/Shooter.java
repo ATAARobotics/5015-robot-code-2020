@@ -10,85 +10,74 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
- * Ball shooter code
+ * Ball shooting code
  *
  * @author Jacob Guglielmin, Ben Heard, Alexander Greco
  */
 
+/**
+ * The current state the intake is in.
+ */
 enum IntakeCase {
     WAITING,
     STARTING,
     RUNNING,
-    REVERSE,
+    EJECTING_INTAKE,
+    EJECTING_MAGAZINE,
+    DOWN_STOPPED,
     OFF
 }
 
+/**
+ * The current state the shooter is in.
+ */
 enum ShootCase {
-    INITIAL,
-    WARMUP,
+    SPEED_UP,
     RUNNING,
     BALL_SHOOTING
 }
 
-
 /**
- * The shooter class controls the ball intake, storage, and shooter.
+ * The shooter class controls the ball intake, magazine, and shooter.
  * It will automatically intake, but not too many balls.
  */
 public class Shooter {
-
-    //private final double beltCircumference = 0.0 * Math.PI;
-    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
     private RobotMap robotMap = null;
-
-    private final double magazineSpeed = -0.60;
-    private double intakeSpeed = -1.0;
-    private double shooterSpeed = 0.85;
-    private boolean shooterActive = false;
-
     private Timer magazineTimer = new Timer();
 
-    private double ballsStored = 0;
-    private IntakeCase intakeCase = IntakeCase.WAITING;
-    private ShootCase shootCase = ShootCase.INITIAL;
+    private final double magazineSpeed = -0.6;
+    private final double magazineFullSpeed = -1.0;
+    private final double intakeSpeed = -1.0;
+    private double shooterSpeed = 0.85;
+
     private double setPoint = 0;
-    public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
+    private final double kP = 0.0007;
+    private final double kI = 0.0000002;
+    private final double kD = 0.1;
+    private final double kIz = 0;
+    private final double kFF = 0.00021;
+    private final double kMinOutput = 0.0;
+    private final double kMaxOutput = 1.0;
+    private final double maxRPM = 5600.0;
 
-    private boolean safetyOverride = false;
-    private boolean intakeToggle = true;
+    private int ballsStored = 0;
 
+    private IntakeCase intakeCase = IntakeCase.WAITING;
+    private ShootCase shootCase = ShootCase.SPEED_UP;
 
-    /**
-     * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
-     * as well as the lasershark for the intake.
-     * @param robotMap The robotMap instance for this robot.
-     */
     public Shooter(RobotMap robotMap) {
         this.robotMap = robotMap;
+        PIDInit();
     }
 
-    /**
-     * Sets the intake on or off, uses intakeSpeed for the power if on.
-     * @param running Whether the intake wheels should be spinning
-     */
-    public void PIDInit() {
-        // set PID coefficients
-        kP = 0.0007;
-        kI = 0.0000002;
-        kD = 0.1;
-        kIz = 0;
+    //// Internal PID Functions ////
 
-        //Max rpm
-        kFF = 0.00021;
-
-        kMaxOutput = 1;
-        kMinOutput = 0;
-        maxRPM = 5600;
+    private void PIDInit() {
         robotMap.setShooterPID(kP, kI, kD, kIz, kFF);
         robotMap.setShooterOutputRange(kMinOutput, kMaxOutput);
     }
 
-    public void PIDPeriodic() {
+    private void PIDPeriodic() {
         // read PID coefficients from SmartDashboard
         double p = SmartDashboard.getNumber("P Gain", kP);
         double i = SmartDashboard.getNumber("I Gain", kI);
@@ -100,119 +89,119 @@ public class Shooter {
 
         SmartDashboard.putNumber("SetPoint", setPoint);
         SmartDashboard.putNumber("ProcessVariable", robotMap.checkShooterVelocity());
-
-    }
-    public void shooterPeriodic() {
-        SmartDashboard.putNumber("Balls Stored", ballsStored);
-        setShooter(shooterActive);
-        PIDPeriodic();
-        SmartDashboard.putBoolean("Override", safetyOverride);
     }
 
-    private void setMagazine(boolean running) {
-        setMagazine(running, magazineSpeed);
-    }
+    //// Internal Util Functions ////
 
-    private void setMagazine(boolean running, double speed) {
-        if (running) {
-            robotMap.setMagazineMotor(speed);
-        } else {
-            robotMap.setMagazineMotor(0.0);
+    /**
+     * Gets wheather there is a ball in the intake.
+     */
+    private boolean checkIntakeBall() {
+        if (robotMap.checkIntakeDetector() < 7.0) {
+            if (robotMap.checkIntakeDetector() != 0.0) {
+                return true;
+            } else {
+                DriverStation.reportError("Intake Lasershark Disconnected", false);
+            }
         }
+        return false;
     }
 
     /**
-     * Gets wheather there is a ball in the intake
+     * Gets wheather there is a ball being shot.
      */
-    private boolean getIntakeDectector() {
-        if (robotMap.checkIntakeDetector() < 5.0 && robotMap.checkIntakeDetector() != 0.0) {
-            return true;
-        } else if(robotMap.checkIntakeDetector() == 0.0) {
-            DriverStation.reportError("Intake Lasershark Disconnected", false);
-            return false;
-        } else {
-            return false;
+    private boolean checkShootingBall() {
+        if (robotMap.checkShooterDetector() < 7.0) {
+            if (robotMap.checkShooterDetector() != 0.0) {
+                return true;
+            } else {
+                DriverStation.reportError("Shooting Lasershark Disconnected", false);
+            }
         }
+        return false;
     }
 
-    private boolean getShootDetector() {
-        if (robotMap.checkShooterDetector() < 5.0 && robotMap.checkShooterDetector() != 0.0) {
-            return true;
-        } else if(robotMap.checkShooterDetector() == 0.0) {
-            DriverStation.reportError("Shooting Lasershark Disconnected", false);
-            return false;
-        } else {
-            return false;
-        }
-    }
-
+    /**
+     * Set the shooter on or off, including the solenoids.
+     * @param running Whether the shooter wheel should be spinning
+     */
     private void setShooter(boolean running) {
         if (running) {
             robotMap.setShooterOutputRange(kMinOutput, kMaxOutput);
             setPoint = shooterSpeed * maxRPM;
         } else {
-            setPoint = 0 * maxRPM;
             robotMap.setShooterOutputRange(0.0, 0.0);
+            setPoint = 0;
         }
         robotMap.setShooterSetPoint(setPoint);
     }
 
     /**
-     * Sets the amount of balls stored for a user-override.
+     * Set the intake on or off, including the solenoids.
+     * @param running Whether the intake wheels should be spinning
      */
-    public void setBallsStored(int ballsStored) {
-        this.ballsStored = ballsStored;
+    private void setIntake(boolean running) {
+        setIntakeMotors(running);
+        robotMap.setIntakeExtended(running);
     }
 
     /**
-     * Main update loop for intaking balls automatically.
+     * Set the intake motors on or off.
+     * @param running Whether the intake wheels should be spinning
      */
-
-    //Allow code to control intake motor and solenoid
-    private void setIntake(boolean running) {
-        setIntakeMotors(running);
-        if(running) {
-            robotMap.setIntakeExtended(true);
-        } else {
-            robotMap.setIntakeExtended(false);
-        }
-    }
-    private void setIntakeMotors(boolean running){
-        if(running) {
-            robotMap.setIntakeMotor(intakeToggle ? intakeSpeed : 0.0);
+    private void setIntakeMotors(boolean running) {
+        if (running) {
+            if (intakeCase == IntakeCase.EJECTING_INTAKE) {
+                robotMap.setIntakeMotor(intakeSpeed*-1.0);
+            } else {
+                robotMap.setIntakeMotor(intakeSpeed);
+            }
         } else {
             robotMap.setIntakeMotor(0.0);
         }
     }
+
+    private void setMagazine(boolean running, boolean fullSpeed) {
+        double speed = fullSpeed ? magazineFullSpeed : magazineSpeed;
+        if (running) {
+            if (intakeCase == IntakeCase.EJECTING_MAGAZINE) {
+                robotMap.setMagazineMotor(speed*-0.5);
+            } else {
+                robotMap.setMagazineMotor(speed);
+            }
+        } else {
+            robotMap.setMagazineMotor(0.0);
+        }
+    }
+
+    private void setMagazine(boolean running) {
+        setMagazine(running, false);
+    }
+
+    //// Main looping functions ////
+
+    /**
+     * Main update loop for intaking balls automatically.
+     */
     public void intake() {
         switch (intakeCase) {
             case WAITING:
-                setIntakeSpeed(-1.0);
-                if (ballsStored < 5 || safetyOverride) {
+                if (ballsStored < 5) {
                     setMagazine(false);
                     setIntake(true);
+                    if (checkIntakeBall()) {
+                        intakeCase = IntakeCase.STARTING;
+                    }
                 } else {
                     setMagazine(false);
-                    setIntakeMotors(false);
-                    //intakeCase = IntakeCase.OFF;
-                }
-
-                if (getIntakeDectector() && ballsStored != 5) {
-                    intakeCase = IntakeCase.STARTING;
+                    setIntake(false);
                 }
 
                 break;
-
             case STARTING:
-                setIntakeSpeed(-1.0);
-                if (ballsStored < 4) {
-                    if (getIntakeDectector()) {
-                        setMagazine(true);
-                    } else {
-                        magazineTimer.reset();
-                        magazineTimer.start();
-                        intakeCase = IntakeCase.RUNNING;
-                    }
+                setIntake(true);
+                if (ballsStored < 4 && checkIntakeBall()) {
+                    setMagazine(true);
                 } else {
                     magazineTimer.reset();
                     magazineTimer.start();
@@ -220,34 +209,39 @@ public class Shooter {
                 }
 
                 break;
-
             case RUNNING:
-                setIntakeSpeed(-1.0);
-                if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.15) {
-                        setMagazine(true);
-                    } else {
-                        ballsStored++;
-                        intakeCase = IntakeCase.WAITING;
-                    }
-                } else {
-                    if(magazineTimer.get() < 0.1) {
-                        setMagazine(true);
-                    } else {
-                        ballsStored++;
-                        intakeCase = IntakeCase.WAITING;
-                    }
-                }
-                break;
-            case REVERSE:
-                setIntakeSpeed(1.0);
                 setIntake(true);
+                double waitingTime = 0.1;
+                if (ballsStored < 4) {
+                    waitingTime = 0.15;
+                }
+                if(magazineTimer.get() < waitingTime) {
+                    setMagazine(true);
+                } else {
+                    ballsStored++;
+                    if (ballsStored > 5) {
+                        ballsStored = 5;
+                    }
+                    intakeCase = IntakeCase.WAITING;
+                }
+
                 break;
+            case EJECTING_INTAKE:
+                setIntake(true);
+                setMagazine(false);
+                break;
+            case EJECTING_MAGAZINE:
+                setIntake(false);
+                setMagazine(true);
+                break;
+            case DOWN_STOPPED:
+                setIntake(true);
+                setIntakeMotors(false);
             case OFF:
                 setIntake(false);
                 break;
             default:
-                DriverStation.reportError(String.format("Invalid Intake Case: %d", intakeCase), false);
+                DriverStation.reportError(String.format("Invalid Intake Case: %s", intakeCase.toString()), false);
         }
     }
 
@@ -258,110 +252,120 @@ public class Shooter {
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
-            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + robotMap.checkShooterDetector(), false);
+            setShooter(false);
             switch (shootCase) {
-                case INITIAL: // Shooter was not active last tick
-                    shooterActive = true;
-                    shootCase = ShootCase.WARMUP;
-                    //DriverStation.reportWarning("Switching to cooldown", false);
-
-                    break;
-                case WARMUP: // Shooter speeding up
+                case SPEED_UP: // Shooter speeding up
                     if (robotMap.checkShooterVelocity() >= setPoint) {
                         shootCase = ShootCase.RUNNING;
                     }
                     break;
 
                 case RUNNING: // Shooter running
-                    setIntakeMotors(true);
-                    setMagazine(true, -1.0);
                     setIntake(true);
-                    if (robotMap.checkShooterDetector() < 7.0) {
+                    setMagazine(true, true);
+                    if (checkShootingBall()) {
                         shootCase = ShootCase.BALL_SHOOTING;
                     }
 
                     break;
                 case BALL_SHOOTING:
-                    if(robotMap.checkShooterDetector() > 7.0){
-                        shootCase = ShootCase.WARMUP;
+                    if(!checkShootingBall()){
+                        shootCase = ShootCase.SPEED_UP;
                         ballsStored--;
                         if (ballsStored < 0) {
                             ballsStored = 0;
                         }
-
                     }
+
                     break;
                 default:
                     DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false);
             }
-        } else if (shootCase == ShootCase.WARMUP ||
-            shootCase == ShootCase.RUNNING) { // User released the button
+        } else if (shootCase == ShootCase.SPEED_UP || shootCase == ShootCase.RUNNING) {
             setMagazine(false);
-            shooterActive = false;
+            setShooter(false);
 
-            shootCase = ShootCase.INITIAL;
+            // Reset shoot case for next time
+            shootCase = ShootCase.SPEED_UP;
         }
     }
 
-    public void setOverride(boolean newOverride) {
-        safetyOverride = newOverride;
-        if (intakeCase == IntakeCase.OFF && safetyOverride == false) {
-            intakeCase = IntakeCase.WAITING;
-        }
+    public void shooterPeriodic() {
+        SmartDashboard.putNumber("Balls Stored", ballsStored);
+        PIDPeriodic();
     }
 
+    //// Other Public interfaces ////
+
+    /**
+     * Gets the amount of balls currently stored in the magazine.
+     */
     public double getBallsStored() {
         return ballsStored;
     }
-    public void toggleIntake(){
-        if(intakeCase != IntakeCase.OFF){
-            intakeCase = IntakeCase.OFF;
-        }else{
-            intakeCase = IntakeCase.WAITING;
-        }
 
+    /**
+     * Sets the amount of balls stored for a user-override.
+     */
+    public void setBallsStored(int ballsStored) {
+        this.ballsStored = ballsStored;
     }
-    public void toggleIntake(boolean climbing){
-        if(climbing){
-            intakeCase = IntakeCase.OFF;
-        }else{
-            if(intakeCase != IntakeCase.OFF){
-                intakeCase = IntakeCase.OFF;
-            }else{
-                intakeCase = IntakeCase.WAITING;
-            }
-        }
-    }
-    // Shoot at different speeds based on distance from wall
-    // TODO: Please check that this is the correct way to input the formulas
+
+    /**
+     * Shoot at different speeds based on distance from wall
+     */
     public void setShooterSpeed(double distance) {
-        // If distance is 0.0 (manual entry), set speed to 0.85
+        // If distance is 0.0 (manual entry), set speed to the manual speed.
         if(distance != 0.0){
             distance += 17;
             // Sets speed based on distance from wall
             if(distance < 52) {
                 shooterSpeed = -1.32 + 0.112*distance + -0.00144*distance*distance;
             } else {
-                shooterSpeed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
+                shooterSpeed = 0.658 + -0.00244*distance + 0.000019*distance*distance;
             }
         } else {
             shooterSpeed = SmartDashboard.getNumber("Shooter Speed", 0.85);
         }
     }
-    public void setIntakeSpeed(double speed){
-        intakeSpeed = speed;
+
+    public void toggleIntake() {
+        toggleIntake(false);
     }
-    public void reverseIntake(){
-        if(intakeCase != IntakeCase.OFF){
-            if(intakeCase != IntakeCase.REVERSE){
-                intakeCase = IntakeCase.REVERSE;
-            }else{
+
+    public void toggleIntake(boolean climbing){
+        if (climbing) {
+            intakeCase = IntakeCase.OFF;
+        } else {
+            if (intakeCase == IntakeCase.OFF) {
                 intakeCase = IntakeCase.WAITING;
+            } else {
+                intakeCase = IntakeCase.OFF;
             }
         }
-        System.out.println("INTAKE CASE: " + intakeCase);
     }
+
     public void toggleIntakeMotors() {
-        intakeToggle = !intakeToggle;
+        if (intakeCase == IntakeCase.DOWN_STOPPED) {
+            intakeCase = IntakeCase.WAITING;
+        } else {
+            intakeCase = IntakeCase.DOWN_STOPPED;
+        }
+    }
+
+    public void ejectIntake() {
+        if (intakeCase == IntakeCase.EJECTING_INTAKE) {
+            intakeCase = IntakeCase.WAITING;
+        } else {
+            intakeCase = IntakeCase.EJECTING_INTAKE;
+        }
+    }
+
+    public void ejectMagazine(boolean ejecting) {
+        if (ejecting) {
+            intakeCase = IntakeCase.EJECTING_MAGAZINE;
+        } else if (intakeCase == IntakeCase.EJECTING_MAGAZINE) {
+            intakeCase = IntakeCase.WAITING;
+        }
     }
 }

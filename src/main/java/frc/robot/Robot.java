@@ -84,10 +84,10 @@ public class Robot extends TimedRobot {
         propertiesBattery.put("Threshold Color", "green");
 
         driveTemp = Shuffleboard.getTab("Dashboard Refresh")
-        .add("Drive Train Temperature", robotMap.getDriveTrainTemperature())
-        .withWidget("Temperature Gauge") // specify the widget here
-        .withProperties(properties)
-        .getEntry();
+            .add("Drive Train Temperature", robotMap.getDriveTrainTemperature())
+            .withWidget("Temperature Gauge") // specify the widget here
+            .withProperties(properties)
+            .getEntry();
 
         shooterTemp = Shuffleboard.getTab("Dashboard Refresh")
             .add("Shooter Temperature", robotMap.getShooterTemperature())
@@ -133,8 +133,6 @@ public class Robot extends TimedRobot {
         SmartDashboard.putData("Gunner Scheme choices", gunnerSchemePicker);
 
         SmartDashboard.putNumber("Balls Stored", 0.0);
-
-        robotMap.shooter.PIDInit();
 
         teleop.teleopInit();
         robotMap.limeLight.ledOff();
