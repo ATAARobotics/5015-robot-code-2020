@@ -101,7 +101,7 @@ public class Shooter {
         kIz = 0;
 
         //Max rpm
-        kFF = 0.00021;
+        kFF = 0.00015;
 
         kMaxOutput = 1;
         kMinOutput = 0;
@@ -114,20 +114,20 @@ public class Shooter {
         shooterController.setOutputRange(kMinOutput, kMaxOutput);
 
         // display PID coefficients on SmartDashboard
-        SmartDashboard.putNumber("I Gain", kI);
-        SmartDashboard.putNumber("D Gain", kD);
-        SmartDashboard.putNumber("P Gain", kP);
-        SmartDashboard.putNumber("Feed Forward", kFF);
-        SmartDashboard.putNumber("Manual Shooter Speed", manualShooterSpeed);
+        SmartDashboard.putNumber("Shooting I Gain", kI);
+        SmartDashboard.putNumber("Shooting D Gain", kD);
+        SmartDashboard.putNumber("Shooting P Gain", kP);
+        SmartDashboard.putNumber("Shooting Feed Forward", kFF);
+        SmartDashboard.putNumber("Shooting Manual Shooter Speed", manualShooterSpeed);
     }
 
     public void PIDPeriodic() {
         // read PID coefficients from SmartDashboard
-        double p = SmartDashboard.getNumber("P Gain", 0);
-        double i = SmartDashboard.getNumber("I Gain", 0);
-        double d = SmartDashboard.getNumber("D Gain", 0);
-        double ff = SmartDashboard.getNumber("Feed Forward", 0);
-        manualShooterSpeed = SmartDashboard.getNumber("Manual Shooter Speed", 0.85);
+        double p = SmartDashboard.getNumber("Shooting P Gain", 0);
+        double i = SmartDashboard.getNumber("Shooting I Gain", 0);
+        double d = SmartDashboard.getNumber("Shooting D Gain", 0);
+        double ff = SmartDashboard.getNumber("Shooting Feed Forward", 0);
+        manualShooterSpeed = SmartDashboard.getNumber("Shooting Manual Shooter Speed", 0.85);
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller
         if ((i != kI)) {
