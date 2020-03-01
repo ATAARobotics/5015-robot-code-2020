@@ -44,7 +44,7 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
-    private final double magazineSpeed = -0.65;
+    private final double magazineSpeed = -0.70;
     private double intakeSpeed = -1.0;
     private double shooterSpeed = 0.85;
     private double manualShooterSpeed = 0.85;

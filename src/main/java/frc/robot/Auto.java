@@ -24,9 +24,9 @@ public class Auto {
 
     // TODO Tune PID
     // Turn values
-    double Tp = 0;
-    double Ti = 0;
-    double Td = 0;
+    double Tp = 0.04;
+    double Ti = 0.03;
+    double Td = 0.007;
 
     double turn = 0;
     PIDController turnPID;
@@ -167,7 +167,6 @@ public class Auto {
             commandNumber++;
             encoders.reset();
             encoders.PID(0);
-            gyro.reset();
             nextCommand = false;
         }
         encoders.PID(100);
