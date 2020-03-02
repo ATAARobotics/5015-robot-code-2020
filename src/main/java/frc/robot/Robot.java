@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
 import edu.wpi.first.wpilibj.RobotController;
 
@@ -40,7 +41,7 @@ public class Robot extends TimedRobot {
 
     // Add variables for the auto selector
     final String rev = "5015-2020-rev1";
-    String fileName = "./autos/swatbots.auto";
+    String fileName = "/home/lvuser/autos/swatbots.auto";
     Path path = Paths.get(fileName);
     private String autoSelected;
     private final SendableChooser<String> autoPicker = new SendableChooser<>();
@@ -121,6 +122,7 @@ public class Robot extends TimedRobot {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            
         }
         autoPicker.setDefaultOption("Default Auto", "Default");
         SmartDashboard.putData("Auto Choices", autoPicker);
@@ -138,7 +140,7 @@ public class Robot extends TimedRobot {
         robotMap.shooter.PIDInit();
 
         teleop.teleopInit();
-        robotMap.limeLight.ledOff();
+        robotMap.limeLight.setCameraMode(CameraMode.Drive);
     }
 
     /**

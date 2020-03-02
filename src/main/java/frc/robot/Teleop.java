@@ -23,7 +23,6 @@ public class Teleop {
     // Vision Control Variables
     private boolean discoOn = false;
     private int onTargetCounter = 0;
-    private boolean visionShoot = false;
 
     // Vision PID and PID values
     private boolean visionActive = false;
@@ -38,7 +37,7 @@ public class Teleop {
         this.encoders = robotMap.getDriveEncoders();
         this.limeLight = robotMap.limeLight;
         this.shooter = robotMap.shooter;
-        this.colorSensor = robotMap.colorSensor;
+        //this.colorSensor = robotMap.colorSensor;
         this.gyro = robotMap.getGyro();
         this.intakeDetector = robotMap.intakeDetector;
         this.shootDetector = robotMap.shootDetector;
@@ -48,8 +47,8 @@ public class Teleop {
 
     public void teleopInit() {
 
-        String colorGuess = colorSensor.findColor();
-        SmartDashboard.putString("Color", colorGuess);
+        // String colorGuess = colorSensor.findColor();
+        // SmartDashboard.putString("Color", colorGuess);
         encoders.reset();
 
         // Disable Vision Processing on Limelight

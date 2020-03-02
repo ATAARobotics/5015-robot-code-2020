@@ -4,6 +4,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 /**
  * Encoder code
  *
@@ -21,8 +23,8 @@ public class Encoders {
 
     // Drive values
     //TODO: Tune straight driving values
-    double Dp = 0;
-    double Di = 0;
+    double Dp = 0.04;
+    double Di = 0.00002;
     double Dd = 0;
 
     public Encoders(TalonSRX leftMotor, TalonSRX rightMotor) {
@@ -71,8 +73,8 @@ public class Encoders {
 		rightMotor.config_kI(0, Di, 30);
 		rightMotor.config_kD(0, Dd, 30);
 
-        leftTicksPerInch = 1820;
-        rightTicksPerInch = 1820;
+        leftTicksPerInch = 263839.0/174.0;
+        rightTicksPerInch = 300952.0/169.0;
     }
     public double getRight() {
         return rightMotor.getSelectedSensorPosition();
@@ -97,8 +99,12 @@ public class Encoders {
     //Returns if it completes within 100 ticks
     //TODO: Adjust tolerance
     public boolean PID(double target) {
-        leftMotor.set(ControlMode.Position, target*leftTicksPerInch);
+        leftMotor.set(ControlMode.Position, -target*leftTicksPerInch);
         rightMotor.set(ControlMode.Position, target*rightTicksPerInch);
-        return (leftMotor.getClosedLoopError(0) < 100 && rightMotor.getClosedLoopError(0) < 100);
+        System.out.println("le: " + leftMotor.getClosedLoopError());
+        System.out.println("re: " + rightMotor.getClosedLoopError());
+        System.out.println("lt: " + leftMotor.getClosedLoopTarget());
+        System.out.println("rt: " + rightMotor.getClosedLoopTarget());
+        return (leftMotor.getClosedLoopError() < leftTicksPerInch/100 && rightMotor.getClosedLoopError() < rightTicksPerInch/100);
     }
 }

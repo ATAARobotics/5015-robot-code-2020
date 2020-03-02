@@ -43,15 +43,13 @@ public class Auto {
     Gyro gyro = null;
     List<String> autoCommands;
     List<List<String>> splitAutoCommands = new ArrayList<List<String>>();
-    final String root = "./autos";
     final String rev = "5015-2020-rev1";
-    String fileName = "./auto/AAAAAA.auto";
+    String fileName = "/home/lvuser/autos/swatbots.auto";
 
     Path path = Paths.get(fileName);
 
     private int commandNumber = 0;
     private boolean nextCommand = false;
-    private boolean targetLock = false;
 
     private Shooter shooter;
     private LimeLight limeLight;
@@ -66,6 +64,7 @@ public class Auto {
         this.swatDrive = robotMap.swatDrive;
         this.shooter = robotMap.shooter;
         this.alignment = robotMap.align;
+        this.limeLight = robotMap.limeLight;
     }
 
     /**
@@ -88,21 +87,22 @@ public class Auto {
         autoCommands.remove(0);
         //auto start
         int start = 1;
-        int end = autoCommands.size()-1;
+        int end = autoCommands.size();
         int i=0;
         //Get the index of the line which defines the selected auto and get the first command based on its location
         outer: for (;i<autoCommands.size();i++) {
             String command = autoCommands.get(i);
-            if(command.equals(autoSelected)) {
+            if(command.contains(autoSelected)) {
                start=i+1;
                break outer;
             }
         }
+        i++;
         //Get the index of the line which defines the next auto  and get the last command based on its location
         outer: for (;i<autoCommands.size();i++) {
             String command = autoCommands.get(i);
-            if(command.equals(autoSelected)) {
-               end=i-1;
+            if(command.contains(":")) {
+               end=i;
                break outer;
             }
         }
@@ -119,12 +119,18 @@ public class Auto {
      * periodically.
      */
     public void AutoPeriodic() {
+        shooter.shooterPeriodic();
+        if (commandNumber > splitAutoCommands.size() - 1) {
+            return;
+        }
         List<String> command = splitAutoCommands.get(commandNumber);
         String commandType = command.get(0);
         double commandValue = Double.parseDouble(command.get(1));
+        System.out.println(commandType);
         //Move with encoder value PID
         if(commandType.equals("m")) {
-            commandValue = commandValue/12;
+            commandValue = commandValue*12;
+            System.out.println(commandValue);
             nextCommand = encoders.PID(commandValue);
         }
         //Rotate with gyro value PID
@@ -135,41 +141,37 @@ public class Auto {
         }
         //Shoot until empty
         else if(commandType.equals("s")) {
-            if(!targetLock) {
-                if(alignment.atSetpoint()){
-                    DriverStation.reportWarning("On target", false);
-                    onTargetCounter++;
-                    // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
-                    if (onTargetCounter > 10) {
-                        //Pass target distance to shooter
-                        targetLock = true;
+            if(alignment.atSetpoint()){
+                DriverStation.reportWarning("On target with " + shooter.getBallsStored(), false);
+                onTargetCounter++;
+                // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
+                if (onTargetCounter > 10) {
+                    //Pass target distance to shooter
+                    if(shooter.getBallsStored() != 0) {
+                        shooter.setShooterSpeed(alignment.getDistance());
+                        shooter.shoot(true);
                     }
-                } else {
-                    DriverStation.reportWarning("Not on target", false);
-                    //Rotate using values from the limelight
-                    swatDrive.arcadeDrive(0.0, alignment.visionAlign());
+                    else {
+                        shooter.shoot(false);
+                        nextCommand = true;
+                    }
                 }
             } else {
-                targetLock = false;
-                //Check ballsStored to see if magazine has been emptied
-                if(shooter.getBallsStored() != 0) {
-                    shooter.setShooterSpeed(alignment.getDistance());
-                    shooter.shoot(true);
-                }
-                else {
-                    shooter.shoot(false);
-                    nextCommand = true;
-                }
+                DriverStation.reportWarning("Not on target", false);
+                //Rotate using values from the limelight
+               swatDrive.arcadeDrive(0.0, alignment.visionAlign());
             }
         }
         //increment commandNumber after a completed command and run resets
         if(nextCommand) {
+            shooter.shoot(false);
+            onTargetCounter = 0;
+            System.out.println("New Command");
             commandNumber++;
             encoders.reset();
             encoders.PID(0);
             nextCommand = false;
         }
-        encoders.PID(100);
     }
 
     /**
@@ -185,7 +187,8 @@ public class Auto {
     }
 
     //Get commands from auto file
-	public void setAutoCommands(List<String> autoCommands2) {
-        autoCommands = autoCommands2;
+	public void setAutoCommands(List<String> autoCommands) {
+        this.autoCommands = autoCommands;
+        System.out.println(autoCommands.size());
 	}
 }

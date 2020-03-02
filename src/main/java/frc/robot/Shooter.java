@@ -45,7 +45,7 @@ public class Shooter {
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
     private final double magazineSpeed = -0.70;
-    private double intakeSpeed = -1.0;
+    private double intakeSpeed = 1.0;
     private double shooterSpeed = 0.85;
     private double manualShooterSpeed = 0.85;
     private boolean shooterActive = false;
@@ -232,7 +232,7 @@ public class Shooter {
     public void intake() {
         switch (intakeCase) {
             case WAITING:
-                setIntakeSpeed(-1.0);
+                setIntakeSpeed(1.0);
                 if (ballsStored < 5 || safetyOverride) {
                     setMagazine(false);
                     setIntake(true);
@@ -249,7 +249,7 @@ public class Shooter {
                 break;
 
             case STARTING:
-                setIntakeSpeed(-1.0);
+                setIntakeSpeed(1.0);
                 if (ballsStored < 4) {
                     if (getIntakeDectector()) {
                         setMagazine(true);
@@ -267,9 +267,9 @@ public class Shooter {
                 break;
 
             case RUNNING:
-                setIntakeSpeed(-1.0);
+                setIntakeSpeed(1.0);
                 if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.15) {
+                    if(magazineTimer.get() < 0.1) {
                         setMagazine(true);
                     } else {
                         ballsStored++;
@@ -285,7 +285,7 @@ public class Shooter {
                 }
                 break;
             case REVERSE:
-                setIntakeSpeed(1.0);
+                setIntakeSpeed(-1.0);
                 setIntake(true);
                 setMagazine(false);
                 break;

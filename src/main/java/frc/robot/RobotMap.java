@@ -8,13 +8,9 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.ColorSensorV3;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
-import edu.wpi.first.wpilibj.Ultrasonic;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 
 import frc.robot.vision.LimeLight;
@@ -26,8 +22,8 @@ import frc.robot.vision.LimeLight;
 
 public class RobotMap {
     // Color wheel / Control Panel
-    private final I2C.Port colorPort = I2C.Port.kOnboard;
-    private final ColorSensorV3 colorSensorHardware = new ColorSensorV3(colorPort);
+    // private final I2C.Port colorPort = I2C.Port.kOnboard;
+    // private final ColorSensorV3 colorSensorHardware = new ColorSensorV3(colorPort);
 
     // Motors
     // Drive
@@ -74,7 +70,7 @@ public class RobotMap {
     // Controllers for specific actions on the robot, these classes should be
     // accessed directly because they have nice interfaces
     public SWATDrive swatDrive;
-    public ColorSensor colorSensor;
+    //public ColorSensor colorSensor;
     public LimeLight limeLight;
     public Shooter shooter;
     public RangeFinder intakeDetector;
@@ -87,7 +83,7 @@ public class RobotMap {
 
         // Init submodules
         swatDrive = new SWATDrive(this);
-        colorSensor = new ColorSensor(this);
+        //colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
         intakeDetector = new RangeFinder(intakeLaserShark);
         shootDetector = new RangeFinder(shootLaserShark);
@@ -169,9 +165,9 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the hardware color sensor for the control panel.
      */
-    protected ColorSensorV3 getColorSensor() {
+    /* protected ColorSensorV3 getColorSensor() {
         return colorSensorHardware;
-    }
+    } */
 
     public CANPIDController getShooterController() {
         return shootController;

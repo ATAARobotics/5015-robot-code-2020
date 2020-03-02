@@ -8,7 +8,7 @@ public class ColorSensor {
 
     public ColorSensor(RobotMap robotMap) {
         // Initialize Classes
-        this.colorSensor = robotMap.getColorSensor();
+        //this.colorSensor = robotMap.getColorSensor();
     }
 
     String findColor() {

@@ -24,7 +24,6 @@ class OI {
     private String gunnerScheme = "Default";
     private boolean manualShoot;
     private boolean overrideSafeties = false;
-    private boolean overriding = false;
     private boolean discoToggle;
     private boolean toggleIntakeMotors;
 
