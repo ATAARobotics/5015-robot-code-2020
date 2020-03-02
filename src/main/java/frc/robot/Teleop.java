@@ -14,7 +14,6 @@ public class Teleop {
     private LimeLight limeLight = null;
     private Shooter shooter = null;
     private Climber climber = null;
-    private ColorSensor colorSensor = null;
     private Gyro gyro = null;
     private RangeFinder intakeDetector = null;
     private RangeFinder shootDetector = null;

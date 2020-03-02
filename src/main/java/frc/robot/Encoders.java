@@ -4,8 +4,6 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * Encoder code
  *
@@ -22,7 +20,6 @@ public class Encoders {
     private double rightTicksPerInch;
 
     // Drive values
-    //TODO: Tune straight driving values
     double Dp = 0.04;
     double Di = 0.00002;
     double Dd = 0;
@@ -102,7 +99,6 @@ public class Encoders {
 
     //Send ticks required to go a specified distance(For use in PIDs)
     //Returns if it completes within 100 ticks
-    //TODO: Adjust tolerance
     public boolean PID(double target) {
         leftMotor.set(ControlMode.Position, -target*leftTicksPerInch);
         rightMotor.set(ControlMode.Position, target*rightTicksPerInch);

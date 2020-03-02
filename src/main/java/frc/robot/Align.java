@@ -13,7 +13,6 @@ public class Align {
     private double D = 0.007;
     private double tolerance = 0.5;
 
-    //TODO: Tune PID for alignment
     private PIDController visionAlignPID = new PIDController(P, I, D);
 
     //Variables to get distance to wall. THESE MUST BE ACCURATE.

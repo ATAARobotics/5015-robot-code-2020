@@ -105,7 +105,6 @@ public class RobotMap {
 
     /**
      * Returns the double solenoid accessed with the gear shifting functionality
-     * TODO: make a wrapper class for this.
      */
     public DoubleSolenoid getGearShift() {
         return gearShiftSolenoid;
@@ -113,7 +112,6 @@ public class RobotMap {
 
     /**
      * Returns the encoders associated with the drive train.
-     * TODO: make a wrapper class for this.
      */
      public Encoders getDriveEncoders() {
          return driveEncoders;
@@ -129,7 +127,6 @@ public class RobotMap {
 
     /**
      * Returns the navx attached to the robot.
-     * TODO: make a wrapper class for this.
      */
     public Gyro getGyro() {
         return NavX;
