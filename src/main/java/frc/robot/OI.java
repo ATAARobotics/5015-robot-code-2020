@@ -35,17 +35,19 @@ class OI {
 
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
+        
+        manualClimb = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
 
         //climbToggle = driveStick.getBumperReleased(Hand.kLeft);
         climbToggle = false;
         climbRelease = driveStick.getStartButton();
 
         resetBalls = gunnerStick.getStartButtonReleased();
-        manualClimb = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
         visionShoot = gunnerStick.getBButtonReleased();
+        manualShoot = gunnerStick.getYButton();
         intakeToggle = gunnerStick.getAButtonReleased();
         intakeReverse = gunnerStick.getXButtonReleased();
-        magazineReverse = gunnerStick.getBackButtonReleased();
+        magazineReverse = gunnerStick.getBackButton();
         toggleIntakeMotors = gunnerStick.getBumperReleased(Hand.kRight);
 
         //Switch statement to determine controls for the driver
@@ -68,7 +70,6 @@ class OI {
                 break;
 
             default:
-                manualShoot = gunnerStick.getYButton();
 
                 // if ((gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75) && !overriding) {
                 //     overrideSafeties = !overrideSafeties;

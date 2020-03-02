@@ -60,6 +60,8 @@ public class Auto {
 
     private int onTargetCounter = 0;
 
+    private List<String> autoCommandList;
+
     public Auto(RobotMap robotMap) {
         this.gyro = robotMap.getGyro();
         this.encoders = robotMap.getDriveEncoders();
@@ -109,8 +111,8 @@ public class Auto {
             }
         }
         //Split commands into command type and value ex.["m","10"]
-        autoCommands = autoCommands.subList(start, end);
-        for (String command : autoCommands) {
+        autoCommandList = autoCommands.subList(start, end);
+        for (String command : autoCommandList) {
             List<String> item = Arrays.asList(command.split(" "));
             splitAutoCommands.add(item);
         }
@@ -197,7 +199,34 @@ public class Auto {
 
     //Get auto selected from dashboard
     public void setAutoMode(String autoMode) {
-        autoSelected = autoMode;
+        if(autoSelected == autoMode) {
+            autoSelected = autoMode;
+            int start = 1;
+            int end = autoCommands.size();
+            int i=0;
+            outer: for (;i<autoCommands.size();i++) {
+                String command = autoCommands.get(i);
+                if(command.contains(autoSelected)) {
+                   start=i+1;
+                   break outer;
+                }
+            }
+            i++;
+            //Get the index of the line which defines the next auto  and get the last command based on its location
+            outer: for (;i<autoCommands.size();i++) {
+                String command = autoCommands.get(i);
+                if(command.contains(":")) {
+                   end=i;
+                   break outer;
+                }
+            }
+            //Split commands into command type and value ex.["m","10"]
+            autoCommandList = autoCommands.subList(start, end);
+            for (String command : autoCommandList) {
+                List<String> item = Arrays.asList(command.split(" "));
+                splitAutoCommands.add(item);
+            }
+        }
     }
 
     //Get commands from auto file

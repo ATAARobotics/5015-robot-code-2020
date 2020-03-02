@@ -173,6 +173,8 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledPeriodic() {
         robotMap.shooter.setBallsStored((int)SmartDashboard.getNumber("Balls Stored", 3));
+        autoSelected = SmartDashboard.getString("Auto Selector", "ShootForward");
+        auto.setAutoMode(autoSelected);
     }
 
     @Override
