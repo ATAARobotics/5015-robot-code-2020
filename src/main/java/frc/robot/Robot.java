@@ -177,7 +177,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void autonomousInit() {
-        autoSelected = SmartDashboard.getString("Auto Selector", "Default");
+        autoSelected = SmartDashboard.getString("Auto Selector", "ShootForward");
         auto.setAutoMode(autoSelected);
         auto.AutoInit();
     }

@@ -50,6 +50,8 @@ public class Auto {
 
     private int commandNumber = 0;
     private boolean nextCommand = false;
+    private int nextCounter = 0;
+    private int correctCounter = 0;
 
     private Shooter shooter;
     private LimeLight limeLight;
@@ -120,6 +122,9 @@ public class Auto {
      */
     public void AutoPeriodic() {
         shooter.shooterPeriodic();
+        if (nextCounter < 10) {
+            nextCounter++;
+        }
         if (commandNumber > splitAutoCommands.size() - 1) {
             return;
         }
@@ -131,7 +136,14 @@ public class Auto {
         if(commandType.equals("m")) {
             commandValue = commandValue*12;
             System.out.println(commandValue);
-            nextCommand = encoders.PID(commandValue);
+            if (encoders.PID(commandValue)) {
+                correctCounter++;
+            } else {
+                correctCounter = 0;
+            }
+            if (correctCounter > 10) {
+                nextCommand = true;
+            }
         }
         //Rotate with gyro value PID
         else if(commandType.equals("r")) {
@@ -171,6 +183,8 @@ public class Auto {
             encoders.reset();
             encoders.PID(0);
             nextCommand = false;
+            nextCounter = 0;
+            correctCounter = 0;
         }
     }
 

@@ -93,6 +93,11 @@ public class Encoders {
     public void reset() {
         leftMotor.setSelectedSensorPosition(0);
         rightMotor.setSelectedSensorPosition(0);
+        System.out.println("Did reset");
+        System.out.println("le: " + leftMotor.getClosedLoopError());
+        System.out.println("re: " + rightMotor.getClosedLoopError());
+        System.out.println("lt: " + leftMotor.getClosedLoopTarget());
+        System.out.println("rt: " + rightMotor.getClosedLoopTarget());
     }
 
     //Send ticks required to go a specified distance(For use in PIDs)
@@ -101,10 +106,14 @@ public class Encoders {
     public boolean PID(double target) {
         leftMotor.set(ControlMode.Position, -target*leftTicksPerInch);
         rightMotor.set(ControlMode.Position, target*rightTicksPerInch);
+        System.out.println("In PID: " + target);
         System.out.println("le: " + leftMotor.getClosedLoopError());
         System.out.println("re: " + rightMotor.getClosedLoopError());
         System.out.println("lt: " + leftMotor.getClosedLoopTarget());
         System.out.println("rt: " + rightMotor.getClosedLoopTarget());
-        return (leftMotor.getClosedLoopError() < leftTicksPerInch/100 && rightMotor.getClosedLoopError() < rightTicksPerInch/100);
+        return (leftMotor.getClosedLoopError() < leftTicksPerInch
+            && rightMotor.getClosedLoopError() < rightTicksPerInch
+            && leftMotor.getClosedLoopError() != 0
+            && rightMotor.getClosedLoopError() != 0);
     }
 }
