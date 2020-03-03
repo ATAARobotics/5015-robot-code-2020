@@ -269,7 +269,7 @@ public class Shooter {
             case RUNNING:
                 setIntakeSpeed(1.0);
                 if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.1) {
+                    if(magazineTimer.get() < 0.2) {
                         setMagazine(true);
                     } else {
                         ballsStored++;

@@ -20,9 +20,9 @@ import frc.robot.vision.LimeLight;
  */
 public class Auto {
 
-    String autoSelected;
+    String autoSelected = null;
 
-    // TODO Tune PID
+    // TODO: Tune PID
     // Turn values
     double Tp = 0.04;
     double Ti = 0.03;
@@ -123,6 +123,7 @@ public class Auto {
      * periodically.
      */
     public void AutoPeriodic() {
+        System.out.println(autoSelected);
         shooter.shooterPeriodic();
         if (nextCounter < 10) {
             nextCounter++;
@@ -199,7 +200,7 @@ public class Auto {
 
     //Get auto selected from dashboard
     public void setAutoMode(String autoMode) {
-        if(autoSelected == autoMode) {
+        if(autoSelected != autoMode) {
             autoSelected = autoMode;
             int start = 1;
             int end = autoCommands.size();
