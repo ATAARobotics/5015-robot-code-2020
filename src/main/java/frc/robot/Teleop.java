@@ -142,9 +142,6 @@ public class Teleop {
                 if(joysticks.getBallReset()){
                     shooter.setBallsStored(0);
                 }
-                if (joysticks.getToggleIntakeMotors()) {
-                    shooter.toggleIntake();
-                }
 
                 if (joysticks.getSlow()) {
                     driveTrain.slow();

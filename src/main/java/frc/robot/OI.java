@@ -25,7 +25,6 @@ class OI {
     private boolean manualShoot;
     private boolean overrideSafeties = false;
     private boolean discoToggle;
-    private boolean toggleIntakeMotors;
 
     public OI() {
 
@@ -45,10 +44,10 @@ class OI {
         resetBalls = gunnerStick.getStartButtonReleased();
         visionShoot = gunnerStick.getBButtonReleased();
         manualShoot = gunnerStick.getYButton();
-        intakeToggle = gunnerStick.getAButtonReleased();
+        intakeToggle = gunnerStick.getBumperReleased(Hand.kRight);
         intakeReverse = gunnerStick.getXButtonReleased();
         magazineReverse = gunnerStick.getBackButton();
-        toggleIntakeMotors = gunnerStick.getBumperReleased(Hand.kRight);
+         
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
@@ -140,8 +139,5 @@ class OI {
     }
     public boolean getBallReset(){
         return resetBalls;
-    }
-    public boolean getToggleIntakeMotors(){
-        return toggleIntakeMotors;
     }
 }

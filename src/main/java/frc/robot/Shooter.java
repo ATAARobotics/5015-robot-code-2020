@@ -50,8 +50,8 @@ public class Shooter {
 
     private final double magazineSpeed = -0.70;
     private double intakeSpeed = 1.0;
-    private double shooterSpeed = 0.85;
-    private double manualShooterSpeed = 0.85;
+    private double shooterSpeed = 0.82;
+    private double manualShooterSpeed = 0.82;
     private boolean shooterActive = false;
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
@@ -71,7 +71,6 @@ public class Shooter {
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
     private boolean safetyOverride = false;
-    private boolean intakeToggle = false;
 
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
@@ -313,7 +312,7 @@ public class Shooter {
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
         if(running) {
-            intakeMotor.set(ControlMode.PercentOutput, intakeToggle ? intakeSpeed : 0.0);
+            intakeMotor.set(ControlMode.PercentOutput, intakeSpeed);
             intakeControl.set(Value.kForward);
         } else {
             intakeMotor.set(ControlMode.PercentOutput, 0.0);
