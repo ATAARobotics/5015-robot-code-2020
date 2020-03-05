@@ -64,7 +64,7 @@ public class Shooter {
 
     private Timer magazineTimer = new Timer();
 
-    private double ballsStored = 0;
+    private double ballsStored = 3;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
     private double setPoint = 0;

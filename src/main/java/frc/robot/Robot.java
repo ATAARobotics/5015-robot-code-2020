@@ -135,7 +135,7 @@ public class Robot extends TimedRobot {
         gunnerSchemePicker.addOption("Fun Mode", funMode);
         SmartDashboard.putData("Gunner Scheme choices", gunnerSchemePicker);
 
-        SmartDashboard.putNumber("Balls Stored", 0.0);
+        SmartDashboard.putNumber("Balls Stored", 3.0);
 
         robotMap.shooter.PIDInit();
 
