@@ -135,9 +135,7 @@ public class Teleop {
                 if(joysticks.getIntakeReverse()){
                     shooter.reverseIntake();
                 }
-                if(joysticks.getMagazineReverse()){
-                    shooter.reverseMagazine();
-                }
+                shooter.reverseMagazine(joysticks.getMagazineReverse());
                 if(joysticks.getGearShift()) {
                     driveTrain.gearShift();
                 }
@@ -145,7 +143,7 @@ public class Teleop {
                     shooter.setBallsStored(0);
                 }
                 if (joysticks.getToggleIntakeMotors()) {
-                    shooter.toggleIntakeMotors();
+                    shooter.toggleIntake();
                 }
 
                 if (joysticks.getSlow()) {
@@ -153,7 +151,7 @@ public class Teleop {
                 }
             }
         } else {
-            shooter.toggleIntake(true);
+            shooter.setIntakeSpeed(0);
         }
 
         SmartDashboard.putNumber("Lasershark Intake Distance", intakeDetector.getDistance());

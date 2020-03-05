@@ -1,17 +1,20 @@
+//TODO: Fix this code
+
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 
 /**
  * Ball shooter code
@@ -44,6 +47,7 @@ public class Shooter {
 
     //private final double beltCircumference = 0.0 * Math.PI;
     //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
+
     private final double magazineSpeed = -0.70;
     private double intakeSpeed = 1.0;
     private double shooterSpeed = 0.85;
@@ -69,7 +73,6 @@ public class Shooter {
     private boolean safetyOverride = false;
     private boolean intakeToggle = false;
 
-
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
      * as well as the lasershark for the intake.
@@ -93,6 +96,8 @@ public class Shooter {
      * Sets the intake on or off, uses intakeSpeed for the power if on.
      * @param running Whether the intake wheels should be spinning
      */
+    
+     ////START: PID
     public void PIDInit() {
         // set PID coefficients
         kP = 0.0007;
@@ -151,12 +156,7 @@ public class Shooter {
         SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
 
     }
-    public void shooterPeriodic() {
-        SmartDashboard.putNumber("Balls Stored", ballsStored);
-        setShooter(shooterActive);
-        PIDPeriodic();
-        SmartDashboard.putBoolean("Override", safetyOverride);
-    }
+    ////END: PID
 
     private void setMagazine(boolean running) {
         setMagazine(running, magazineSpeed);
@@ -170,10 +170,129 @@ public class Shooter {
         }
     }
 
+    public void reverseMagazine(boolean reverse){
+        if(intakeCase == IntakeCase.WAITING && reverse){
+            intakeCase = IntakeCase.MAGREVERSE;
+        } else if (intakeCase == IntakeCase.MAGREVERSE && !reverse) {
+            intakeCase = IntakeCase.WAITING;
+        }
+        System.out.println("INTAKE CASE: " + intakeCase);
+    }
+
     /**
      * Sets the shooter on or off, uses shootSpeed for the power if on.
      *
      * @param running Whether the magazine should be moving
+     */
+
+    ////START: Shooter
+    public void shooterPeriodic() {
+        SmartDashboard.putNumber("Balls Stored", ballsStored);
+        setShooter(shooterActive);
+        PIDPeriodic();
+        SmartDashboard.putBoolean("Override", safetyOverride);
+    }
+
+    private void setShooter(boolean running) {
+        if (running) {
+            shooterController.setOutputRange(kMinOutput, kMaxOutput);
+            setPoint = shooterSpeed * maxRPM;
+        } else {
+            setPoint = 0 * maxRPM;
+            shooterController.setOutputRange(0, 0);
+        }
+        shooterController.setReference(setPoint, ControlType.kVelocity);
+    }
+
+    public void setShooterSpeed(double distance) {
+        double speed = 0.0;
+        //If distance is 0.0 (manual entry), sets speed to 0.85
+        if(distance != 0.0){
+            distance += 17;
+            //Sets speed based on distance from wall
+            if(distance < 52) {
+                speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
+            } else {
+                speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
+            }
+        }else{
+
+            speed = manualShooterSpeed;
+        }
+
+            shooterSpeed = speed;
+    }
+    
+    public void shoot(boolean active) {
+        if (active) {
+            DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
+            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
+            switch (shootCase) {
+                case INITIAL: // Shooter was not active last tick
+                    shooterActive = true;
+                    shootCase = ShootCase.WARMUP;
+                    //DriverStation.reportWarning("Switching to cooldown", false);
+
+                    break;
+                case WARMUP: // Shooter speeding up
+                    if (shooterEncoder.getVelocity() >= setPoint) {
+                        shootCase = ShootCase.RUNNING;
+                    }
+                    break;
+
+                case RUNNING: // Shooter running
+                    setMagazine(true, -1.0);
+                    setIntake(true);
+                    if (shootDetector.getDistance() < 7.0) {
+                        shootCase = ShootCase.BALL_SHOOTING;
+                    }
+
+                    break;
+                case BALL_SHOOTING:
+                    if(shootDetector.getDistance() > 7.0){
+                        shootCase = ShootCase.WARMUP;
+                        if (ballsStored >= 1) {
+                            ballsStored--;
+                        }
+                        if (ballsStored < 0) {
+                            ballsStored = 0;
+                        }
+
+                    }
+                    break;
+                default:
+                    DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false);
+            }
+        } else if (shootCase == ShootCase.WARMUP ||
+            shootCase == ShootCase.RUNNING) { // User released the button
+            setMagazine(false);
+            shooterActive = false;
+
+            shootCase = ShootCase.INITIAL;
+        }
+    }
+    ////END: Shooter
+    
+    /**
+     * Sets the amount of balls stored for a user-override.
+     */
+    public void setBallsStored(int ballsStored) {
+        this.ballsStored = ballsStored;
+    }
+    
+    public double getBallsStored() {
+		return ballsStored;
+    }
+
+    public void setOverride(boolean newOverride) {
+        safetyOverride = newOverride;
+        if (intakeCase == IntakeCase.OFF && safetyOverride == false) {
+            intakeCase = IntakeCase.WAITING;
+        }
+    }
+
+    /**
+     * Main update loop for intaking balls automatically.
      */
     private boolean getIntakeDectector() {
 
@@ -190,45 +309,18 @@ public class Shooter {
             return false;
         }
     }
-
-    private void setShooter(boolean running) {
-        if (running) {
-            shooterController.setOutputRange(kMinOutput, kMaxOutput);
-            setPoint = shooterSpeed * maxRPM;
-        } else {
-            setPoint = 0 * maxRPM;
-            shooterController.setOutputRange(0, 0);
-        }
-        shooterController.setReference(setPoint, ControlType.kVelocity);
-    }
-
-    /**
-     * Sets the amount of balls stored for a user-override.
-     */
-    public void setBallsStored(int ballsStored) {
-        this.ballsStored = ballsStored;
-    }
-
-    /**
-     * Main update loop for intaking balls automatically.
-     */
-
+   
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
-        setIntakeMotors(running);
         if(running) {
+            intakeMotor.set(ControlMode.PercentOutput, intakeToggle ? intakeSpeed : 0.0);
             intakeControl.set(Value.kForward);
         } else {
+            intakeMotor.set(ControlMode.PercentOutput, 0.0);
             intakeControl.set(Value.kReverse);
         }
     }
-    private void setIntakeMotors(boolean running){
-        if(running) {
-            intakeMotor.set(ControlMode.PercentOutput, intakeToggle ? intakeSpeed : 0.0);
-        } else {
-            intakeMotor.set(ControlMode.PercentOutput, 0.0);
-        }
-    }
+
     public void intake() {
         switch (intakeCase) {
             case WAITING:
@@ -238,8 +330,8 @@ public class Shooter {
                     setIntake(true);
                 } else {
                     setMagazine(false);
-                    setIntakeMotors(false);
-                    //intakeCase = IntakeCase.OFF;
+                    setIntake(false);
+                    //disableIntake();
                 }
 
                 if (getIntakeDectector() && ballsStored != 5) {
@@ -304,70 +396,6 @@ public class Shooter {
      * Main update loop for the shooter, when not active, just shuts off the shooter.
      * @param active Whether the shooter should be shooting.
      */
-    public void shoot(boolean active) {
-        if (active) {
-            DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
-            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
-            switch (shootCase) {
-                case INITIAL: // Shooter was not active last tick
-                    shooterActive = true;
-                    shootCase = ShootCase.WARMUP;
-                    //DriverStation.reportWarning("Switching to cooldown", false);
-
-                    break;
-                case WARMUP: // Shooter speeding up
-                    if (shooterEncoder.getVelocity() >= setPoint) {
-                        shootCase = ShootCase.RUNNING;
-                    }
-                    break;
-
-                case RUNNING: // Shooter running
-                    setIntakeMotors(true);
-                    setMagazine(true, -1.0);
-                    setIntake(true);
-                    if (shootDetector.getDistance() < 7.0) {
-                        shootCase = ShootCase.BALL_SHOOTING;
-                    }
-
-                    break;
-                case BALL_SHOOTING:
-                    if(shootDetector.getDistance() > 7.0){
-                        shootCase = ShootCase.WARMUP;
-                        if (ballsStored >= 1) {
-                            ballsStored--;
-                        }
-                        if (ballsStored < 0) {
-                            ballsStored = 0;
-                        }
-
-                    }
-                    break;
-                default:
-                    DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false);
-            }
-        } else if (shootCase == ShootCase.WARMUP ||
-            shootCase == ShootCase.RUNNING) { // User released the button
-            setMagazine(false);
-            shooterActive = false;
-
-            shootCase = ShootCase.INITIAL;
-        }
-    }
-
-    public void setOverride(boolean newOverride) {
-        safetyOverride = newOverride;
-        if (intakeCase == IntakeCase.OFF && safetyOverride == false) {
-            intakeCase = IntakeCase.WAITING;
-        }
-    }
-
-    public double getTemperature() {
-        return shooterMotor.getMotorTemperature();
-    }
-
-	public double getBallsStored() {
-		return ballsStored;
-    }
     public void toggleIntake(){
         if(intakeCase != IntakeCase.OFF){
             intakeCase = IntakeCase.OFF;
@@ -376,39 +404,13 @@ public class Shooter {
         }
 
     }
-    public void toggleIntake(boolean climbing){
-        if(climbing){
-            intakeCase = IntakeCase.OFF;
-        }else{
-            if(intakeCase != IntakeCase.OFF){
-                intakeCase = IntakeCase.OFF;
-            }else{
-                intakeCase = IntakeCase.WAITING;
-            }
-        }
-    }
+
     //Shoot at different speeds based on distance from wall
-    public void setShooterSpeed(double distance) {
-        double speed = 0.0;
-        //If distance is 0.0 (manual entry), sets speed to 0.85
-        if(distance != 0.0){
-            distance += 17;
-            //Sets speed based on distance from wall
-            if(distance < 52) {
-                speed = -1.32 + 0.112*distance + -0.00144*distance*distance;
-            } else {
-                speed = 0.658 + -0.00244*distance + 0.0000161*distance*distance;
-            }
-        }else{
 
-            speed = manualShooterSpeed;
-        }
-
-            shooterSpeed = speed;
-    }
     public void setIntakeSpeed(double speed){
         intakeSpeed = speed;
     }
+    
     public void reverseIntake(){
         if(intakeCase != IntakeCase.OFF){
             if(intakeCase != IntakeCase.REVERSE){
@@ -419,17 +421,9 @@ public class Shooter {
         }
         System.out.println("INTAKE CASE: " + intakeCase);
     }
-    public void reverseMagazine(){
-        if(intakeCase != IntakeCase.OFF){
-            if(intakeCase != IntakeCase.MAGREVERSE){
-                intakeCase = IntakeCase.MAGREVERSE;
-            }else{
-                intakeCase = IntakeCase.WAITING;
-            }
-        }
-        System.out.println("INTAKE CASE: " + intakeCase);
+    
+    public double getTemperature() {
+        return shooterMotor.getMotorTemperature();
     }
-    public void toggleIntakeMotors() {
-        intakeToggle = !intakeToggle;
-    }
+    
 }
