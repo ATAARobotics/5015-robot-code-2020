@@ -28,6 +28,7 @@ enum IntakeCase {
     RUNNING,
     REVERSE,
     MAGREVERSE,
+    ALLREVERSE,
     OFF
 }
 
@@ -172,7 +173,9 @@ public class Shooter {
     public void reverseMagazine(boolean reverse){
         if(intakeCase == IntakeCase.WAITING && reverse){
             intakeCase = IntakeCase.MAGREVERSE;
-        } else if (intakeCase == IntakeCase.MAGREVERSE && !reverse) {
+        } else if (intakeCase == IntakeCase.REVERSE && reverse) {
+            intakeCase = IntakeCase.ALLREVERSE;
+        } else if ((intakeCase == IntakeCase.MAGREVERSE || intakeCase == IntakeCase.ALLREVERSE) && !reverse) {
             intakeCase = IntakeCase.WAITING;
         }
         System.out.println("INTAKE CASE: " + intakeCase);
@@ -383,6 +386,10 @@ public class Shooter {
             case MAGREVERSE:
                 setMagazine(true, 0.3);
                 break;
+            case ALLREVERSE:
+                setIntakeSpeed(-1.0);
+                setIntake(true);
+                setMagazine(true, 0.3);
             case OFF:
                 setIntake(false);
                 break;
@@ -412,7 +419,7 @@ public class Shooter {
     
     public void reverseIntake(){
         if(intakeCase != IntakeCase.OFF){
-            if(intakeCase != IntakeCase.REVERSE){
+            if(intakeCase != IntakeCase.REVERSE && intakeCase != IntakeCase.ALLREVERSE){
                 intakeCase = IntakeCase.REVERSE;
             }else{
                 intakeCase = IntakeCase.WAITING;

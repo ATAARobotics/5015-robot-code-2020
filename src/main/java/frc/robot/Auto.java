@@ -177,6 +177,16 @@ public class Auto {
                swatDrive.arcadeDrive(0.0, alignment.visionAlign());
             }
         }
+        else if(commandType.equals("f")) {
+            if(shooter.getBallsStored() != 0) {
+                shooter.setShooterSpeed(alignment.getDistance());
+                shooter.shoot(true);
+            }
+            else {
+                shooter.shoot(false);
+                nextCommand = true;
+            }
+        }
         //increment commandNumber after a completed command and run resets
         if(nextCommand) {
             shooter.shoot(false);

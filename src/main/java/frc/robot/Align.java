@@ -11,7 +11,7 @@ public class Align {
     private double P = 0.04;
     private double I = 0.03;
     private double D = 0.007;
-    private double tolerance = 0.5;
+    private double tolerance = 2.5;
 
     private PIDController visionAlignPID = new PIDController(P, I, D);
 
