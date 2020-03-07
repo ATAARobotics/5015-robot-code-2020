@@ -119,7 +119,7 @@ public class Climber {
 
     public void manualClimb(boolean climb) {
         if (!climbing && climb) {
-            climberMotors.set(-0.5);
+            climberMotors.set(-0.85);
             manualClimbing = true;
         } else if (!climbing && !climb && manualClimbing) {
             climberMotors.set(0.0);

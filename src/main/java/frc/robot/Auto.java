@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
+import edu.wpi.first.wpilibj.Timer;
 
 //import frc.robot.pathweaver.PathFinder;
 
@@ -45,7 +46,7 @@ public class Auto {
     List<List<String>> splitAutoCommands = new ArrayList<List<String>>();
     final String rev = "5015-2020-rev1";
     String fileName = "/home/lvuser/autos/swatbots.auto";
-
+    Timer timer = new Timer();
     Path path = Paths.get(fileName);
 
     private int commandNumber = 0;
@@ -178,7 +179,7 @@ public class Auto {
             }
         }
         else if(commandType.equals("f")) {
-            if(shooter.getBallsStored() != 0) {
+            if(Timer.getMatchTime()>5) {
                 shooter.setShooterSpeed(alignment.getDistance());
                 shooter.shoot(true);
             }

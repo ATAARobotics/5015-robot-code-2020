@@ -25,6 +25,7 @@ class OI {
     private boolean manualShoot;
     private boolean overrideSafeties = false;
     private boolean discoToggle;
+    private boolean distShoot;
 
     public OI() {
 
@@ -44,6 +45,7 @@ class OI {
         resetBalls = gunnerStick.getStartButtonReleased();
         visionShoot = gunnerStick.getBButtonReleased();
         manualShoot = gunnerStick.getYButton();
+        distShoot = gunnerStick.getAButton();
         intakeToggle = gunnerStick.getBumperReleased(Hand.kRight);
         intakeReverse = gunnerStick.getXButtonReleased();
         magazineReverse = gunnerStick.getBackButton();
@@ -123,6 +125,10 @@ class OI {
 
     public boolean getManualClimb() {
         return manualClimb;
+    }
+
+    public boolean getDistShoot() {
+        return distShoot;
     }
 
     public boolean getClimbRelease() {
