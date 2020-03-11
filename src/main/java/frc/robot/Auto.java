@@ -180,7 +180,7 @@ public class Auto {
         }
         else if(commandType.equals("f")) {
             if(Timer.getMatchTime()>5) {
-                shooter.setShooterSpeed(alignment.getDistance());
+                shooter.setShooterSpeed(alignment.getDistance()+2);
                 shooter.shoot(true);
             }
             else {
