@@ -10,48 +10,76 @@ class OI {
     private double ZRotation;
     private boolean gearShift;
     private boolean slow;
-    private boolean visionButton;
+    private boolean visionShoot;
+    private boolean climbToggle;
+    private boolean manualClimb;
+    private boolean climbRelease;
+    private boolean intakeToggle;
+    private boolean intakeReverse;
+    private boolean magazineReverse;
+    private boolean resetBalls;
 
     //Gunner variables
     private XboxController gunnerStick = new XboxController(1);
     private String gunnerScheme = "Default";
+    private boolean manualShoot;
+    private boolean overrideSafeties = false;
+    private boolean discoToggle;
+    private boolean distShoot;
 
-    //Special Function variables
-    boolean leftTriggerPressed = false;
-    boolean rightTriggerPressed = false;
-    
     public OI() {
 
     }
     //periodic function to update controller input
     public void checkInputs() {
+
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
-        visionButton = driveStick.getBackButtonReleased();
+        
+        manualClimb = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
 
-        //TODO Add any new controls for driver
+        //climbToggle = driveStick.getBumperReleased(Hand.kLeft);
+        climbToggle = false;
+        climbRelease = driveStick.getStartButton();
+
+        resetBalls = gunnerStick.getStartButtonReleased();
+        visionShoot = gunnerStick.getBButtonReleased();
+        manualShoot = gunnerStick.getYButton();
+        distShoot = gunnerStick.getAButton();
+        intakeToggle = gunnerStick.getBumperReleased(Hand.kRight);
+        intakeReverse = gunnerStick.getXButtonReleased();
+        magazineReverse = gunnerStick.getBackButton();
+         
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
             case "Reverse Turning":
                 XSpeed = -driveStick.getY(Hand.kLeft);
                 ZRotation = driveStick.getX(Hand.kRight);
-                break;    
+                break;
             default:
                 XSpeed = driveStick.getY(Hand.kLeft);
                 ZRotation = -driveStick.getX(Hand.kRight);
                 break;
         }
-        
-        //TODO Add controls for gunner
 
-        //Switch statement to detirmine controls for the gunner
-        
+        //Switch statement to determine controls for the gunner
         switch (gunnerScheme) {
-            
+            case "Fun Mode":
+
+                discoToggle = gunnerStick.getStartButtonReleased();
+                break;
+
             default:
 
-                break;   
+                // if ((gunnerStick.getTriggerAxis(Hand.kRight) >= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) >= 0.75) && !overriding) {
+                //     overrideSafeties = !overrideSafeties;
+                //     overriding = true;
+                // } else if ((gunnerStick.getTriggerAxis(Hand.kRight) <= 0.75) && (gunnerStick.getTriggerAxis(Hand.kLeft) <= 0.75)) {
+                //     overriding = false;
+                // }
+
+                break;
         }
     }
 
@@ -71,7 +99,51 @@ class OI {
         return slow;
     }
 
-    public boolean getVisionButton() {
-        return visionButton;
+    public boolean getVisionShoot() {
+        return visionShoot;
+    }
+    public boolean getDiscoButton(){
+        return discoToggle;
+    }
+    public void setDriveScheme(String driveScheme){
+        driverScheme = driveScheme;
+    }
+    public void setGunnerScheme(String gunnerScheme){
+        this.gunnerScheme = gunnerScheme;
+    }
+	public boolean getManualShoot() {
+		return manualShoot;
+    }
+
+    public boolean getOverride() {
+        return overrideSafeties;
+    }
+
+    public boolean getClimbButton() {
+        return climbToggle;
+    }
+
+    public boolean getManualClimb() {
+        return manualClimb;
+    }
+
+    public boolean getDistShoot() {
+        return distShoot;
+    }
+
+    public boolean getClimbRelease() {
+        return climbRelease;
+    }
+    public boolean getIntakeToggle(){
+        return intakeToggle;
+    }
+    public boolean getIntakeReverse(){
+        return intakeReverse;
+    }
+    public boolean getMagazineReverse(){
+        return magazineReverse;
+    }
+    public boolean getBallReset(){
+        return resetBalls;
     }
 }

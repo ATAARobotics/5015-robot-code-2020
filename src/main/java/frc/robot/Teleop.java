@@ -1,125 +1,187 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.command.PIDSubsystem;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.vision.CameraMode;
 import frc.robot.vision.LimeLight;
 
 public class Teleop {
-    // Vairables for robot classes
+    // Variables for robot classes
     private SWATDrive driveTrain = null;
     private Encoders encoders = null;
     private OI joysticks = null;
     private LimeLight limeLight = null;
+    private Shooter shooter = null;
+    private Climber climber = null;
+    private Gyro gyro = null;
+    private RangeFinder intakeDetector = null;
+    private RangeFinder shootDetector = null;
+    private Align alignment = null;
 
-    public boolean PIDEnabled = false;
-    public boolean aligning = false;
+    // Vision Control Variables
+    private boolean discoOn = false;
     private int onTargetCounter = 0;
-    private PIDSubsystem visionAlignPID;
+
+    // Vision PID and PID values
     private boolean visionActive = false;
-    private double P = 0.05;
-    private double I = 0.0026;
-    private double D = 0.05;
-    private double tolerance = 0.2;
 
-    /*UltrasonicCode
-    private Ultrasonics ultrasonics;
-    */
+    NetworkTableEntry driveTemp;
+    NetworkTableEntry shootTemp;
+    private boolean distShootActive = false;
 
-    public Teleop(SWATDrive swatDrive, Encoders encoders, LimeLight limeLight) {
-        //Initialize Classes
+    public Teleop(RobotMap robotMap) {
+        // Initialize Classes
         joysticks = new OI();
-        driveTrain = swatDrive;
-        this.encoders = encoders;
-        this.limeLight = limeLight;
+        this.driveTrain = robotMap.swatDrive;
+        this.encoders = robotMap.getDriveEncoders();
+        this.limeLight = robotMap.limeLight;
+        this.shooter = robotMap.shooter;
+        //this.colorSensor = robotMap.colorSensor;
+        this.gyro = robotMap.getGyro();
+        this.intakeDetector = robotMap.intakeDetector;
+        this.shootDetector = robotMap.shootDetector;
+        this.climber = robotMap.climber;
+        this.alignment = robotMap.align;
     }
+
     public void teleopInit() {
+
+        // String colorGuess = colorSensor.findColor();
+        // SmartDashboard.putString("Color", colorGuess);
         encoders.reset();
 
-        //Sets up PID
-        visionAlignPID = new PIDSubsystem("AlignPID", P, I, D) {
-            @Override
-            protected double returnPIDInput() {return limeLight.getTx(); }
-            @Override
-            protected void usePIDOutput(double output) { drive(0, output, true);
-                //DriverStation.reportWarning("Vision Running " + output, true);
-            }
-            @Override
-            protected void initDefaultCommand() { }
-            };
-        
-        visionAlignPID.setAbsoluteTolerance(tolerance);
-        visionAlignPID.getPIDController().setContinuous(false);
-        visionAlignPID.setOutputRange(-1,1);
-        visionAlignPID.setInputRange(-27, 27);
         // Disable Vision Processing on Limelight
         limeLight.setCameraMode(CameraMode.Drive);
-        SmartDashboard.putNumber("Tolerance", tolerance);
-        SmartDashboard.putNumber("Setpoint", visionAlignPID.getSetpoint());
+
     }
 
     public void TeleopPeriodic() {
+        climber.moveClimber();
+        SmartDashboard.putNumber("Distance To Wall", alignment.getDistance());
+        SmartDashboard.putNumber("Angle To Target", limeLight.getTy());
+        SmartDashboard.putString("Limelight Mode", limeLight.getCamMode());
+        SmartDashboard.putNumber("Gyro Value", gyro.getAngle());
+
         joysticks.checkInputs();
-        visionAlignPID.setAbsoluteTolerance(tolerance);
-        //drive
 
-        if(joysticks.getVisionButton()) {
-            visionActive = !visionActive;
-            if (visionActive) {
-                onTargetCounter = 0;
-            }
-        }
-        
-        SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
-        SmartDashboard.putNumber("EncoderRight", encoders.getRight());
-        SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
-        SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
+        if (!climber.getClimbing()) {
 
-        // Vision Alignment
-        if(visionActive) {
+            shooter.shooterPeriodic();
 
-            // Disable Vision if Aligned
-            if(PIDEnabled && visionAlignPID.onTarget()){
-                DriverStation.reportWarning("On target", false);
-                onTargetCounter++;
-                // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
-                if (onTargetCounter > 10) {
-                    stopAlignPID();
-                    limeLight.setCameraMode(CameraMode.Drive);
-                    visionActive = false;
-                }
-            } else {
-                //onTargetCounter = 0;
-                DriverStation.reportWarning("Not on target", false);
-                // Start PID if not started already, vision is enabled, and not aligned
-                if(!PIDEnabled){
+            // When vision button is pressed, toggle vision and CameraMode
+            if (joysticks.getVisionShoot()) {
+                visionActive = !visionActive;
+                if (visionActive) {
+                    onTargetCounter = 0;
                     limeLight.setCameraMode(CameraMode.Vision);
-                    startAlignPID();
+                } else {
+                    limeLight.setCameraMode(CameraMode.Drive);
                 }
             }
-        // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
-        }else{
-            // If PID is enabled but vision is disabled stop vision alignment PID and reset camera settings
-            if(PIDEnabled){
-                stopAlignPID();
-                limeLight.setCameraMode(CameraMode.Drive);
+            else if(!visionActive){
+                distShootActive = joysticks.getDistShoot();
+                if (distShootActive) {
+                    limeLight.setCameraMode(CameraMode.Vision);
+                } else {
+                    limeLight.setCameraMode(CameraMode.Drive);
+                }
             }
 
-            //This is where the robot is driven (disabled during vision)
-            driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
 
-            if(joysticks.getGearShift()) {
-                driveTrain.gearShift();
+            SmartDashboard.putNumber("EncoderLeft", encoders.getLeft());
+            SmartDashboard.putNumber("EncoderRight", encoders.getRight());
+            SmartDashboard.putNumber("EncoderLeftDistance", encoders.getLeftDistance());
+            SmartDashboard.putNumber("EncoderRightDistance", encoders.getRightDistance());
+
+            // Vision Alignment
+            if(visionActive) {
+                //shooter.shoot(false);
+                shooter.setShooterSpeed(alignment.getDistance());
+                // Disable Vision if Aligned
+                    if(alignment.atSetpoint()){
+                        DriverStation.reportWarning("On target", false);
+                        onTargetCounter++;
+                        // Once has been on target for 10 counts: Disable PID, Reset Camera Settings
+                        if (onTargetCounter > 10) {
+                            //Pass target distance to shooter
+                            if (shooter.getBallsStored() > 0) {
+                                shooter.shoot(true);
+                            } else {
+                                visionActive = false;
+                                limeLight.setCameraMode(CameraMode.Drive);
+                            }
+
+                        }
+                    } else {
+                        DriverStation.reportWarning("Not on target", false);
+                        //Rotate using values from the limelight
+                        driveTrain.arcadeDrive(0.0, alignment.visionAlign());
+
+                    }
+            // If Vision is disabled normal driving and control operations. (AKA Mainly not vision code)
+            }else{
+                shooter.intake();
+                if(distShootActive) {
+                    shooter.setShooterSpeed(alignment.getDistance()-2);
+                    if (shooter.getBallsStored() > 0) {
+                        shooter.shoot(true);
+                    }
+                }
+                else {
+                    boolean shootButton = joysticks.getManualShoot();
+                    //sets shooter speed to 0.85 if manual shoot is pressed
+                    if(shootButton){
+                        shooter.setShooterSpeed(0.0);
+                    }
+                    shooter.shoot(shootButton);
+                }
+                //This is where the robot is driven (disabled during vision)
+				driveTrain.arcadeDrive(joysticks.getXSpeed(), joysticks.getZRotation());
+
+                if(joysticks.getDiscoButton()){
+                    discoOn = !discoOn;
+                    if(discoOn){
+                        limeLight.setCameraMode(CameraMode.Disco);
+                    }else{
+                        limeLight.setCameraMode(CameraMode.Drive);
+                    }
+                }
+                if(joysticks.getIntakeToggle()){
+                    shooter.toggleIntake();
+                }
+                if(joysticks.getIntakeReverse()){
+                    shooter.reverseIntake();
+                }
+                shooter.reverseMagazine(joysticks.getMagazineReverse());
+                if(joysticks.getGearShift()) {
+                    driveTrain.gearShift();
+                }
+                if(joysticks.getBallReset()){
+                    shooter.setBallsStored(0);
+                }
+
+                if (joysticks.getSlow()) {
+                    driveTrain.slow();
+                }
             }
-            if (joysticks.getSlow()) {
-                driveTrain.slow();
-            }
-            else; 
-        }    
+        } else {
+            shooter.setIntakeSpeed(0);
+        }
+
+        SmartDashboard.putNumber("Lasershark Intake Distance", intakeDetector.getDistance());
+
+        SmartDashboard.putNumber("Lasershark Shooter Distance", shootDetector.getDistance());
+
+        climber.manualClimb(joysticks.getManualClimb());
+
+        if (joysticks.getClimbButton()) {
+            climber.toggleClimb();
+        }
     }
-        
+
 	public void drive(double speedA, double speedB, boolean arcade) {
+
         if(arcade) {
             driveTrain.arcadeDrive(speedA, speedB);
         }
@@ -128,36 +190,16 @@ public class Teleop {
         }
 	}
 
-    // -- Vision: --
-    // Start alignment PID
-    public void startAlignPID() {
-        visionAlignPID.setSetpoint(0.0);
-        visionAlignPID.enable();
-        PIDEnabled = true;
-    }
-
-    // Stop Alignment PID
-    public void stopAlignPID() {
-        visionAlignPID.disable();
-        PIDEnabled = false;
-        
-    }
-    // Update tolerance for Vision PID from shuffleboard
-    public void updateFromShuffleData(){
-        tolerance = SmartDashboard.getNumber("Tolerance", tolerance);
-    }
-
-    // -- End Vision --
-
 	public void TestPeriodic() {
-        //safe mode
-        driveTrain.gearShiftSafe();
         joysticks.checkInputs();
-        
-        driveTrain.arcadeDrive(joysticks.getXSpeed() * driveTrain.getMaxStraightSpeed(), joysticks.getZRotation() * driveTrain.getMaxTurnSpeed());
-        if (joysticks.getSlow()) {
-            driveTrain.slow();
-        }
-        else; 
-	}
+
+        climber.release(joysticks.getClimbRelease());
+    }
+    public void setDriveScheme(String driveScheme){
+        joysticks.setDriveScheme(driveScheme);
+    }
+    public void setGunnerScheme(String gunnerScheme){
+        joysticks.setGunnerScheme(gunnerScheme);
+    }
+
 }

@@ -12,5 +12,9 @@ public enum CameraMode {
     /**
      * Lowers Camera Exposure, Enabled Vision Processing, and Turns on Vision LED
      */
-    Vision
+    Vision,
+    /**
+     * Drive Mode but with strobe function on LED
+     */
+    Disco
 }

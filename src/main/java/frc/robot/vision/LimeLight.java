@@ -16,18 +16,20 @@ public class LimeLight {
     NetworkTableEntry tx;
     NetworkTableEntry ty;
     NetworkTableEntry ta;
+    NetworkTableEntry tc;
     NetworkTableEntry ledMode;
     NetworkTableEntry camMode;
 
     public LimeLight(){
-        table = NetworkTableInstance.getDefault().getTable("limelight-swat");
+        table = NetworkTableInstance.getDefault().getTable("limelight-swatbot");
         tv = table.getEntry("tv");
         tx = table.getEntry("tx");
         ty = table.getEntry("ty");
         ta = table.getEntry("ta");
+        tc = table.getEntry("tc");
         ledMode =  table.getEntry("ledMode");
         camMode = table.getEntry("camMode");
-        
+
     }
 
     /**
@@ -40,7 +42,7 @@ public class LimeLight {
 
     /**
      * Returns the horizontal offset from the crosshair to the target
-     * @return Target Horizontal Offset from Crosshair. (Value between -27 and 27)
+     * @return Target Horizontal Offset from Crosshair. (Value between -29.8 and 29.8)
      */
     public double getTx(){
         return tx.getDouble(0);
@@ -48,7 +50,7 @@ public class LimeLight {
 
     /**
      * Returns the vertical offset from crosshair to target
-     * @return Target Vertical Offset from Crosshair. (Value between -20.5 and 20.5)
+     * @return Target Vertical Offset from Crosshair. (Value between -24.85 and 24.85)
      */
     public double getTy(){
         return ty.getDouble(0);
@@ -60,6 +62,14 @@ public class LimeLight {
      */
     public double getTa(){
         return ta.getDouble(0);
+    }
+
+    /**
+     * Returns rgb values at the target's crosshair
+     * @return Red, Green and Blue values at crosshair location
+     */
+    public double getTc(){
+        return tc.getDouble(0);
     }
 
     /**
@@ -105,7 +115,27 @@ public class LimeLight {
                 camMode.setDouble(0);
                 ledMode.setDouble(3);
                 break;
+            case Disco:
+                camMode.setDouble(1);
+                ledMode.setDouble(2);
+                break;
         }
     }
+
+    public String getCamMode() {
+        switch ((int)camMode.getDouble(-1)) {
+            case 0:
+
+                return "Vision";
+                
+            case 1:
+
+                return "Driving";
         
+            default:
+
+                return "Error";
+        }
+    }
+
 }
