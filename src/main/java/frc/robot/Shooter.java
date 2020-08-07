@@ -52,7 +52,7 @@ public class Shooter {
     private final double magazineSpeed = -0.70;
     private double intakeSpeed = 1.0;
     private double shooterSpeed = 0.82;
-    private double manualShooterSpeed = 0.82;
+    private double manualShooterSpeed = -0.82;
     private boolean shooterActive = false;
     private CANSparkMax shooterMotor = null;
     private CANEncoder shooterEncoder = null;
@@ -96,7 +96,7 @@ public class Shooter {
      * Sets the intake on or off, uses intakeSpeed for the power if on.
      * @param running Whether the intake wheels should be spinning
      */
-    
+
      ////START: PID
     public void PIDInit() {
         // set PID coefficients
@@ -132,7 +132,7 @@ public class Shooter {
         double i = SmartDashboard.getNumber("Shooting I Gain", 0);
         double d = SmartDashboard.getNumber("Shooting D Gain", 0);
         double ff = SmartDashboard.getNumber("Shooting Feed Forward", 0);
-        manualShooterSpeed = SmartDashboard.getNumber("Shooting Manual Shooter Speed", 0.85);
+        manualShooterSpeed = SmartDashboard.getNumber("Shooting Manual Shooter Speed", -0.82);
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller
         if ((i != kI)) {
@@ -197,7 +197,7 @@ public class Shooter {
 
     private void setShooter(boolean running) {
         if (running) {
-            shooterController.setOutputRange(kMinOutput, kMaxOutput);
+            shooterController.setOutputRange(-1, 0);
             setPoint = shooterSpeed * maxRPM;
         } else {
             setPoint = 0 * maxRPM;
@@ -224,7 +224,7 @@ public class Shooter {
 
             shooterSpeed = speed;
     }
-    
+
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
@@ -237,7 +237,7 @@ public class Shooter {
 
                     break;
                 case WARMUP: // Shooter speeding up
-                    if (shooterEncoder.getVelocity() >= setPoint) {
+                    if (shooterEncoder.getVelocity() <= setPoint) {
                         shootCase = ShootCase.RUNNING;
                     }
                     break;
@@ -274,14 +274,14 @@ public class Shooter {
         }
     }
     ////END: Shooter
-    
+
     /**
      * Sets the amount of balls stored for a user-override.
      */
     public void setBallsStored(int ballsStored) {
         this.ballsStored = ballsStored;
     }
-    
+
     public double getBallsStored() {
 		return ballsStored;
     }
@@ -311,7 +311,7 @@ public class Shooter {
             return false;
         }
     }
-   
+
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
         if(running) {
@@ -363,7 +363,7 @@ public class Shooter {
             case RUNNING:
                 setIntakeSpeed(1.0);
                 if(ballsStored < 4) {
-                    if(magazineTimer.get() < 0.2) {
+                    if(magazineTimer.get() < 0.3) {
                         setMagazine(true);
                     } else {
                         ballsStored++;
@@ -416,7 +416,7 @@ public class Shooter {
     public void setIntakeSpeed(double speed){
         intakeSpeed = speed;
     }
-    
+
     public void reverseIntake(){
         if(intakeCase != IntakeCase.OFF){
             if(intakeCase != IntakeCase.REVERSE && intakeCase != IntakeCase.ALLREVERSE){
@@ -427,9 +427,9 @@ public class Shooter {
         }
         System.out.println("INTAKE CASE: " + intakeCase);
     }
-    
+
     public double getTemperature() {
         return shooterMotor.getMotorTemperature();
     }
-    
+
 }
