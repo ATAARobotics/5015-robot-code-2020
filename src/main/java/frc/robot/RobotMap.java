@@ -37,9 +37,9 @@ public class RobotMap {
     private VictorSPX magazineMotor = new VictorSPX(6);
 
     //Add shooter and conveyor belt
-    private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
+    private WPI_TalonSRX shootMotor = new WPI_TalonSRX(7);
     private VictorSPX intakeMotor = new VictorSPX(5);
-    private CANPIDController shootController = shootMotor.getPIDController();
+    //private CANPIDController shootController = shootMotor.getPIDController();
 
     // Add climber
     private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
@@ -47,9 +47,9 @@ public class RobotMap {
 
     // Encoders
     // Shooter
-    private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
+    //private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
 
-    //Climber
+    //Climber[]
     private CANEncoder climbEncoder = new CANEncoder(climbMotor);
 
     // Drivetrain
@@ -87,7 +87,7 @@ public class RobotMap {
         limeLight = new LimeLight();
         intakeDetector = new RangeFinder(intakeLaserShark);
         shootDetector = new RangeFinder(shootLaserShark);
-        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, intakeDetector, shootDetector, shootController);
+        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, intakeDetector, shootDetector);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
         align = new Align(this);
@@ -138,17 +138,17 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the hardware encoder on the shooter motor.
      */
-    protected CANEncoder getShooterEncoder() {
-        return shooterEncoder;
-    }
+    // protected CANEncoder getShooterEncoder() {
+    //     return shooterEncoder;
+    // }
 
     /**
      * For internal use in Shooter.java.
      * Returns the hardware shooter motor.
      */
-    protected CANSparkMax getShooterMotor() {
-        return shootMotor;
-    }
+    // protected CANSparkMax getShooterMotor() {
+    //     return shootMotor;
+    // }
 
     /**
      * For internal use in Shooter.java.
@@ -166,9 +166,9 @@ public class RobotMap {
         return colorSensorHardware;
     } */
 
-    public CANPIDController getShooterController() {
-        return shootController;
-    }
+    // public CANPIDController getShooterController() {
+    //     return shootController;
+    // }
 
      public CANSparkMax getClimberMotor() {
         return climbMotor;

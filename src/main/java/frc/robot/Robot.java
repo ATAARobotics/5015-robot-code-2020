@@ -76,7 +76,7 @@ public class Robot extends TimedRobot {
         properties.put("Angle Range", 180);
         properties.put("Color", "green");
         properties.put("Threshold Color", "red");
-        
+
         Map<String, Object> propertiesBattery = new HashMap<String, Object>();
         propertiesBattery.put("Min Value", 0);
         propertiesBattery.put("Max Value", 100);
@@ -90,12 +90,12 @@ public class Robot extends TimedRobot {
         .withWidget("Temperature Gauge") // specify the widget here
         .withProperties(properties)
         .getEntry();
-                
-        shooterTemp = Shuffleboard.getTab("Dashboard Refresh")
-            .add("Shooter Temperature", shooter.getTemperature())
-            .withWidget("Temperature Gauge") // specify the widget here
-            .withProperties(properties)
-            .getEntry();
+
+        // shooterTemp = Shuffleboard.getTab("Dashboard Refresh")
+        //     .add("Shooter Temperature", shooter.getTemperature())
+        //     .withWidget("Temperature Gauge") // specify the widget here
+        //     .withProperties(properties)
+        //     .getEntry();
 
         double volt = (RobotController.getBatteryVoltage() - 11) / 2;
         batteryVolt = Shuffleboard.getTab("Dashboard Refresh")
@@ -122,7 +122,7 @@ public class Robot extends TimedRobot {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            
+
         }
         autoPicker.setDefaultOption("Default Auto", "Default");
         SmartDashboard.putData("Auto Selector", autoPicker);
@@ -137,7 +137,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putNumber("Balls Stored", 3.0);
 
-        robotMap.shooter.PIDInit();
+        //robotMap.shooter.PIDInit();
 
         teleop.teleopInit();
         robotMap.limeLight.setCameraMode(CameraMode.Drive);
@@ -155,7 +155,7 @@ public class Robot extends TimedRobot {
     @Override
     public void robotPeriodic() {
         driveTemp.setDouble(driveTrain.getTemperature());
-        shooterTemp.setDouble(shooter.getTemperature());
+        //shooterTemp.setDouble(shooter.getTemperature());
         double volt = Math.floor(((RobotController.getBatteryVoltage() - 11.75) / 2) * 100);
         if (volt < 0) {
             volt = 0;
