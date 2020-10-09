@@ -9,6 +9,8 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
+import com.ctre.phoenix.sensors.CANCoder;
+import edu.wpi.first.wpilibj.controller.PIDController;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
@@ -56,8 +58,10 @@ public class Shooter {
     private double manualShooterSpeed = 0.82;
     private boolean shooterActive = false;
     private WPI_TalonSRX shooterMotor = null;
-    private CANEncoder shooterEncoder = null;
-    private CANPIDController shooterController = null;
+    //private CANEncoder shooterEncoder = null;
+    //private CANPIDController shooterController = null;
+    private CANCoder shooterEncoder = null;
+    private PIDController shooterPID = null;
     private VictorSPX magazineMotor = null;
     private VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
@@ -65,15 +69,25 @@ public class Shooter {
     private DoubleSolenoid intakeControl = null;
 
     private Timer magazineTimer = new Timer();
-    private Timer shooterTimer = new Timer();
 
     private double ballsStored = 3;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
     private double setPoint = 0;
-    public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
+    private double processVariable;
+    private double kP = 0.0007;
+    private double kI = 0.0000002;
+    private double kD = 0.1;
+    private double kIz = 0;
+        //Max rpm
+    private double kFF = 0.00015;
 
+    private double kMaxOutput = 1;
+    private double kMinOutput = 0;
+    private double maxRPM = 6000;
     private boolean safetyOverride = false;
+
+
 
     /**
      * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
@@ -83,15 +97,16 @@ public class Shooter {
      * @param intakeMotor The intake motor
      */
     public Shooter(WPI_TalonSRX shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl,
-        RangeFinder intakeDetector, RangeFinder shootDetector) {
+        RangeFinder intakeDetector, RangeFinder shootDetector, CANCoder shooterEncoder) {
         this.shooterMotor = shooterMotor;
         this.magazineMotor = magazineMotor;
         this.intakeMotor = intakeMotor;
-        //this.shooterEncoder = shooterEncoder;
+        this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
         //this.shooterController = shooterController;
         this.intakeControl = intakeControl;
+        shooterPID = new PIDController(kP, kI, kD);
     }
 
     /**
@@ -100,64 +115,49 @@ public class Shooter {
      */
 
      ////START: PID
-    // public void PIDInit() {
-    //     // set PID coefficients
-    //     kP = 0.0007;
-    //     kI = 0.0000002;
-    //     kD = 0.1;
-    //     kIz = 0;
+    public void PIDInit() {
+        // set PID coefficients
+        processVariable = shooterEncoder.getVelocity()/360;
+        // display PID coefficients on SmartDashboard
+        SmartDashboard.putNumber("Shooting I Gain", kI);
+        SmartDashboard.putNumber("Shooting D Gain", kD);
+        SmartDashboard.putNumber("Shooting P Gain", kP);
+        SmartDashboard.putNumber("Shooting Feed Forward", kFF);
+        SmartDashboard.putNumber("Shooting Manual Shooter Speed", manualShooterSpeed);
+    }
 
-    //     //Max rpm
-    //     kFF = 0.00015;
+    public void PIDPeriodic() {
+        // read PID coefficients from SmartDashboard
+        double p = SmartDashboard.getNumber("Shooting P Gain", 0);
+        double i = SmartDashboard.getNumber("Shooting I Gain", 0);
+        double d = SmartDashboard.getNumber("Shooting D Gain", 0);
+        double ff = SmartDashboard.getNumber("Shooting Feed Forward", 0);
+        manualShooterSpeed = SmartDashboard.getNumber("Shooting Manual Shooter Speed", -0.82);
+        processVariable = shooterEncoder.getVelocity()/360;
 
-    //     kMaxOutput = 1;
-    //     kMinOutput = 0;
-    //     maxRPM = 5600;
-    //     shooterController.setP(kP);
-    //     shooterController.setI(kI);
-    //     shooterController.setD(kD);
-    //     shooterController.setIZone(kIz);
-    //     shooterController.setFF(kFF);
-    //     shooterController.setOutputRange(kMinOutput, kMaxOutput);
+        // if PID coefficients on SmartDashboard have changed, write new values to
+        // controller
+        if ((i != kI)) {
+            shooterPID.setI(i);
+            kI = i;
+        }
+        if ((d != kD)) {
+            shooterPID.setD(d);
+            kD = d;
+        }
+        if ((p != kP)) {
+            shooterPID.setP(p);
+            kP = p;
+        }
+        // if ((ff != kFF)) {
+        //     shooterPID.setFF(ff);
+        //     kFF = ff;
+        // }
 
-    //     // display PID coefficients on SmartDashboard
-    //     SmartDashboard.putNumber("Shooting I Gain", kI);
-    //     SmartDashboard.putNumber("Shooting D Gain", kD);
-    //     SmartDashboard.putNumber("Shooting P Gain", kP);
-    //     SmartDashboard.putNumber("Shooting Feed Forward", kFF);
-    //     SmartDashboard.putNumber("Shooting Manual Shooter Speed", manualShooterSpeed);
-    // }
+        SmartDashboard.putNumber("SetPoint", setPoint);
+        SmartDashboard.putNumber("ProcessVariable", processVariable);
 
-    // public void PIDPeriodic() {
-    //     // read PID coefficients from SmartDashboard
-    //     double p = SmartDashboard.getNumber("Shooting P Gain", 0);
-    //     double i = SmartDashboard.getNumber("Shooting I Gain", 0);
-    //     double d = SmartDashboard.getNumber("Shooting D Gain", 0);
-    //     double ff = SmartDashboard.getNumber("Shooting Feed Forward", 0);
-    //     manualShooterSpeed = SmartDashboard.getNumber("Shooting Manual Shooter Speed", -0.82);
-    //     // if PID coefficients on SmartDashboard have changed, write new values to
-    //     // controller
-    //     if ((i != kI)) {
-    //         shooterController.setI(i);
-    //         kI = i;
-    //     }
-    //     if ((d != kD)) {
-    //         shooterController.setD(d);
-    //         kD = d;
-    //     }
-    //     if ((p != kP)) {
-    //         shooterController.setP(p);
-    //         kP = p;
-    //     }
-    //     if ((ff != kFF)) {
-    //         shooterController.setFF(ff);
-    //         kFF = ff;
-    //     }
-
-    //     SmartDashboard.putNumber("SetPoint", setPoint);
-    //     SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
-
-    // }
+    }
     ////END: PID
 
     private void setMagazine(boolean running) {
@@ -193,21 +193,19 @@ public class Shooter {
     public void shooterPeriodic() {
         SmartDashboard.putNumber("Balls Stored", ballsStored);
         setShooter(shooterActive);
-        //PIDPeriodic();
+        PIDPeriodic();
         SmartDashboard.putBoolean("Override", safetyOverride);
     }
 
     private void setShooter(boolean running) {
         if (running) {
-            //shooterController.setOutputRange(-1, 0);
             setPoint = shooterSpeed * maxRPM;
-            shooterMotor.set(manualShooterSpeed);
         } else {
             setPoint = 0 * maxRPM;
-            shooterMotor.set(0.0);
-            //shooterController.setOutputRange(0, 0);
         }
-        //shooterController.setReference(setPoint, ControlType.kVelocity);
+        shooterPID.setSetpoint(setPoint);
+        shooterMotor.set(shooterPID.calculate(SmartDashboard.getNumber("ProcessVariable", 0)));
+
     }
 
     public void setShooterSpeed(double distance) {
@@ -236,23 +234,17 @@ public class Shooter {
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
-                    shooterTimer.reset();
-                    shooterTimer.start();
                     shootCase = ShootCase.WARMUP;
                     //DriverStation.reportWarning("Switching to cooldown", false);
 
                     break;
                 case WARMUP: // Shooter speeding up
-                    // if (shooterEncoder.getVelocity() <= setPoint) {
-                    //     shootCase = ShootCase.RUNNING;
-                    // }
-                    if(shooterTimer.get() > 2.0){
+                    if (shooterEncoder.getVelocity() <= setPoint) {
                         shootCase = ShootCase.RUNNING;
                     }
                     break;
 
                 case RUNNING: // Shooter running
-                    shooterTimer.reset();
                     setMagazine(true, -1.0);
                     setIntake(true);
                     if (shootDetector.getDistance() < 7.0) {

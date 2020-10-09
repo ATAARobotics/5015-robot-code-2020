@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import frc.robot.vision.LimeLight;
 
@@ -39,7 +40,7 @@ public class RobotMap {
     //Add shooter and conveyor belt
     private WPI_TalonSRX shootMotor = new WPI_TalonSRX(7);
     private VictorSPX intakeMotor = new VictorSPX(5);
-    //private CANPIDController shootController = shootMotor.getPIDController();
+    private CANCoder shooterEncoder = new CANCoder(9);
 
     // Add climber
     private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
@@ -47,7 +48,6 @@ public class RobotMap {
 
     // Encoders
     // Shooter
-    //private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
 
     //Climber[]
     private CANEncoder climbEncoder = new CANEncoder(climbMotor);
@@ -87,7 +87,7 @@ public class RobotMap {
         limeLight = new LimeLight();
         intakeDetector = new RangeFinder(intakeLaserShark);
         shootDetector = new RangeFinder(shootLaserShark);
-        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, intakeDetector, shootDetector);
+        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, intakeDetector, shootDetector, shooterEncoder);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
         align = new Align(this);
@@ -146,9 +146,9 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the hardware shooter motor.
      */
-    // protected CANSparkMax getShooterMotor() {
-    //     return shootMotor;
-    // }
+    protected WPI_TalonSRX getShooterMotor() {
+        return shootMotor;
+    }
 
     /**
      * For internal use in Shooter.java.
@@ -166,9 +166,9 @@ public class RobotMap {
         return colorSensorHardware;
     } */
 
-    // public CANPIDController getShooterController() {
-    //     return shootController;
-    // }
+    public CANCoder getShooterEncoder() {
+        return shooterEncoder;
+    }
 
      public CANSparkMax getClimberMotor() {
         return climbMotor;
@@ -185,4 +185,5 @@ public class RobotMap {
     public double getDrivetrainTemperature() {
         return (rearRightMotor.getTemperature() + rearLeftMotor.getTemperature() + frontRightMotor.getTemperature() + frontLeftMotor.getTemperature()) / 4;
     }
+
 }
