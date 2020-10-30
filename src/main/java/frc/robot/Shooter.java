@@ -322,7 +322,7 @@ public class Shooter {
         } else {
             return false;
         }*/
-        return false;
+        return true;
     }
 
     //Allow code to control intake motor and solenoid
