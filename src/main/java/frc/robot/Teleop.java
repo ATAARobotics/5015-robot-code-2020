@@ -169,9 +169,9 @@ public class Teleop {
             shooter.setIntakeSpeed(0);
         }
 
-        SmartDashboard.putNumber("Lasershark Intake Distance", intakeDetector.getDistance());
+        //SmartDashboard.putNumber("Lasershark Intake Distance", intakeDetector.getDistance());
 
-        SmartDashboard.putNumber("Lasershark Shooter Distance", shootDetector.getDistance());
+        //SmartDashboard.putNumber("Lasershark Shooter Distance", shootDetector.getDistance());
 
         climber.manualClimb(joysticks.getManualClimb());
 

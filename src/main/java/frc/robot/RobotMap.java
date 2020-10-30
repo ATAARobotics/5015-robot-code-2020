@@ -85,8 +85,8 @@ public class RobotMap {
         swatDrive = new SWATDrive(this);
         //colorSensor = new ColorSensor(this);
         limeLight = new LimeLight();
-        intakeDetector = new RangeFinder(intakeLaserShark);
-        shootDetector = new RangeFinder(shootLaserShark);
+        //intakeDetector = new RangeFinder(intakeLaserShark);
+        //shootDetector = new RangeFinder(shootLaserShark);
         shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, intakeDetector, shootDetector);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);

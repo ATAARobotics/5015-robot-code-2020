@@ -232,7 +232,7 @@ public class Shooter {
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
-            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
+            //DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
@@ -255,13 +255,13 @@ public class Shooter {
                     shooterTimer.reset();
                     setMagazine(true, -1.0);
                     setIntake(true);
-                    if (shootDetector.getDistance() < 7.0) {
+                    /*if (shootDetector.getDistance() < 7.0) {
                         shootCase = ShootCase.BALL_SHOOTING;
-                    }
+                    }*/
 
                     break;
                 case BALL_SHOOTING:
-                    if(shootDetector.getDistance() > 7.0){
+                    /*if(shootDetector.getDistance() > 7.0){
                         shootCase = ShootCase.WARMUP;
                         if (ballsStored >= 1) {
                             ballsStored--;
@@ -271,6 +271,8 @@ public class Shooter {
                         }
 
                     }
+                    */
+                    ballsStored = 0;
                     break;
                 default:
                     DriverStation.reportError(String.format("Invalid Shoot Case: %s", shootCase.toString()), false);
@@ -308,7 +310,7 @@ public class Shooter {
      */
     private boolean getIntakeDectector() {
 
-        if (intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0) {
+        /*if (intakeDetector.getDistance() < 5.0 && intakeDetector.getDistance() != 0.0) {
 
             return true;
 
@@ -319,7 +321,8 @@ public class Shooter {
 
         } else {
             return false;
-        }
+        }*/
+        return false;
     }
 
     //Allow code to control intake motor and solenoid

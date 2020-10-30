@@ -4,13 +4,13 @@ import com.cuforge.libcu.Lasershark;
 
 public class RangeFinder {
 
-    private Lasershark lasershark = null;
+    //private Lasershark lasershark = null;
 
-    public RangeFinder(Lasershark lasershark) {
-        this.lasershark = lasershark;
-    }
+    /*public RangeFinder(Lasershark lasershark) {
+        //this.lasershark = lasershark;
+    }*/
     
-    public double getDistance() {
-        return lasershark.getDistanceInches();
-    }
+    /*public double getDistance() {
+        //return lasershark.getDistanceInches();
+    }*/
 }
