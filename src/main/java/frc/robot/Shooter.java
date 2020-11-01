@@ -3,18 +3,17 @@
 package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.sensors.CANCoder;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 
 /**
  * Ball shooter code
@@ -23,42 +22,34 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  */
 
 enum IntakeCase {
-    WAITING,
-    STARTING,
-    RUNNING,
-    REVERSE,
-    MAGREVERSE,
-    ALLREVERSE,
-    OFF
+    WAITING, STARTING, RUNNING, REVERSE, MAGREVERSE, ALLREVERSE, OFF
 }
 
 enum ShootCase {
-    INITIAL,
-    WARMUP,
-    RUNNING,
-    BALL_SHOOTING
+    INITIAL, WARMUP, RUNNING, BALL_SHOOTING
 }
 
-
 /**
- * The shooter class controls the ball intake, storage, and shooter.
- * It will automatically intake, but not too many balls.
+ * The shooter class controls the ball intake, storage, and shooter. It will
+ * automatically intake, but not too many balls.
  */
 public class Shooter {
 
-    //private final double beltCircumference = 0.0 * Math.PI;
-    //private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
+    // private final double beltCircumference = 0.0 * Math.PI;
+    // private final double magazineTicksPerBall = 0.0 / beltCircumference * 7.5;
 
     private final double magazineSpeed = -0.70;
     private double intakeSpeed = 1.0;
     private double shooterSpeed = 0.82;
     private double manualShooterSpeed = 0.82;
     private boolean shooterActive = false;
-    private CANSparkMax shooterMotor = null;
-    private CANEncoder shooterEncoder = null;
-    private CANPIDController shooterController = null;
-    private VictorSPX magazineMotor = null;
-    private VictorSPX intakeMotor = null;
+    private WPI_TalonSRX shooterMotorMaster = null;
+    private WPI_TalonSRX shooterMotorFollower = null;
+    private SpeedControllerGroup shooterMotors = null;
+    private CANCoder shooterEncoder = null;
+    private PIDController shooterController = null;
+    private WPI_VictorSPX magazineMotor = null;
+    private WPI_VictorSPX intakeMotor = null;
     private RangeFinder intakeDetector = null;
     private RangeFinder shootDetector = null;
     private DoubleSolenoid intakeControl = null;
@@ -69,36 +60,43 @@ public class Shooter {
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
     private double setPoint = 0;
+    private double rpm = 0;
     public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM;
 
     private boolean safetyOverride = false;
+    private double minOutput = kMinOutput;
+    private double maxOutput = kMaxOutput;
 
     /**
-     * Constructs a shooter object with the motors for the shooter and the intake/conveyor,
-     * as well as the lasershark for the intake.
-     * @param shooterMotor The motor that shoots balls
+     * Constructs a shooter object with the motors for the shooter and the
+     * intake/conveyor, as well as the lasershark for the intake.
+     *
+     * @param shooterMotor  The motor that shoots balls
      * @param magazineMotor The magazine motor
-     * @param intakeMotor The intake motor
+     * @param intakeMotor   The intake motor
      */
-    public Shooter(CANSparkMax shooterMotor, VictorSPX magazineMotor, VictorSPX intakeMotor, DoubleSolenoid intakeControl, CANEncoder shooterEncoder,
-        RangeFinder intakeDetector, RangeFinder shootDetector, CANPIDController shooterController) {
-        this.shooterMotor = shooterMotor;
+    public Shooter(WPI_TalonSRX shooterMotorMaster, WPI_TalonSRX shooterMotorFollower, SpeedControllerGroup shooterMotor, WPI_VictorSPX magazineMotor, WPI_VictorSPX intakeMotor,
+            DoubleSolenoid intakeControl, CANCoder shooterEncoder,
+            RangeFinder intakeDetector, RangeFinder shootDetector) {
+
+        this.shooterMotors = shooterMotor;
         this.magazineMotor = magazineMotor;
         this.intakeMotor = intakeMotor;
-        this.shooterEncoder = shooterEncoder;
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
-        this.shooterController = shooterController;
         this.intakeControl = intakeControl;
+        shooterController = new PIDController(kP, kI, kD);
+        this.shooterMotorMaster = shooterMotorMaster;
+        this.shooterMotorFollower = shooterMotorMaster;
     }
 
     /**
      * Sets the intake on or off, uses intakeSpeed for the power if on.
      * @param running Whether the intake wheels should be spinning
      */
-    
+
      ////START: PID
-    public void PIDInit() {
+    public void ShooterInit() {
         // set PID coefficients
         kP = 0.0007;
         kI = 0.0000002;
@@ -110,13 +108,34 @@ public class Shooter {
 
         kMaxOutput = 1;
         kMinOutput = 0;
-        maxRPM = 5600;
+        maxRPM = 10000;
         shooterController.setP(kP);
         shooterController.setI(kI);
         shooterController.setD(kD);
-        shooterController.setIZone(kIz);
+        /*shooterController.setIZone(kIz);
         shooterController.setFF(kFF);
-        shooterController.setOutputRange(kMinOutput, kMaxOutput);
+        shooterController.setOutputRange(kMinOutput, kMaxOutput);*/
+
+        shooterMotorMaster.enableCurrentLimit(true);
+        //Reset all settings - Optional
+        shooterMotorMaster.configFactoryDefault();
+
+        //Current Settings - Optional: Are persistent and can be done from Tuner
+        shooterMotorMaster.configContinuousCurrentLimit(35);
+        shooterMotorMaster.configPeakCurrentDuration(0);
+        shooterMotorMaster.configPeakCurrentLimit(35);
+
+        //Reset all settings - Optional
+        shooterMotorFollower.configFactoryDefault();
+
+        //Current Settings - Optional: Are persistent and can be done from Tuner
+        shooterMotorFollower.configContinuousCurrentLimit(35);
+        shooterMotorFollower.configPeakCurrentDuration(0);
+        shooterMotorFollower.configPeakCurrentLimit(35);
+
+        //enable limit - Mandatory: must be done from API during RobotInit
+        shooterMotorMaster.enableCurrentLimit(true);
+        shooterMotorFollower.enableCurrentLimit(true);
 
         // display PID coefficients on SmartDashboard
         SmartDashboard.putNumber("Shooting I Gain", kI);
@@ -126,12 +145,12 @@ public class Shooter {
         SmartDashboard.putNumber("Shooting Manual Shooter Speed", manualShooterSpeed);
     }
 
-    public void PIDPeriodic() {
+    public double PIDPeriodic() {
         // read PID coefficients from SmartDashboard
         double p = SmartDashboard.getNumber("Shooting P Gain", 0);
         double i = SmartDashboard.getNumber("Shooting I Gain", 0);
         double d = SmartDashboard.getNumber("Shooting D Gain", 0);
-        double ff = SmartDashboard.getNumber("Shooting Feed Forward", 0);
+        //double ff = SmartDashboard.getNumber("Shooting Feed Forward", 0);
         manualShooterSpeed = SmartDashboard.getNumber("Shooting Manual Shooter Speed", 0.85);
         // if PID coefficients on SmartDashboard have changed, write new values to
         // controller
@@ -147,13 +166,23 @@ public class Shooter {
             shooterController.setP(p);
             kP = p;
         }
-        if ((ff != kFF)) {
+        /*if ((ff != kFF)) {
             shooterController.setFF(ff);
             kFF = ff;
-        }
+        }*/
 
         SmartDashboard.putNumber("SetPoint", setPoint);
-        SmartDashboard.putNumber("ProcessVariable", shooterEncoder.getVelocity());
+        SmartDashboard.putNumber("ProcessVariable", rpm);
+        double speed = shooterController.calculate(rpm, setPoint);
+        if(speed > kMaxOutput) {
+            speed = maxOutput;
+        }
+
+        else if(speed < kMinOutput) {
+            speed = minOutput;
+        }
+
+        return speed;
 
     }
     ////END: PID
@@ -190,20 +219,22 @@ public class Shooter {
     ////START: Shooter
     public void shooterPeriodic() {
         SmartDashboard.putNumber("Balls Stored", ballsStored);
-        setShooter(shooterActive);
-        PIDPeriodic();
         SmartDashboard.putBoolean("Override", safetyOverride);
+        setShooter(shooterActive);
+        shooterMotors.set(PIDPeriodic());
+
     }
 
     private void setShooter(boolean running) {
         if (running) {
-            shooterController.setOutputRange(kMinOutput, kMaxOutput);
+            minOutput = kMinOutput;
+            maxOutput = kMaxOutput;
             setPoint = shooterSpeed * maxRPM;
         } else {
             setPoint = 0 * maxRPM;
-            shooterController.setOutputRange(0, 0);
+            minOutput = 0;
+            maxOutput = 0;
         }
-        shooterController.setReference(setPoint, ControlType.kVelocity);
     }
 
     public void setShooterSpeed(double distance) {
@@ -224,7 +255,7 @@ public class Shooter {
 
             shooterSpeed = speed;
     }
-    
+
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
@@ -274,14 +305,14 @@ public class Shooter {
         }
     }
     ////END: Shooter
-    
+
     /**
      * Sets the amount of balls stored for a user-override.
      */
     public void setBallsStored(int ballsStored) {
         this.ballsStored = ballsStored;
     }
-    
+
     public double getBallsStored() {
 		return ballsStored;
     }
@@ -311,7 +342,7 @@ public class Shooter {
             return false;
         }
     }
-   
+
     //Allow code to control intake motor and solenoid
     private void setIntake(boolean running) {
         if(running) {
@@ -416,7 +447,7 @@ public class Shooter {
     public void setIntakeSpeed(double speed){
         intakeSpeed = speed;
     }
-    
+
     public void reverseIntake(){
         if(intakeCase != IntakeCase.OFF){
             if(intakeCase != IntakeCase.REVERSE && intakeCase != IntakeCase.ALLREVERSE){
@@ -427,9 +458,9 @@ public class Shooter {
         }
         System.out.println("INTAKE CASE: " + intakeCase);
     }
-    
+
     public double getTemperature() {
-        return shooterMotor.getMotorTemperature();
+        return (shooterMotorMaster.getTemperature() + shooterMotorFollower.getTemperature())/2;
     }
-    
+
 }

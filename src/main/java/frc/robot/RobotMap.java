@@ -3,9 +3,9 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
+import com.ctre.phoenix.sensors.CANCoder;
 import com.cuforge.libcu.Lasershark;
 import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -34,12 +34,14 @@ public class RobotMap {
     private SpeedControllerGroup rightMotors = new SpeedControllerGroup(rearRightMotor, frontRightMotor); // Group
     private SpeedControllerGroup leftMotors = new SpeedControllerGroup(rearLeftMotor, frontLeftMotor); // Group
     //Ball magazine
-    private VictorSPX magazineMotor = new VictorSPX(6);
+    private WPI_VictorSPX magazineMotor = new WPI_VictorSPX(6);
 
     //Add shooter and conveyor belt
-    private CANSparkMax shootMotor = new CANSparkMax(7, MotorType.kBrushless);
-    private VictorSPX intakeMotor = new VictorSPX(5);
-    private CANPIDController shootController = shootMotor.getPIDController();
+    private WPI_TalonSRX shootMotorMaster = new WPI_TalonSRX(7);
+    private WPI_TalonSRX shootMotorFollower = new WPI_TalonSRX(8);
+    private SpeedControllerGroup shootMotors = new SpeedControllerGroup(shootMotorMaster, shootMotorFollower);
+    private WPI_VictorSPX intakeMotor = new WPI_VictorSPX(5);
+    //private CANPIDController shootController = shootMotor.getPIDController();
 
     // Add climber
     private CANSparkMax climbMotor = new CANSparkMax(10, MotorType.kBrushless);
@@ -47,7 +49,7 @@ public class RobotMap {
 
     // Encoders
     // Shooter
-    private CANEncoder shooterEncoder = new CANEncoder(shootMotor);
+    private CANCoder shooterEncoder = new CANCoder(9);
 
     //Climber
     private CANEncoder climbEncoder = new CANEncoder(climbMotor);
@@ -87,7 +89,7 @@ public class RobotMap {
         limeLight = new LimeLight();
         intakeDetector = new RangeFinder(intakeLaserShark);
         shootDetector = new RangeFinder(shootLaserShark);
-        shooter = new Shooter(shootMotor, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, intakeDetector, shootDetector, shootController);
+        shooter = new Shooter(shootMotorMaster, shootMotorFollower, shootMotors, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, intakeDetector, shootDetector);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
         align = new Align(this);
@@ -138,7 +140,7 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the hardware encoder on the shooter motor.
      */
-    protected CANEncoder getShooterEncoder() {
+    protected CANCoder getShooterEncoder() {
         return shooterEncoder;
     }
 
@@ -146,8 +148,8 @@ public class RobotMap {
      * For internal use in Shooter.java.
      * Returns the hardware shooter motor.
      */
-    protected CANSparkMax getShooterMotor() {
-        return shootMotor;
+    protected SpeedControllerGroup getShooterMotorMaster() {
+        return shootMotors;
     }
 
     /**
@@ -166,9 +168,9 @@ public class RobotMap {
         return colorSensorHardware;
     } */
 
-    public CANPIDController getShooterController() {
+    /*public CANPIDController getShooterController() {
         return shootController;
-    }
+    }*/
 
      public CANSparkMax getClimberMotor() {
         return climbMotor;

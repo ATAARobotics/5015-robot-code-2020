@@ -69,6 +69,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotInit() {
+
         Map<String, Object> properties = new HashMap<String, Object>();
         properties.put("Min Value", 0);
         properties.put("Max Value", 70);
@@ -76,7 +77,7 @@ public class Robot extends TimedRobot {
         properties.put("Angle Range", 180);
         properties.put("Color", "green");
         properties.put("Threshold Color", "red");
-        
+
         Map<String, Object> propertiesBattery = new HashMap<String, Object>();
         propertiesBattery.put("Min Value", 0);
         propertiesBattery.put("Max Value", 100);
@@ -90,7 +91,7 @@ public class Robot extends TimedRobot {
         .withWidget("Temperature Gauge") // specify the widget here
         .withProperties(properties)
         .getEntry();
-                
+
         shooterTemp = Shuffleboard.getTab("Dashboard Refresh")
             .add("Shooter Temperature", shooter.getTemperature())
             .withWidget("Temperature Gauge") // specify the widget here
@@ -122,7 +123,7 @@ public class Robot extends TimedRobot {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            
+
         }
         autoPicker.setDefaultOption("Default Auto", "Default");
         SmartDashboard.putData("Auto Selector", autoPicker);
@@ -137,7 +138,7 @@ public class Robot extends TimedRobot {
 
         SmartDashboard.putNumber("Balls Stored", 3.0);
 
-        robotMap.shooter.PIDInit();
+        robotMap.shooter.ShooterInit();
 
         teleop.teleopInit();
         robotMap.limeLight.setCameraMode(CameraMode.Drive);
