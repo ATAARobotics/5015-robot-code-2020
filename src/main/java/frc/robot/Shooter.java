@@ -52,8 +52,8 @@ public class Shooter {
 
     private final double magazineSpeed = -0.25;
     private double intakeSpeed = 1.0;
-    private double shooterSpeed = 0.82;
-    private double manualShooterSpeed = 0.82;
+    private double shooterSpeed = 0.75;
+    private double manualShooterSpeed = 0.75;
     private boolean shooterActive = false;
     private WPI_TalonSRX shooterMotor = null;
     private CANEncoder shooterEncoder = null;
