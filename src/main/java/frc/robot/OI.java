@@ -16,6 +16,7 @@ class OI {
     private boolean climbRelease;
     private boolean intakeToggle;
     private boolean intakeReverse;
+    private boolean hoodToggle;
     private boolean magazineReverse;
     private boolean resetBalls;
 
@@ -35,7 +36,7 @@ class OI {
 
         gearShift = driveStick.getXButtonReleased();
         slow = driveStick.getAButtonReleased();
-        
+
         manualClimb = driveStick.getBumper(Hand.kLeft) && driveStick.getBumper(Hand.kRight);
 
         //climbToggle = driveStick.getBumperReleased(Hand.kLeft);
@@ -47,9 +48,10 @@ class OI {
         manualShoot = gunnerStick.getYButton();
         distShoot = gunnerStick.getAButton();
         intakeToggle = gunnerStick.getBumperReleased(Hand.kRight);
+        hoodToggle = gunnerStick.getBumperReleased(Hand.kLeft);
         intakeReverse = gunnerStick.getXButtonReleased();
         magazineReverse = gunnerStick.getBackButton();
-         
+
 
         //Switch statement to determine controls for the driver
         switch (driverScheme) {
@@ -139,6 +141,9 @@ class OI {
     }
     public boolean getIntakeReverse(){
         return intakeReverse;
+    }
+    public boolean getHoodToggle(){
+        return hoodToggle;
     }
     public boolean getMagazineReverse(){
         return magazineReverse;

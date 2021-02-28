@@ -153,6 +153,9 @@ public class Teleop {
                 if(joysticks.getIntakeReverse()){
                     shooter.reverseIntake();
                 }
+                if(joysticks.getHoodToggle()){
+                    shooter.toggleHood();
+                }
                 shooter.reverseMagazine(joysticks.getMagazineReverse());
                 if(joysticks.getGearShift()) {
                     driveTrain.gearShift();

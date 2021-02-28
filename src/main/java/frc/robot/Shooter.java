@@ -53,9 +53,11 @@ public class Shooter {
     private RangeFinder intakeDetector = null;
     private RangeFinder shootDetector = null;
     private DoubleSolenoid intakeControl = null;
+    private DoubleSolenoid hoodControl = null;
 
     private Timer magazineTimer = new Timer();
 
+    private boolean hoodForward = false;
     private double ballsStored = 3;
     private IntakeCase intakeCase = IntakeCase.WAITING;
     private ShootCase shootCase = ShootCase.INITIAL;
@@ -76,7 +78,7 @@ public class Shooter {
      * @param intakeMotor   The intake motor
      */
     public Shooter(WPI_TalonSRX shooterMotorMaster, WPI_TalonSRX shooterMotorFollower, SpeedControllerGroup shooterMotor, WPI_VictorSPX magazineMotor, WPI_VictorSPX intakeMotor,
-            DoubleSolenoid intakeControl, CANCoder shooterEncoder,
+            DoubleSolenoid intakeControl, DoubleSolenoid hoodControl, CANCoder shooterEncoder,
             RangeFinder intakeDetector, RangeFinder shootDetector) {
 
         this.shooterMotors = shooterMotor;
@@ -85,6 +87,8 @@ public class Shooter {
         this.intakeDetector = intakeDetector;
         this.shootDetector = shootDetector;
         this.intakeControl = intakeControl;
+        this.hoodControl = hoodControl;
+        this.shooterEncoder = shooterEncoder;
         shooterController = new PIDController(kP, kI, kD);
         this.shooterMotorMaster = shooterMotorMaster;
         this.shooterMotorFollower = shooterMotorMaster;
@@ -457,6 +461,23 @@ public class Shooter {
             }
         }
         System.out.println("INTAKE CASE: " + intakeCase);
+    }
+
+    public void setHood(boolean forward){
+        if(forward){
+            hoodControl.set(Value.kForward);
+            hoodForward = true;
+        }else{
+            hoodControl.set(Value.kReverse);
+            hoodForward = false;
+        }
+    }
+    public void toggleHood(){
+        if(hoodForward){
+            setHood(false);
+        }else{
+            setHood(true);
+        }
     }
 
     public double getTemperature() {

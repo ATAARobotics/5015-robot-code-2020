@@ -37,8 +37,8 @@ public class RobotMap {
     private WPI_VictorSPX magazineMotor = new WPI_VictorSPX(6);
 
     //Add shooter and conveyor belt
-    private WPI_TalonSRX shootMotorMaster = new WPI_TalonSRX(7);
-    private WPI_TalonSRX shootMotorFollower = new WPI_TalonSRX(8);
+    private WPI_TalonSRX shootMotorMaster = new WPI_TalonSRX(8);
+    private WPI_TalonSRX shootMotorFollower = new WPI_TalonSRX(7);
     private SpeedControllerGroup shootMotors = new SpeedControllerGroup(shootMotorMaster, shootMotorFollower);
     private WPI_VictorSPX intakeMotor = new WPI_VictorSPX(5);
     //private CANPIDController shootController = shootMotor.getPIDController();
@@ -60,6 +60,7 @@ public class RobotMap {
     // Pneumatics
     private DoubleSolenoid gearShiftSolenoid = new DoubleSolenoid(0, 1);
     private DoubleSolenoid intakeSolenoid = new DoubleSolenoid(6, 7);
+    private DoubleSolenoid hoodSolenoid = new DoubleSolenoid(2, 3);
 
     // Gyro
     private Gyro NavX = new Gyro();
@@ -89,7 +90,7 @@ public class RobotMap {
         limeLight = new LimeLight();
         intakeDetector = new RangeFinder(intakeLaserShark);
         shootDetector = new RangeFinder(shootLaserShark);
-        shooter = new Shooter(shootMotorMaster, shootMotorFollower, shootMotors, magazineMotor, intakeMotor, intakeSolenoid, shooterEncoder, intakeDetector, shootDetector);
+        shooter = new Shooter(shootMotorMaster, shootMotorFollower, shootMotors, magazineMotor, intakeMotor, intakeSolenoid, hoodSolenoid, shooterEncoder, intakeDetector, shootDetector);
         driveEncoders = new Encoders(rearLeftMotor, rearRightMotor);
         climber = new Climber(this);
         align = new Align(this);
