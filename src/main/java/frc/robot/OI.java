@@ -69,7 +69,7 @@ class OI {
         switch (gunnerScheme) {
             case "Fun Mode":
 
-                discoToggle = gunnerStick.getStartButtonReleased();
+                discoToggle = gunnerStick.getBackButtonReleased();
                 break;
 
             default:

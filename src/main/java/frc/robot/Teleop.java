@@ -125,7 +125,7 @@ public class Teleop {
                 if(distShootActive) {
                     shooter.setShooterSpeed(alignment.getDistance()-2);
                     if (shooter.getBallsStored() > 0) {
-                        shooter.shoot(true);
+                        shooter.setHood(true);
                     }
                 }
                 else {

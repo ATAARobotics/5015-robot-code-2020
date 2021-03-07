@@ -40,8 +40,8 @@ public class Shooter {
 
     private final double magazineSpeed = -0.70;
     private double intakeSpeed = 1.0;
-    private double shooterSpeed = 0.82;
-    private double manualShooterSpeed = 0.82;
+    private double shooterSpeed = 0.7;
+    private double manualShooterSpeed = 0.7;
     private boolean shooterActive = false;
     private WPI_TalonSRX shooterMotorMaster = null;
     private WPI_TalonSRX shooterMotorFollower = null;
@@ -102,9 +102,9 @@ public class Shooter {
      ////START: PID
     public void ShooterInit() {
         // set PID coefficients
-        kP = 0.0007;
-        kI = 0.0000002;
-        kD = 0.1;
+        kP = 0.002;
+        kI = 0.0000008;
+        kD = 0.0;
         kIz = 0;
 
         //Max rpm
@@ -174,10 +174,11 @@ public class Shooter {
             shooterController.setFF(ff);
             kFF = ff;
         }*/
-
+        rpm = -(shooterEncoder.getVelocity())/360;
         SmartDashboard.putNumber("SetPoint", setPoint);
         SmartDashboard.putNumber("ProcessVariable", rpm);
         double speed = shooterController.calculate(rpm, setPoint);
+        SmartDashboard.putNumber("Shooter Speed", speed);
         if(speed > kMaxOutput) {
             speed = maxOutput;
         }
@@ -211,7 +212,7 @@ public class Shooter {
         } else if ((intakeCase == IntakeCase.MAGREVERSE || intakeCase == IntakeCase.ALLREVERSE) && !reverse) {
             intakeCase = IntakeCase.WAITING;
         }
-        System.out.println("INTAKE CASE: " + intakeCase);
+        //System.out.println("INTAKE CASE: " + intakeCase);
     }
 
     /**
@@ -263,7 +264,7 @@ public class Shooter {
     public void shoot(boolean active) {
         if (active) {
             DriverStation.reportWarning(String.format("Shoot Case: %s", shootCase.toString()), false);
-            DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
+            //DriverStation.reportWarning("Shooter LZRSHRK Distance: " + shootDetector.getDistance(), false);
             switch (shootCase) {
                 case INITIAL: // Shooter was not active last tick
                     shooterActive = true;
@@ -272,7 +273,7 @@ public class Shooter {
 
                     break;
                 case WARMUP: // Shooter speeding up
-                    if (shooterEncoder.getVelocity() >= setPoint) {
+                    if (rpm >= (setPoint * 0.95)) {
                         shootCase = ShootCase.RUNNING;
                     }
                     break;
